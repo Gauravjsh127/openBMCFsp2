@@ -1,4 +1,4 @@
-MACHINE ??= "qemuarm"
+MACHINE ??= "fsp2"
 DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
@@ -16,8 +16,252 @@ BB_DISKMON_DIRS = "\
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
 INHERIT += "extrausers"
-EXTRA_USERS_PARAMS = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
-  "
-MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
+
+################ kernel ############################################
+IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
+
+
+################ Drivers ############################################
+IMAGE_INSTALL_append = "sample-driver "
+
+##1 fsptrace ######
+IMAGE_INSTALL_append = "fsptrace "
+
+##2 PSI ######
+IMAGE_INSTALL_append +="psi"
+
+##3 IBM utils ######
+IMAGE_INSTALL_append +="ibmutils"
+
+##4 DMA ######
+IMAGE_INSTALL_append +="basedma"
+IMAGE_INSTALL_append +="hostdma"
+IMAGE_INSTALL_append +="memdma"
+
+##5 IOMUX ######
+IMAGE_INSTALL_append +="iomux"
+
+##6 Jtag ######
+IMAGE_INSTALL_append +="jtag"
+
+##7 ngfsi ######
+IMAGE_INSTALL_append +="ngfsi"
+
+##8 scanfsi ######
+IMAGE_INSTALL_append +="scanfsi"
+
+##9 scomfsi ######
+IMAGE_INSTALL_append +="scomfsi"
+
+##10 sfc ######
+IMAGE_INSTALL_append +="sfc"
+
+##11 scratchpad ######
+IMAGE_INSTALL_append +="scratchpad"
+
+##12 mbx ######
+IMAGE_INSTALL_append +="mbx"
+
+##13 iic ######
+IMAGE_INSTALL_append +="iic"
+
+##14 dra ######
+IMAGE_INSTALL_append +="dra"
+
+##15 dra ######
+IMAGE_INSTALL_append +="ibmuart"
+
+##16 Gpio ######
+IMAGE_INSTALL_append +="gpio"
+
+##17 sbefifo ######
+IMAGE_INSTALL_append +="sbefifo"
+
+################ ADALS ############################################
+
+## ADAL Header files ######
+IMAGE_INSTALL_append += "adal-headerfiles adal-headerfiles-dev "
+
+## 1 fsptrace ######
+IMAGE_INSTALL_append +="fsptrace-adal fsptrace-adal-staticdev fsptrace-adal-dev "
+IMAGE_INSTALL_append +="libtrex libtrex-dev "
+
+##2 SCAN ######
+IMAGE_INSTALL_append += "scan-adal scan-adal-dev "
+
+##3 SCOM ######
+IMAGE_INSTALL_append += "scom-adal scom-adal-dev "
+
+##4 BASE ######
+IMAGE_INSTALL_append += "base-adal base-adal-dev "
+
+##5 FSI ######
+IMAGE_INSTALL_append += "fsi-adal fsi-adal-dev "
+
+##6 IOMUX ######
+IMAGE_INSTALL_append += "iomux-adal iomux-adal-dev "
+
+##7 dd-ddfc ######
+IMAGE_INSTALL_append += "dd-ffdc-adal dd-ffdc-adal-dev "
+
+##8 PSI ######
+IMAGE_INSTALL_append += "psi-adal psi-adal-dev "
+
+##9 IIC ######
+IMAGE_INSTALL_append += "iic-master-adal iic-master-adal-dev "
+IMAGE_INSTALL_append += "iic-slave-adal iic-slave-adal-dev "
+
+##10 mbx ######
+IMAGE_INSTALL_append += "mbx-adal mbx-adal-dev "
+
+##11 PCI ######
+IMAGE_INSTALL_append += "pci-adal pci-adal-dev "
+
+##12 RTC ######
+IMAGE_INSTALL_append += "rtc-adal rtc-adal-dev "
+
+##13 Scratchpad ######
+IMAGE_INSTALL_append += "scratchpad-adal scratchpad-adal-dev "
+
+##14 Tone ######
+IMAGE_INSTALL_append += "tone-adal tone-adal-dev "
+
+##15 SFC ######
+IMAGE_INSTALL_append += "sfc-adal sfc-adal-dev "
+
+##16 Hostdma ######
+IMAGE_INSTALL_append += "hostdma-adal hostdma-adal-dev "
+
+##17 UART ######
+IMAGE_INSTALL_append += "uart-adal uart-adal-dev "
+
+##18 JTAG ######
+IMAGE_INSTALL_append += "jtag-adal jtag-adal-dev "
+
+##19 GPIO ######
+IMAGE_INSTALL_append += "gpio-adal gpio-adal-dev "
+
+##20 GPIO ######
+IMAGE_INSTALL_append += "lua-bbutils-adal lua-bbutils-adal-dev "
+
+##21 PCI ######
+IMAGE_INSTALL_append += "pci-adal pci-adal-dev "
+
+##22 SBEFIFO ######
+IMAGE_INSTALL_append += "sbefifo-adal sbefifo-adal-dev "
+
+################ FLD Additional packages ############################################
+
+IMAGE_INSTALL_append += "apps-headerfiles  apps-headerfiles-dev "
+
+IMAGE_INSTALL_append += "sqlite3 "
+
+IMAGE_INSTALL_append += "fuse fuse-dev "
+IMAGE_INSTALL_append += "libtirpc libtirpc-dev "
+
+IMAGE_INSTALL_append += "rpcbind rpcbind-dev "
+
+IMAGE_INSTALL_append = " kernel-modules "
+
+EXTRA_IMAGE_FEATURES += "tools-debug"
+
+IMAGE_INSTALL_append +=" gdb gdbserver libatomic "
+
+
+IMAGE_INSTALL_append += "trace-collect "
+
+## Pscn and FLD Libraries AND BINARIES ######
+
+IMAGE_INSTALL_append += "additional-rootfs "
+
+IMAGE_INSTALL_append += "ppcdbg ppcdbg-dev "
+
+IMAGE_INSTALL_append += "fpart "
+
+IMAGE_INSTALL_append += "fcp "
+
+IMAGE_INSTALL_append += "aeea aeea-dev "
+
+IMAGE_INSTALL_append += "fld-libs fld-libs-dev "
+
+IMAGE_INSTALL_append += "dbgx dbgx-dev "
+
+IMAGE_INSTALL_append += "clib clib-dev "
+
+IMAGE_INSTALL_append += "ffs ffs-dev "
+
+IMAGE_INSTALL_append += "spinor spinor-dev "
+
+IMAGE_INSTALL_append += "ffsfs "
+
+IMAGE_INSTALL_append += "bootenvfld "
+
+IMAGE_INSTALL_append += "fsp-trace "
+
+IMAGE_INSTALL_append += "tiny-kmsglogd "
+
+IMAGE_INSTALL_append += "tiny-syslogd "
+
+IMAGE_INSTALL_append += "zeromq zeromq-dev "
+
+################ openBMC packages ############################################
+
+IMAGE_INSTALL_append += "libstdc++ "
+
+IMAGE_INSTALL_append += " kmod rpm "
+
+IMAGE_INSTALL_append += " makedumpfile makedumpfile-dev "
+
+IMAGE_INSTALL_append += " openldap openldap-dev lua acl   "
+
+#IMAGE_INSTALL_append += " gnutils "
+
+#IMAGE_INSTALL_append += " glibc "
+
+IMAGE_INSTALL_append += " libidn gmp nettle libcap "
+
+IMAGE_INSTALL_append += " libgpg-error libgcrypt  "
+
+IMAGE_INSTALL_append += " libpam pam-plugin-succeed-if pam-plugin-access "
+
+##libpam check this package image
+
+IMAGE_INSTALL_append += "net-snmp net-snmp-dev "
+
+IMAGE_INSTALL_append += "registry "
+
+IMAGE_INSTALL_append += "openssh openssh-dev "
+
+IMAGE_INSTALL_append += "glibc glibc-dev "
+
+IMAGE_INSTALL_append += "util-linux util-linux-dev "
+
+IMAGE_INSTALL_append += "tcpdump tcpdump-dev "
+
+IMAGE_INSTALL_append += "pciutils pciutils-dev "
+
+IMAGE_INSTALL_append += "net-tools net-tools-dev "
+
+IMAGE_INSTALL_append += "krb5 krb5-dev "
+
+IMAGE_INSTALL_append += "xz xz-dev "
+
+IMAGE_INSTALL_append += "lua lua-dev "
+
+IMAGE_INSTALL_append += "libbz2 "
+
+IMAGE_INSTALL_append += "elfutils elfutils-dev "
+
+IMAGE_INSTALL_append += "libcap-ng libcap-ng-dev "
+
+IMAGE_INSTALL_append += "libxml2 liburcu "
+
+IMAGE_INSTALL_append += "audit "
+
+IMAGE_INSTALL_append += "ifenslave ethtool kexec-tools "
+
+IMAGE_INSTALL_append += "udev "
+
+IMAGE_INSTALL_append += "trace-cmd "
+
 

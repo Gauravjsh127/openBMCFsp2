@@ -8,6 +8,11 @@ BBFILES ?= ""
 BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-poky \
+  ##OEROOT##/meta-openbmc-bsp/meta-ibm/meta-fsp2 \
+  ##OEROOT##/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-drivers \
+  ##OEROOT##/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-adals \
+  ##OEROOT##/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps \  
+  ##OEROOT##/import-layers/meta-openembedded/meta-filesystems/   \
   ##OEROOT##/import-layers/meta-openembedded/meta-oe \
   ##OEROOT##/import-layers/meta-openembedded/meta-networking \
   ##OEROOT##/import-layers/meta-openembedded/meta-python \
