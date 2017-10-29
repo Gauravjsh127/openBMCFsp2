@@ -13,7 +13,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'm32', ' -m32', '', d)}"
 TUNE_ARCH .= "${@bb.utils.contains('TUNE_FEATURES', 'm32', 'powerpc', '', d)}"
 
 TUNEVALID[fpu-hard] = "Use hardware FPU."
-TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-hard', ' -mhard-float', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', ' -msoft-float', '', d)}"
 
 TUNEVALID[fpu-soft] = "Use software FPU."
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', ' -msoft-float', '', d)}"
@@ -28,7 +28,7 @@ BASE_LIB_tune-powerpc-nf = "lib"
 TUNE_PKGARCH_tune-powerpc-nf = "powerpc-nf"
 PACKAGE_EXTRA_ARCHS_tune-powerpc-nf = "powerpc-nf"
 
-TUNE_FEATURES_tune-powerpc = "m32 fpu-hard"
+TUNE_FEATURES_tune-powerpc = "m32 fpu-soft"
 BASE_LIB_tune-powerpc = "lib"
 TUNE_PKGARCH_tune-powerpc = "powerpc"
 PACKAGE_EXTRA_ARCHS_tune-powerpc = "powerpc"
