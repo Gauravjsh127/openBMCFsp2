@@ -1,0 +1,302 @@
+diff --git a/arch/powerpc/boot/dts/fsp2.dts b/arch/powerpc/boot/dts/fsp2.dts
+index 6a63026..0649120 100644
+--- a/arch/powerpc/boot/dts/fsp2.dts
++++ b/arch/powerpc/boot/dts/fsp2.dts
+@@ -389,6 +389,14 @@
+ 			  0x80000000 0x00000010 0x80000000 0x80000000>;
+ 		clock-frequency = <333333334>;
+ 
++		buddy-reset-irq {
++			compatible = "ibm,buddy-reset-irq";
++
++			#interrupt-cells = <2>;
++			interrupt-parent = <&UIC1_5>;
++			interrupts = <27 0x84>;
++		};
++
+ 		plb6-system-hung-irq {
+ 			compatible = "ibm,bus-error-irq";
+ 			#interrupt-cells = <2>;
+@@ -452,6 +460,15 @@
+ 			interrupts = <17 0x84>;
+ 		};
+ 
++
++               RTC: rtc {
++                       device_type = "rtc";
++                       compatible = "ibm,rtc-fsp2";
++                       iic-dev-width = <1>;
++                       iic-slave-addr = <0xD0>;
++                       iic-eng-num = <0x0>;
++               };
++
+ 		MAL0: mcmal0 {
+ 			#interrupt-cells = <1>;
+ 			#address-cells = <0>;
+@@ -487,7 +504,137 @@
+ 					 /*TXDE*/  3 &UIC1_2 14 0x4
+ 					 /*RXDE*/  4 &UIC1_2 13 0x4>;
+ 		};
++                PSI: psimaster {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,psi";
++
++                        interrupt-parent = <&PSI>;
++                        interrupts = <0 1 2 3>;
++                        /* index interrupt-parent interrupt# type */
++                        interrupt-map = </*Link 0*/ 0 &UIC1_1 1 0x4
++					 /*Link 1*/ 1 &UIC1_1 2 0x4
++					 /*Link 2*/ 2 &UIC1_1 3 0x4
++					 /*Link 3*/ 3 &UIC1_1 4 0x4>;
++		};
++
++                MBX: zhost {
++                        #interrupt-cells = <1>;
++                        #address-cells = <0>;
++                        #size-cells = <0>;
++                        compatible = "ibm,psi-mbx";
++                        type = "ZHOST";
++                        interrupt-parent = <&MBX>;
++                        interrupts = <0 1 2 3>; 
++                        /* index interrupt-parent interrupt# type */
++                        interrupt-map = </*Link 0*/ 0 &UIC1_3 8 0x4 
++                                         /*Link 1*/ 1 &UIC1_3 9 0x4 
++                                         /*Link 2*/ 2 &UIC1_3 10 0x4 
++                                         /*Link 3*/ 3 &UIC1_3 11 0x4>;
++                };  
++
++		EDMA0: dma.0 {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,edma";
++			dcr-reg = <0x180 0x40>;
++			channels = <4>;
++			logical_id = <0>;
++			type = "FSI";
++			interrupt-parent = <&EDMA0>;
++			interrupts = <0 1 2 3>;
++			/* index interrupt-parent interrupt# type */
++			interrupt-map = < /* chnl_0 */ 0 &UIC1_1  28 0x4
++					  /* chnl_1 */ 1 &UIC1_1  29 0x4
++					  /* chnl_2 */ 2 &UIC1_1  30 0x4
++					  /* chnl_3 */ 3 &UIC1_1  31 0x4>;
++		};
++
++		EDMA1: dma.1 {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,edma";
++			dcr-reg = <0x1C0 0x40>;
++			channels = <4>;
++			logical_id = <1>;
++			type = "FSI";
++			interrupt-parent = <&EDMA1>;
++			interrupts = <0 1 2 3>;
++			/* index interrupt-parent interrupt# type */
++			interrupt-map = < /* chnl_0 */ 0 &UIC1_1  24 0x4
++					  /* chnl_1 */ 1 &UIC1_1  25 0x4
++					  /* chnl_2 */ 2 &UIC1_1  26 0x4
++					  /* chnl_3 */ 3 &UIC1_1  27 0x4>;
++		};
++
++		EDMA2: dma.2 {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,edma";
++			dcr-reg = <0x200 0x40>;
++			channels = <4>;
++			logical_id = <2>;
++			type = "FSI";
++			interrupt-parent = <&EDMA2>;
++			interrupts = <0 1 2 3>;
++			/* index interrupt-parent interrupt# type */
++			interrupt-map = < /* chnl_0 */ 0 &UIC1_1  20 0x4
++					  /* chnl_1 */ 1 &UIC1_1  21 0x4
++					  /* chnl_2 */ 2 &UIC1_1  22 0x4
++					  /* chnl_3 */ 3 &UIC1_1  23 0x4>;
++		};
++
++		EDMA3: dma.3 {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,edma";
++			dcr-reg = <0x240 0x40>;
++			channels = <4>;
++			logical_id = <3>;
++			type = "FSI";
++			/* type = <DMA_FSI>; */
++			interrupt-parent = <&EDMA3>;
++			interrupts = <0 1 2 3>;
++			/* index interrupt-parent interrupt# type */
++			interrupt-map = < /* chnl_0 */ 0 &UIC1_1  16 0x4
++					  /* chnl_1 */ 1 &UIC1_1  17 0x4
++					  /* chnl_2 */ 2 &UIC1_1  18 0x4
++					  /* chnl_3 */ 3 &UIC1_1  19 0x4>;
++		};
++
++		EDMA4: hostdma.0 {
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			#size-cells = <0>;
++			compatible = "ibm,edma", "ibm,hostdma";
++			dcr-reg = <0x280 0x40>;
++			channels = <4>;
++			logical_id = <4>;
++			type = "PSI";
++			/* type = <DMA_PSI>; */
++			interrupt-parent = <&EDMA4>;
++			interrupts = <0 1 2 3 4>;
++			/* index interrupt-parent interrupt# type */
++			interrupt-map = < /* chnl_0 */  0 &UIC1_1  12 0x4
++					  /* chnl_1 */  1 &UIC1_1  13 0x4
++					  /* chnl_2 */  2 &UIC1_1  14 0x4
++					  /* chnl_3 */  3 &UIC1_1  15 0x4
++					  /* HDCR_RW */ 4 &UIC0    18 0x1>;
++		};
++		EMMC: emmc@020c0000 {
++			compatible = "arasan,emmc";
++			reg = <0x020c0000 0x20000>;
++			interrupt-parent = <&UIC1_3>;
++			interrupts = <21 0x4	/* INT  */
++				      22 0x4>;  /* WKUP */
+ 
++		};
++		
+ 		mmc0: sdhci@020c0000 {
+ 			compatible	= "st,sdhci-stih407", "st,sdhci";
+ 			reg		= <0x020c0000 0x20000>;
+@@ -565,12 +712,56 @@
+ 				rgmii-channel = <1>;
+ 			};
+ 
++			//TODO: MIB?
++
+ 			RGMII: rgmii@b0000600 {
+ 				compatible = "ibm,rgmii";
+ 				has-mdio;
+ 				reg = <0xb0000600 0x8>;
+ 			};
+ 
++			SPINOR: spinor@b0010400 {
++				compatible ="ibm,spinor";
++				reg = <0xb0010400 0x400>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <10 0x4>;
++			};
++
++			FSI: fsimaster@b0014000 {
++				compatible = "ibm,fsimaster";
++				#interrupt-cells = <1>;
++				#address-cells = <0>;
++				reg = <0xb0014000 0x2e4>;
++				interrupt-parent = <&FSI>;
++				interrupts = <0 1 2>;
++				interrupt-map =</*Port Err*/	0 &UIC0 2  0x4
++						/*Master Err*/	1 &UIC0 3  0x4
++						/*Plug Detect*/	2 &UIC0 27 0x4>;
++				cfam-uics = <&UIC2_0 &UIC2_1 &UIC2_2 &UIC2_3
++					     &UIC2_4 &UIC2_5 &UIC2_6 &UIC2_7
++					     &UIC2_8 &UIC2_9 &UIC2_10 &UIC2_11
++					     &UIC2_12 &UIC2_13 &UIC2_14
++					     &UIC2_15>;
++			};
++
++			MAILBOX_HOSTIP: mbx@b0016000 {
++				compatible = "ibm,mailbox";
++
++				reg = <0xb0016000 0x03c0>;
++
++				interrupt-parent = <&UIC1_1>;
++				interrupts = <0 0x4>;
++			};
++
++			hdcr@b0016000 {
++				compatible = "ibm,hdcr";
++
++				reg = <0xb0016000 0x10>;
++
++				interrupt-parent = <&UIC0>;
++				interrupts = <18 0x1>;
++			};
++
+ 			UART0: serial@b0020000 {
+ 				device_type = "serial";
+ 				compatible = "ns16550";
+@@ -581,8 +772,70 @@
+ 				interrupt-parent = <&UIC0>;
+ 				interrupts = <31 0x4>;
+ 			};
+-		};
+ 
++			IIC0: i2c@b0020100 {
++				compatible = "ibm,iic";
++				reg = <0xb0020100 0x12>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <14 0x4>;
++				/* TODO: add bus connections here?  see canyonlands.dts
++				 * IIC0 for an example. */
++			};
++
++			IIC1: i2c@b0020120 {
++				compatible = "ibm,iic";
++				reg = <0xb0020120 0x12>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <15 0x4>;
++			};
++
++			IIC2: i2c@b0020140 {
++				compatible = "ibm,iic";
++				reg = <0xb0020140 0x12>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <16 0x4>;
++			};
++
++			IIC3: i2c@b0020160 {
++				compatible = "ibm,iic";
++				reg = <0xb0020160 0x12>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <17 0x4>;
++			};
++
++			IIC4: i2c@b0020180 {
++				compatible = "ibm,iic";
++				reg = <0xb0020180 0x12>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <18 0x4>;
++			};
++
++			SRAM: sram@b0024000 {
++				compatible = "ibm,fsp2_sram";
++				reg = <0xb0024000 0x2000 0xb0027F00 0x44>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <6 0x4 7 0x4>;
++				block-size = <0x400>;
++			};
++
++			NVRAM: nvram {
++				compatible = "ibm,cy14c101i";
++				iic-dev-width = <2>;
++				iic-eng-num = <0>;
++				iic-slave-range = <0xa0 0xa2>;
++				block-size = <0x400>;
++				bank-size = <0x10000>;
++			};
++
++			GPIO: gpio@b0027f80 {
++				compatible = "ibm,gpio";
++				reg = <0xb0027f80 0x40>;
++				interrupt-parent = <&UIC1_4>;
++				interrupts = <8 0x4>;
++			};
++                };
++
++		//TODO: USB, PCIe, P Mailbox
+ 		OHCI1: ohci@02040000 {
+ 			compatible = "ohci-le";
+ 			reg = <0x02040000 0xa0>;

@@ -1,0 +1,306 @@
+diff --git a/kernel/fsp/pra.c b/kernel/fsp/pra.c
+new file mode 100644
+index 0000000..f67be28
+--- /dev/null
++++ b/kernel/fsp/pra.c
+@@ -0,0 +1,299 @@
++
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2012
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/errno.h>
++#include <linux/spinlock.h>
++#include <linux/uaccess.h>
++#include <linux/proc_fs.h>
++#include <linux/crash_dump.h>
++#include <linux/fsp/pra.h>
++#include <linux/fsp/checkpoints.h>
++
++extern u32 arch_pra_read(bool current, unsigned int key);
++extern void arch_pra_write(unsigned int key, u32 data);
++extern void arch_pra_init(void);
++
++static DEFINE_SPINLOCK(pra_lock);
++
++int __pra_read(bool current, unsigned int key, u32 *data)
++{
++	unsigned long flags;
++
++	if (key >= PRA_NUMENTRIES)
++		return -EINVAL;
++
++	spin_lock_irqsave(&pra_lock, flags);
++	*data = arch_pra_read(current, key);
++	spin_unlock_irqrestore(&pra_lock, flags);
++
++	return 0;
++}
++
++int pra_read(unsigned int key, u32 *data)
++{
++	return __pra_read(true, key, data);
++}
++
++int pra_read_previous(unsigned int key, u32 *data)
++{
++	return __pra_read(false, key, data);
++}
++
++int pra_write(unsigned int key, u32 data)
++{
++	unsigned long flags;
++	u32 checksum, old_data;
++
++	if (key >= PRA_NUMENTRIES)
++		return -EINVAL;
++
++	/*
++	 * If we're in the capture kernel, ignore PRA writes so that all
++	 * PRA data from the failure will be preserved.
++	 */
++	if (is_kdump_kernel())
++		/* except PRA_USER0 to PRA_USER7 and PRA_PABEND */
++		if(((key<PRA_USER0) || (key>PRA_USER7)) &&
++				((key<PRA_PABEND) || (key>PRA_PABEND_C)))
++			return 0;
++
++	spin_lock_irqsave(&pra_lock, flags);
++
++	/* update checksum */
++	checksum = arch_pra_read(true, PRA_CHECKSUM);
++	old_data = arch_pra_read(true, key);
++	checksum ^= old_data ^ data;
++	arch_pra_write(PRA_CHECKSUM, checksum);
++
++	/* update value */
++	arch_pra_write(key, data);
++
++	spin_unlock_irqrestore(&pra_lock, flags);
++
++	return 0;
++}
++
++static u32 pra_save[PRA_NUMENTRIES*2];
++
++void pra_crash_save()
++{
++	unsigned long flags;
++	int i;
++
++	spin_lock_irqsave(&pra_lock, flags);
++
++	for( i = PRA_CHECKSUM; i < PRA_NUMENTRIES; i++)
++	{
++		/* For each PRA entry two values are stored, the current value
++		 * and the previous value.  We need to save both.
++		 *
++		 * There are PRA_NUMENTRIES current entries and that many
++		 * previous entries.  In our pra_save array, the first
++		 * PRA_NUMENTRIES will be the current pra values and the
++		 * next PRA_NUMENTRIES will be the previous pra values.
++		 */
++
++		/* Save current value. */
++		pra_save[i] = arch_pra_read(true, i);
++
++		/* Save previous value. */
++		pra_save[i+PRA_NUMENTRIES] = arch_pra_read(false, i);
++	}
++
++	spin_unlock_irqrestore(&pra_lock, flags);
++
++	return 0;
++}
++
++/* proc interfaces */
++static struct proc_dir_entry *pra_root;
++
++struct pra_proc_entry {
++	const char *name;
++	int key;
++};
++
++static struct pra_proc_entry cpra_ptab[] = {
++	{ "FSP_PRA_CHECKSUM",			PRA_CHECKSUM },
++	{ "FSP_PRA_CALLOUT",			PRA_CALLOUT },
++	{ "FSP_PRA_BCU_STATE",			PRA_BCU_STATE },
++	{ "FSP_PRA_RR_COUNT",			PRA_RR_COUNT },
++	{ "FSP_PRA_SFT_RST_FLAVOR",		PRA_SFT_RST_FLAVOR },
++	{ "FSP_PRA_CURR_CHKPT",			PRA_CURR_CHKPT },
++	{ "FSP_PRA_MEM_INIT",			PRA_MEM_INIT },
++	{ "FSP_PRA_MEM_INIT_STATIC",		PRA_MEM_INIT_STATIC },
++	{ "FSP_PRA_USER0",			PRA_USER0 },
++	{ "FSP_PRA_USER1",			PRA_USER1 },
++	{ "FSP_PRA_USER2",			PRA_USER2 },
++	{ "FSP_PRA_USER3",			PRA_USER3 },
++	{ "FSP_PRA_USER4",			PRA_USER4 },
++	{ "FSP_PRA_USER5",			PRA_USER5 },
++	{ "FSP_PRA_USER6",			PRA_USER6 },
++	{ "FSP_PRA_USER7",			PRA_USER7 },
++	{ "FSP_PRA_BOOT_FLAGS",			PRA_BOOT_FLAGS },
++	{ "FSP_PRA_ANCHOR_SND",			PRA_ANCHOR_SND },
++	{ "FSP_PRA_BOOTSCRIPT",			PRA_BOOTSCRIPT },
++	{ "FSP_PRA_BOOT_STATUS",		PRA_BOOT_STATUS },
++	{ "FSP_PRA_FFDC_LR",			PRA_FFDC_LR },
++	{ "FSP_PRA_BOOT_DUMP",			PRA_BOOT_DUMP },
++	{ "FSP_PRA_PABEND",			PRA_PABEND },
++	{ "FSP_PRA_PABEND_A",			PRA_PABEND_A },
++	{ "FSP_PRA_PABEND_B",			PRA_PABEND_B },
++	{ "FSP_PRA_PABEND_C",			PRA_PABEND_C },
++	{ "FSP_PRA_ORIG_RESET",			PRA_ORIG_RESET },
++	{ "FSP_PRA_NETBOOT_DHCP_ERR",		PRA_NETBOOT_DHCP_ERR },
++	{ "FSP_PRA_NETBOOT_TFTP_ERR",		PRA_NETBOOT_TFTP_ERR },
++	{ "FSP_PRA_BOOT_ERR_VALUE",		PRA_BOOT_ERR_VALUE },
++	{ "FSP_PRA_BOOT_ERR_FLAGS",		PRA_BOOT_ERR_FLAGS },
++	{ "FSP_PRA_BOOT_THRESHOLD_TIME",	PRA_BOOT_THRESHOLD_TIME },
++	{ "FSP_PRA_BOOT_THRESHOLD_COUNT",	PRA_BOOT_THRESHOLD_COUNT },
++	{ "FSP_PRA_ANCHOR_FFS",			PRA_ANCHOR_FFS },
++	{ "FSP_PRA_ANCHOR_ALT_FFS",		PRA_ANCHOR_ALT_FFS },
++	{ "FSP_PRA_ORIG_RSTINFO",		PRA_ORIG_RSTINFO },
++	{ "FSP_PRA_BOOT_RR_COUNT",		PRA_BOOT_RR_COUNT },
++	{ NULL,					0 }
++};
++
++
++static ssize_t pra_read_proc(struct file * file, char __user * buffer,
++			     size_t count, loff_t * ppos)
++{
++	int len = 0;
++	char buf[32];
++	unsigned int val = 0;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++	struct pra_proc_entry *ptr = PDE_DATA(file->f_inode);
++
++	pra_read(ptr->key, &val);
++
++	len += sprintf(buf+len, "0x%08x\n", val);
++
++	if (offset >= len)
++		return 0;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(buffer, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++	return transfer;
++}
++
++static ssize_t pra_write_proc(struct file * file, const char __user *buffer,
++			      size_t count, loff_t * offset)
++{
++	int len = 0;
++	unsigned int val = 0;
++	char buf[32];
++	struct pra_proc_entry *ptr = PDE_DATA(file->f_inode);
++
++	if (!count)
++		return 0;
++
++	len = (count > sizeof(buf) -1) ? (sizeof(buf) -1) : count;
++
++	if (copy_from_user(buf, buffer, len)) {
++		printk(KERN_ERR "PRA: Could not copy data from user\n");
++		return -EFAULT;
++	}
++
++	buf[len] = '\0';
++	if (buf[len - 1] == '\n')
++		buf[len - 1] = '\0';
++
++	val = simple_strtoul(buf, NULL, 0);
++	pra_write(ptr->key, val);
++
++	return len;
++}
++
++static struct file_operations proc_fops = {
++	.read = pra_read_proc,
++	.write = pra_write_proc
++};
++
++static int pra_create_proc_entry(struct pra_proc_entry *ptr,
++				 struct proc_dir_entry *root)
++{
++	struct proc_dir_entry *tmp = proc_create_data(ptr->name, 0644, root,
++		&proc_fops, ptr);
++
++	if (!tmp) {
++		printk(KERN_ERR "Could not create proc entry: %s\n",
++		       ptr->name);
++		return -ENOMEM;
++	}
++
++	proc_set_size(tmp, 11);
++
++	return 0;
++}
++
++static int __init pra_init(void)
++{
++	int rc = 0;
++	struct pra_proc_entry *cptr = NULL;
++	int i;
++	u32 checksum = 0;
++
++	/* arch-specific initialization */
++	arch_pra_init();
++
++	/* validate PRA checksum and clear out if necessary */
++	for (i = PRA_CHECKSUM+1; i < PRA_NUMENTRIES; i++)
++		checksum ^= arch_pra_read(true, i);
++
++	if (checksum != arch_pra_read(true, PRA_CHECKSUM)) {
++		printk("PRA: Current PRA is invalid.  Clearing...\n");
++		for (i = 0; i < PRA_NUMENTRIES; i++)
++			arch_pra_write(i, 0);
++	}
++
++	/* write a "kernel starting" checkpoint */
++	checkpoint(CHKP_START);
++
++	/* create proc entries */
++	pra_root = proc_mkdir("pra", NULL);
++	if (!pra_root) {
++		printk(KERN_ERR "Cannot create /proc/pra\n");
++		rc= -ENOMEM;
++		goto err0;
++	}
++
++	cptr = cpra_ptab;
++
++	while (cptr->name) {
++		rc = pra_create_proc_entry(cptr, pra_root);
++		if (rc < 0)
++			goto err1;
++
++		cptr++;
++	}
++	return 0;
++
++ err1:
++	remove_proc_entry("pra", NULL);
++ err0:
++	return rc;
++}
++arch_initcall(pra_init);
++ //
+

@@ -1,0 +1,108 @@
+diff --git a/arch/powerpc/platforms/44x/fsp2.c b/arch/powerpc/platforms/44x/fsp2.c
+index a1ce6e3..d367ca3 100644
+--- a/arch/powerpc/platforms/44x/fsp2.c
++++ b/arch/powerpc/platforms/44x/fsp2.c
+@@ -16,6 +16,7 @@
+  * Free Software Foundation;  either version 2 of the  License, or (at your
+  * option) awwny later version.
+  */
++#include <linux/fsp/fsp.h>
+ 
+ #include <linux/init.h>
+ #include <linux/of_platform.h>
+@@ -254,6 +255,6 @@ define_machine(fsp2) {
+ 	.progress		= udbg_progress,
+ 	.init_IRQ		= fsp2_init_irq,
+ 	.get_irq		= uic_get_irq,
+-	.restart		= ppc4xx_reset_system,
++	.restart		= fsp_restart,
+ 	.calibrate_decr		= generic_calibrate_decr,
+ };
+diff --git a/kernel/panic.c b/kernel/panic.c
+index 08aa88d..48dc147 100644
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -25,7 +25,11 @@
+ #include <linux/nmi.h>
+ #include <linux/console.h>
+ #include <linux/bug.h>
++#include <linux/fsp/hdcr.h>
++#include <linux/fsp/pra.h>
++#include <linux/fsp/reset.h>
+ 
++extern void crash_save_regs(void);
+ #define PANIC_TIMER_STEP 100
+ #define PANIC_BLINK_SPD 18
+ 
+@@ -165,6 +169,27 @@ void panic(const char *fmt, ...)
+ 	if (old_cpu != PANIC_CPU_INVALID && old_cpu != this_cpu)
+ 		panic_smp_self_stop();
+ 
++{
++	u32 flavor;
++
++	crash_save_regs();
++
++	/*
++	* Set "Reset/Reload In Progress" and "Critical Operation In Progress"
++	* bits in DISR to let the host know we're dumping.
++	*/
++	disr_set(DISR_RR_INPROG | DISR_CRIT_OP);
++
++	/*
++	 * Set the panic reset flavor if it hasn't already been set.  This will
++	 * be preserved through the kexec and into the following reset because
++	 * PRA writes are disabled in kexec mode.
++	 */
++	if(!pra_read(PRA_SFT_RST_FLAVOR, &flavor) && flavor == 0)
++		pra_write(PRA_SFT_RST_FLAVOR, LINUX_REBOOT_CMD_RESTART2);
++
++	pra_crash_save();
++}
+ 	console_verbose();
+ 	bust_spinlocks(1);
+ 	va_start(args, fmt);
+@@ -180,6 +205,7 @@ void panic(const char *fmt, ...)
+ #endif
+ 
+ 	/*
++	atomic_notifier_call_chain(&pre_kdump_notifier_list, 0, buf);
+ 	 * If we have crashed and we have a crash kernel loaded let it handle
+ 	 * everything else.
+ 	 * If we want to run this after calling panic_notifiers, pass
+diff --git a/kernel/reboot.c b/kernel/reboot.c
+index bd30a97..d38f2f0 100644
+--- a/kernel/reboot.c
++++ b/kernel/reboot.c
+@@ -12,6 +12,8 @@
+ #include <linux/kmod.h>
+ #include <linux/kmsg_dump.h>
+ #include <linux/reboot.h>
++#include <linux/fsp/reboot.h>
++
+ #include <linux/suspend.h>
+ #include <linux/syscalls.h>
+ #include <linux/syscore_ops.h>
+@@ -355,8 +357,21 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
+ #ifdef CONFIG_HIBERNATION
+ 	case LINUX_REBOOT_CMD_SW_SUSPEND:
+ 		ret = hibernate();
+-		break;
+ #endif
++/* FSP specific reboot commands */
++	case LINUX_REBOOT_CMD_TOOLRESET:
++		kernel_restart(LINUX_REBOOT_CMD_TOOLRESET_STR);
++		panic("Tool reset failed");
++		break;
++	case LINUX_REBOOT_CMD_COREDUMP:
++		if (strncpy_from_user(buffer, arg, sizeof(buffer) - 1) < 0 ||
++		    strncmp(buffer, LINUX_REBOOT_CMD_COREDUMP_STR,
++			    strlen(LINUX_REBOOT_CMD_COREDUMP_STR)))
++			strcpy(buffer, "NEWPABEND: Invalid reason\n");
++		buffer[sizeof(buffer) - 1] = '\0';
++		kernel_restart(buffer);
++		panic("Pabend failed");
++		break;
+ 
+ 	default:
+ 		ret = -EINVAL;

@@ -1,0 +1,3649 @@
+diff --git a/arch/powerpc/platforms/fsp/fsp1.c b/arch/powerpc/platforms/fsp/fsp1.c
+new file mode 100644
+index 0000000..1270b20
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp1.c
+@@ -0,0 +1,84 @@
++/* FSP1 board specific routines
++ *
++ * Mike Kobler <mkobler@linux.vnet.ibm.com>
++ * Josh Poimboeuf <jpoimboe@us.ibm.com>
++ * Copyright 2010 IBM Corporation.
++ *
++ * Matt Porter <mporter@kernel.crashing.org>
++ * Copyright 2002-2005 MontaVista Software Inc.
++ *
++ * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
++ * Copyright (c) 2003-2005 Zultys Technologies
++ *
++ * Rewritten and ported to the merged powerpc tree:
++ * Copyright 2007 David Gibson <dwg@au1.ibm.com>, IBM Corporation.
++ *
++ * This program is free software; you can redistribute  it and/or modify it
++ * under  the terms of  the GNU General  Public License as published by the
++ * Free Software Foundation;  either version 2 of the  License, or (at your
++ * option) any later version.
++ */
++
++#include <linux/init.h>
++#include <linux/of_platform.h>
++#include <linux/rtc.h>
++
++#include <asm/machdep.h>
++#include <asm/prom.h>
++#include <asm/udbg.h>
++#include <asm/time.h>
++#include <asm/uic.h>
++#include <asm/pci-bridge.h>
++#include <asm/ppc4xx.h>
++#include <asm/fsp1/rtc.h>
++
++#include <linux/fsp/fsp.h>
++
++static __initdata struct of_device_id fsp1_of_bus[] = {
++	{ .compatible = "ibm,plb4", },
++	{ .compatible = "ibm,opb", },
++	{ .compatible = "ibm,ebc", },
++	{},
++};
++
++static int __init fsp1_device_probe(void)
++{
++	of_platform_bus_probe(NULL, fsp1_of_bus, NULL);
++	//of_instantiate_rtc();
++
++	return 0;
++}
++machine_device_initcall(fsp1, fsp1_device_probe);
++
++/*
++ * Called very early, MMU is off, device-tree isn't unflattened
++ */
++static int __init fsp1_probe(void)
++{
++	unsigned long root = of_get_flat_dt_root();
++
++	if (!of_flat_dt_is_compatible(root, "ibm,fsp1"))
++		return 0;
++
++	return 1;
++}
++
++
++extern long ibmfsp1_time_init(void);
++
++define_machine(fsp1) {
++	.name			= "FSP-1",
++	.probe			= fsp1_probe,
++	.progress		= udbg_progress,
++	.init_IRQ		= uic_init_tree,
++	.get_irq		= uic_get_irq,
++	.restart		= fsp_restart,
++	.panic			= fsp_panic,
++	//.power_off		= fsp_power_off,
++	.halt			= fsp_halt,
++	.machine_check_exception= fsp_machine_check_exception,
++	.calibrate_decr		= generic_calibrate_decr,
++	.time_init		= ibmfsp1_time_init,
++	.set_rtc_time		= ibmfsp1_set_rtc_time,
++	.get_rtc_time		= ibmfsp1_get_rtc_time,
++};
+diff --git a/arch/powerpc/platforms/fsp/fsp1_eddr2.c b/arch/powerpc/platforms/fsp/fsp1_eddr2.c
+new file mode 100644
+index 0000000..70453f4
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp1_eddr2.c
+@@ -0,0 +1,366 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2011
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/interrupt.h>
++#include <linux/proc_fs.h>
++#include <linux/of_platform.h>
++#include <asm/io.h>
++#include <asm/machdep.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++
++#include <linux/fsp/pra.h>
++
++#define SCRUB_RATE 32	/* 1 scrub every 32 auto-refresh cycles */
++#define SCRUB_BUFSZ 10
++
++static unsigned long eddr2_addr_dcr, eddr2_data_dcr;
++static unsigned long scrub_ce_addr[SCRUB_BUFSZ];
++static int scrub_ce_count;
++#define SCRUB_INDEX(count) ((count - 1) % SCRUB_BUFSZ)
++
++static void mtddr(unsigned long reg, unsigned long val)
++{
++	BUG_ON(!eddr2_addr_dcr || !eddr2_data_dcr);
++
++	mtdcr(eddr2_addr_dcr, reg);
++	mtdcr(eddr2_data_dcr, val);
++}
++
++static unsigned long mfddr(unsigned long reg)
++{
++	BUG_ON(!eddr2_addr_dcr || !eddr2_data_dcr);
++
++	mtdcr(eddr2_addr_dcr, reg);
++	return mfdcr(eddr2_data_dcr);
++}
++
++void show_eddr2_regs(void)
++{
++	printk("EDDR2_BESRDC %08lx\n", mfddr(EDDR2_BESRDC));
++	printk("EDDR2_BEARD %08lx\n", mfddr(EDDR2_BEARD));
++	printk("EDDR2_WPESRC %08lx\n", mfddr(EDDR2_WPESRC));
++	printk("EDDR2_WPEAR %08lx\n", mfddr(EDDR2_WPEAR));
++	printk("EDDR2_WMIRQC %08lx\n", mfddr(EDDR2_WMIRQC));
++	printk("EDDR2_PLBOPT %08lx\n", mfddr(EDDR2_PLBOPT));
++	printk("EDDR2_PUABA %08lx\n", mfddr(EDDR2_PUABA));
++	printk("EDDR2_WPAIC %08lx\n", mfddr(EDDR2_WPAIC));
++	printk("EDDR2_WPIRQC %08lx\n", mfddr(EDDR2_WPIRQC));
++	printk("EDDR2_WPAPE %08lx\n", mfddr(EDDR2_WPAPE));
++	printk("EDDR2_MCSTAT %08lx\n", mfddr(EDDR2_MCSTAT));
++	printk("EDDR2_MCOPT1 %08lx\n", mfddr(EDDR2_MCOPT1));
++	printk("EDDR2_MCOPT2 %08lx\n", mfddr(EDDR2_MCOPT2));
++	printk("EDDR2_MODT0 %08lx\n", mfddr(EDDR2_MODT0));
++	printk("EDDR2_MODT1 %08lx\n", mfddr(EDDR2_MODT1));
++	printk("EDDR2_CODT %08lx\n", mfddr(EDDR2_CODT));
++	printk("EDDR2_VVPR %08lx\n", mfddr(EDDR2_VVPR));
++	printk("EDDR2_OPARS %08lx\n", mfddr(EDDR2_OPARS));
++	/* don't even read register OPART, according to the edd2 spec
++	   this triggers 'Adjust Set and Drive/Sense Sequence Start'
++	   printk("EDDR2_OPART %08lx\n", mfddr(EDDR2_OPART)); */
++	printk("EDDR2_RTR %08lx\n", mfddr(EDDR2_RTR));
++	printk("EDDR2_MR0CF %08lx\n", mfddr(EDDR2_MR0CF));
++	printk("EDDR2_MR0EA %08lx\n", mfddr(EDDR2_MR0EA));
++	printk("EDDR2_MR1CF %08lx\n", mfddr(EDDR2_MR1CF));
++	printk("EDDR2_MR1EA %08lx\n", mfddr(EDDR2_MR1EA));
++	printk("EDDR2_TOM %08lx\n", mfddr(EDDR2_TOM));
++	printk("EDDR2_INITPLR0 %08lx\n", mfddr(EDDR2_INITPLR0));
++	printk("EDDR2_INITPLR1 %08lx\n", mfddr(EDDR2_INITPLR1));
++	printk("EDDR2_INITPLR2 %08lx\n", mfddr(EDDR2_INITPLR2));
++	printk("EDDR2_INITPLR3 %08lx\n", mfddr(EDDR2_INITPLR3));
++	printk("EDDR2_INITPLR4 %08lx\n", mfddr(EDDR2_INITPLR4));
++	printk("EDDR2_INITPLR5 %08lx\n", mfddr(EDDR2_INITPLR5));
++	printk("EDDR2_INITPLR6 %08lx\n", mfddr(EDDR2_INITPLR6));
++	printk("EDDR2_INITPLR7 %08lx\n", mfddr(EDDR2_INITPLR7));
++	printk("EDDR2_INITPLR8 %08lx\n", mfddr(EDDR2_INITPLR8));
++	printk("EDDR2_INITPLR9 %08lx\n", mfddr(EDDR2_INITPLR9));
++	printk("EDDR2_INITPLR10 %08lx\n", mfddr(EDDR2_INITPLR10));
++	printk("EDDR2_INITPLR11 %08lx\n", mfddr(EDDR2_INITPLR11));
++	printk("EDDR2_INITPLR12 %08lx\n", mfddr(EDDR2_INITPLR12));
++	printk("EDDR2_INITPLR13 %08lx\n", mfddr(EDDR2_INITPLR13));
++	printk("EDDR2_INITPLR14 %08lx\n", mfddr(EDDR2_INITPLR14));
++	printk("EDDR2_INITPLR15 %08lx\n", mfddr(EDDR2_INITPLR15));
++	printk("EDDR2_RQDC %08lx\n", mfddr(EDDR2_RQDC));
++	printk("EDDR2_RFDC %08lx\n", mfddr(EDDR2_RFDC));
++	printk("EDDR2_RDCC %08lx\n", mfddr(EDDR2_RDCC));
++	printk("EDDR2_DLCR %08lx\n", mfddr(EDDR2_DLCR));
++	printk("EDDR2_CLKTR %08lx\n", mfddr(EDDR2_CLKTR));
++	printk("EDDR2_WRDTR %08lx\n", mfddr(EDDR2_WRDTR));
++	printk("EDDR2_SDTR1 %08lx\n", mfddr(EDDR2_SDTR1));
++	printk("EDDR2_SDTR2 %08lx\n", mfddr(EDDR2_SDTR2));
++	printk("EDDR2_SDTR3 %08lx\n", mfddr(EDDR2_SDTR3));
++	printk("EDDR2_MMODE %08lx\n", mfddr(EDDR2_MMODE));
++	printk("EDDR2_MEMODE %08lx\n", mfddr(EDDR2_MEMODE));
++	printk("EDDR2_ECCES %08lx\n", mfddr(EDDR2_ECCES));
++	printk("EDDR2_ECCCEA %08lx\n", mfddr(EDDR2_ECCCEA));
++	printk("EDDR2_SIECR %08lx\n", mfddr(EDDR2_SIECR));
++	printk("EDDR2_SIESA %08lx\n", mfddr(EDDR2_SIESA));
++	printk("EDDR2_SIEEA %08lx\n", mfddr(EDDR2_SIEEA));
++	printk("EDDR2_SEUEA %08lx\n", mfddr(EDDR2_SEUEA));
++	printk("EDDR2_SEUES %08lx\n", mfddr(EDDR2_SEUES));
++	printk("EDDR2_SECEA %08lx\n", mfddr(EDDR2_SECEA));
++	printk("EDDR2_SECES %08lx\n", mfddr(EDDR2_SECES));
++	printk("EDDR2_SEES0 %08lx\n", mfddr(EDDR2_SEES0));
++	printk("EDDR2_SEES1 %08lx\n", mfddr(EDDR2_SEES1));
++	printk("EDDR2_SFPM %08lx\n", mfddr(EDDR2_SFPM));
++	printk("EDDR2_SIECA %08lx\n", mfddr(EDDR2_SIECA));
++	printk("EDDR2_FCSR %08lx\n", mfddr(EDDR2_FCSR));
++	printk("EDDR2_RTSR %08lx\n", mfddr(EDDR2_RTSR));
++	printk("EDDR2_CID %08lx\n", mfddr(EDDR2_CID));
++	printk("EDDR2_RID %08lx\n", mfddr(EDDR2_RID));
++}
++
++static void start_scrub_continuous_interval(void)
++{
++	unsigned long siecr;
++
++	/* disable any scrub operation that might already be in progress */
++	mtddr(EDDR2_SIECR, 0);
++
++	/* initialize the engine: continuous, stop and lock on error,
++	 * scrub every 32 auto-refresh cycles. */
++	siecr = SCRUB_SIECR_MODE_INTERVAL_CONTINUOUS | SCRUB_SIECR_SUER |
++		SCRUB_SIECR_SCER | SCRUB_SIECR_LUES | SCRUB_SIECR_LCES |
++		SCRUB_RATE;
++
++	mtddr(EDDR2_SIESA, 0);			/* start addr */
++	mtddr(EDDR2_SIEEA, mfddr(EDDR2_TOM));	/* end addr */
++	mtddr(EDDR2_SIECR, siecr);
++}
++
++static irqreturn_t ecc_ue_handler(int irq, void *ptr, struct pt_regs *regs)
++{
++	printk("ECC UE handler: Uncorrectable memory error found!\n");
++	printk("Error status: 0x%08lx\n", mfddr(EDDR2_ECCES));
++
++	pra_write(PRA_CALLOUT, PRA_ECCERR);
++	show_eddr2_regs();
++	panic("Uncorrectable memory error!");
++}
++
++static irqreturn_t ecc_ce_handler(int irq, void *ptr, struct pt_regs *regs)
++{
++	unsigned long error_addr = mfddr(EDDR2_ECCCEA);
++
++	printk("ECC CE handler: Correctable memory error found!\n");
++	printk("Error address : 0x%08lx\n", error_addr);
++	printk("Error status: 0x%08lx\n", mfddr(EDDR2_ECCES));
++
++	/* clear all error bits */
++	mtddr(EDDR2_ECCES, 0xffff7c00);
++
++	/* stop existing scrub */
++	mtddr(EDDR2_SIECR, 0);
++
++	/*
++	 * Configure an immediate scrub to correct the data.  This will result
++	 * in the scrub CE handler getting called, which will increase the
++	 * scrub count.  Then the Operation Completed (OC) handler will be
++	 * called, which will restart scrubbing.
++	 */
++	mtddr(EDDR2_SIESA, error_addr);
++	mtddr(EDDR2_SIECR, SCRUB_SIECR_MODE_IMMEDIATE_SINGLE |
++			   SCRUB_SIECR_SUER | SCRUB_SIECR_SCER |
++			   SCRUB_SIECR_LUES | SCRUB_SIECR_LCES);
++
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t scrub_ue_handler(int irq, void *ptr, struct pt_regs *regs)
++{
++	printk("Scrub UE handler\n");
++	printk("SEES SEUES SEUEA: 0x%08lx 0x%08lx 0x%08lx\n",
++		mfddr(EDDR2_SEES0), mfddr(EDDR2_SEUES), mfddr(EDDR2_SEUEA));
++
++	pra_write(PRA_CALLOUT, PRA_ECCERR);
++	show_eddr2_regs();
++	panic("Uncorrectable memory error!");
++}
++
++static irqreturn_t scrub_ce_handler(int irq, void *ptr, struct pt_regs *regs)
++{
++	scrub_ce_count++;
++	scrub_ce_addr[SCRUB_INDEX(scrub_ce_count)] = mfddr(EDDR2_SECEA);
++
++	printk("Scrub CE handler\n");
++	printk("scrub_ce_count SEES SECES SECEA: %d 0x%08lx 0x%08lx 0x%08lx\n",
++		scrub_ce_count, mfddr(EDDR2_SEES0), mfddr(EDDR2_SECES),
++		mfddr(EDDR2_SECEA));
++
++	/* clear CE & SIES */
++	mtddr(EDDR2_SEES0, SEES_CEI | SEES_SIES_MASK);
++
++	/*
++	 * Now scrub_oc_handler will be called, which will restart the
++	 * scrubbing.
++	 */
++
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t scrub_oc_handler(int irq, void *ptr, struct pt_regs *regs)
++{
++	printk("Scrub operation completed\n");
++	printk("SEES: 0x%08lx\n", mfddr(EDDR2_SEES0));
++
++	/* clear OC bit */
++	mtddr(EDDR2_SEES0, SEES_SIEOC);
++
++	/* restart scrubbing */
++	start_scrub_continuous_interval();
++
++	return IRQ_HANDLED;
++}
++
++static int scrub_count_read(char *page, char **start,
++			    off_t off, int count, int *eof, void *data)
++{
++	int len = 0;
++
++	len = sprintf(page, "%d\n", scrub_ce_count);
++	*eof = 1;
++	return len;
++}
++
++static int scrub_addr_read(char *page, char **start,
++			   off_t off, int count, int *eof, void *data)
++{
++	int len = 0;
++	int i, j;
++
++	for (i = 0, j = scrub_ce_count;(j > 0) && (i < SCRUB_BUFSZ); i++, j--)
++		len += sprintf(page+len, "0x%08lx\n",
++			       scrub_ce_addr[SCRUB_INDEX(j)]);
++
++	*eof = 1;
++	return len;
++}
++
++/* TODO: could this struct be useful in other code? */
++struct of_irq_handler {
++	char *name;
++	void *handler;
++};
++
++static struct of_irq_handler irqs[] = {
++	{
++		.name		= "eDDR2 ECC Uncorrectable Error",
++		.handler	= ecc_ue_handler,
++	},
++	{
++		.name		= "eDDR2 ECC Correctable Error",
++		.handler	= ecc_ce_handler,
++	},
++	{
++		.name		= "eDDR2 Scrub ECC Uncorrectable Error",
++		.handler	= scrub_ue_handler,
++	},
++	{
++		.name		= "eDDR2 Scrub ECC Correctable Error",
++		.handler	= scrub_ce_handler,
++	},
++	{
++		.name		= "eDDR2 Scrub ECC Operation Complete",
++		.handler	= scrub_oc_handler,
++	},
++	{},
++};
++
++static int __devinit fsp_eddr2_of_probe(struct of_device *ofdev,
++					const struct of_device_id *match)
++{
++	unsigned int dcr_base, dcr_len, irq;
++	int i, rc;
++
++	dcr_base = dcr_resource_start(ofdev->node, 0);
++	if (!dcr_base)
++		panic("scrub: can't find DCR resource!");
++
++	dcr_len = dcr_resource_len(ofdev->node, 0);
++	if (dcr_len != 2)
++		panic("scrub: bad DCR resource len %d!", dcr_len);
++
++	/* setup global variables for mfddr() functions */
++	eddr2_addr_dcr = dcr_base;
++	eddr2_data_dcr = dcr_base + 1;
++
++	for (i = 0; irqs[i].name; i++) {
++		irq = irq_of_parse_and_map(ofdev->node, i);
++		if (irq == NO_IRQ)
++			panic("scrub: irq_of_parse_and_map failed: "
++			      "idx=%d name='%s'", i, irqs[i].name);
++
++		rc = request_irq(irq, irqs[i].handler, 0, irqs[i].name, NULL);
++		if (rc)
++			panic("scrub: request_irq failed: rc=%d irq=%d "
++			      "idx=%d name='%s'", rc, irq, i, irqs[i].name);
++	}
++
++	return 0;
++}
++
++static struct of_device_id __devinitdata fsp_eddr2_match_table[] = {
++	{ .compatible	= "ibm,eddr2", },
++	{},
++};
++
++static struct of_platform_driver fsp_eddr2_of_driver = {
++	.name		= "eddr2",
++	.match_table	= fsp_eddr2_match_table,
++	.probe		= fsp_eddr2_of_probe,
++};
++
++static int __init fsp_eddr2_init(void)
++{
++	struct proc_dir_entry *procdir;
++	struct proc_dir_entry *procentry;
++	int ret;
++
++	procdir = proc_mkdir("scrub", NULL);
++	if (!procdir)
++		goto error;
++
++	procentry = create_proc_read_entry("count", 644, procdir,
++					   scrub_count_read, NULL);
++	if (!procentry)
++		goto error;
++
++	procentry = create_proc_read_entry("addr", 644, procdir,
++					   scrub_addr_read, NULL);
++	if (!procentry)
++		goto error;
++
++
++	ret = of_register_platform_driver(&fsp_eddr2_of_driver);
++	if (ret)
++		goto error;
++
++	start_scrub_continuous_interval();
++
++	return 0;
++
++error:
++	panic("fsp_eddr2_init failed");
++
++	return 0;
++}
++
++device_initcall(fsp_eddr2_init);
+diff --git a/arch/powerpc/platforms/fsp/fsp1_handlers.c b/arch/powerpc/platforms/fsp/fsp1_handlers.c
+new file mode 100644
+index 0000000..e7a71c3
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp1_handlers.c
+@@ -0,0 +1,229 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2012
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/kernel.h>
++#include <linux/interrupt.h>
++#include <linux/of_platform.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++
++#include <linux/fsp/pra.h>
++#include <linux/fsp/fsp.h>
++
++static irqreturn_t buddy_reset_irq(int irq, void *dontcare)
++{
++	show_regs(get_irq_regs());
++	panic("Buddy initiated reset" );
++	return IRQ_HANDLED;
++
++}
++
++static void show_plb_arbiter_regs(int plbarb_nr)
++{
++	unsigned long pcbi, pacr, pesrl, pesrh, pearl, pearh;
++
++	pcbi = mfdcr(DCRN_PLB_PCBI+plbarb_nr*8);
++	pacr = mfdcr(DCRN_PLB_P0ACR+plbarb_nr*8);
++	pesrl= mfdcr(DCRN_PLB_P0ESRL+plbarb_nr*8);
++	pesrh= mfdcr(DCRN_PLB_P0ESRH+plbarb_nr*8);
++	pearl= mfdcr(DCRN_PLB_P0EARL+plbarb_nr*8);
++	pearh= mfdcr(DCRN_PLB_P0EARH+plbarb_nr*8);
++	printk("PLB_P%dESRL %lx\n", plbarb_nr, pesrl);
++	printk("PLB_P%dESRH %lx\n", plbarb_nr, pesrh);
++	printk("PLB_P%dEARL %lx\n", plbarb_nr, pearl);
++	printk("PLB_P%dEARH %lx\n", plbarb_nr, pearh);
++	printk("PLB_P%dACR %lx\n", plbarb_nr, pacr);
++	printk("PLB_PCBI/PLB_PCBC %lx\n", pcbi);
++}
++
++static void show_plbopb_regs(int plbopb_nr)
++{
++	unsigned long gesr0, gesr1, gear, gearu, gconfg, glatency, grev;
++
++	gesr0 = mfdcr(DCRN_PLB0_GESR0+plbopb_nr*16);
++	gesr1 = mfdcr(DCRN_PLB0_GESR1+plbopb_nr*16);
++	gear = mfdcr(DCRN_PLB0_GEAR+plbopb_nr*16);
++	gearu = mfdcr(DCRN_PLB0_GEARU+plbopb_nr*16);
++	gconfg = mfdcr(DCRN_PLB0_GCONFG+plbopb_nr*16);
++	glatency = mfdcr(DCRN_PLB0_GLATENCY+plbopb_nr*16);
++	grev = mfdcr(DCRN_PLB0_GREV+plbopb_nr*16);
++
++	printk("PLBOPB%d GESR0 %08lx\n", plbopb_nr, gesr0);
++	printk("PLBOPB%d GESR1 %08lx\n", plbopb_nr, gesr1);
++	printk("PLBOPB%d GEAR %08lx\n", plbopb_nr, gear);
++	printk("PLBOPB%d GEARU %08lx\n", plbopb_nr, gearu);
++	printk("PLBOPB%d GCONFIG %08lx\n", plbopb_nr, gconfg);
++	printk("PLBOPB%d GLATENCY %08lx\n", plbopb_nr, glatency);
++	printk("PLBOPB%d GREV %08lx\n", plbopb_nr, grev);
++}
++
++static irqreturn_t bus_error_irq(int irq, void *data)
++{
++	struct device_node *node = data;
++	const char *name = node->name;
++
++	printk("Bus Error: %s\n", name);
++
++	show_plb_arbiter_regs(0);
++	show_plb_arbiter_regs(1);
++	show_plbopb_regs(0);
++	show_plbopb_regs(1);
++	show_plbopb_regs(2);
++	show_plbopb_regs(3);
++	show_regs(get_irq_regs());
++
++	pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	panic("Bus Error: %s\n", name);
++	return IRQ_HANDLED;
++}
++
++#define	EBC_BEAR 0x20
++#define	EBC_BESR 0x21
++#define	EBC_CFG 0x23
++static irqreturn_t ebc_error_irq(int irq, void *data)
++{
++	struct device_node *node = data;
++	unsigned int ebc_addr, ebc_data, ebc_besr, ebc_bear, ebc_cfg;
++
++	show_regs(get_irq_regs());
++
++	ebc_addr = dcr_resource_start(node, 0);
++	if (!ebc_addr)
++		panic("ebc_error_irq: dcr_resource_start failed");
++
++	ebc_data = ebc_addr + 1;
++
++	mtdcr(ebc_addr, EBC_BESR);
++	ebc_besr = mfdcr(ebc_data);
++	mtdcr(ebc_addr, EBC_BEAR);
++	ebc_bear = mfdcr(ebc_data);
++	mtdcr(ebc_addr, EBC_CFG);
++	ebc_cfg = mfdcr(ebc_data);
++
++	printk("EBC_BESR: %08x\n", ebc_besr);
++	printk("EBC_BEAR: %08x\n", ebc_bear);
++	printk("EBC_CFG: %08x\n", ebc_cfg);
++
++	pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	panic("EBC error\n");
++
++	return IRQ_HANDLED;
++}
++
++void WatchdogHandler(struct pt_regs *regs)
++{
++	mtspr(SPRN_TCR, mfspr(SPRN_TCR) & ~TCR_WIE);
++	show_regs(regs);
++	panic("Received Watchdog Critical Interrupt");
++}
++
++int fsp_machine_check_exception(struct pt_regs *regs)
++{
++	u32 mcsr = mfspr(SPRN_MCSR);
++
++	if (mcsr & MCSR_ICP) {
++                printk("I-Cache Parity Error\n");
++		pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_ICACHE);
++        }
++	else if (mcsr & MCSR_TLBP) {
++                printk("TLB Parity Error\n");
++		pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_TLB);
++        }
++	else if (mcsr & MCSR_DCSP) {
++                printk("D-Cache Search Parity Error\n");
++                pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_DCACHE);
++        }
++	else if (mcsr & MCSR_DCFP) {
++                printk("D-Cache Flush Parity Error\n");
++                pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_DCACHE);
++        }
++	else if (mcsr & MCSR_IB) {
++		printk("Instruction PLB Error\n");
++		pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	}
++	else if (mcsr & MCSR_DRB) {
++		printk("Data Read PLB Error\n");
++		pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	}
++	else if (mcsr & MCSR_DWB) {
++		printk("Data Write PLB Error\n");
++		pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	}
++
++	show_plb_arbiter_regs(0);
++	show_plb_arbiter_regs(1);
++	show_plbopb_regs(0);
++	show_plbopb_regs(1);
++	show_plbopb_regs(2);
++	show_plbopb_regs(3);
++	show_eddr2_regs();
++	show_regs(regs);
++
++        panic("Machine Check\n");
++}
++
++static int __devinit fsp_of_probe(struct of_device *ofdev,
++				  const struct of_device_id *match)
++{
++	int rc;
++	unsigned int irq;
++	struct device_node *node = ofdev->node;
++	irq_handler_t handler = match->data;
++
++	irq = irq_of_parse_and_map(node, 0);
++	if (irq == NO_IRQ)
++		panic("Device tree node %s is missing a valid interrupt",
++		      node->name);
++
++	rc = request_irq(irq, handler, IRQF_DISABLED, node->name, node);
++
++	if (rc)
++		panic("fsp_of_probe: request_irq failed: node=%s rc=%d",
++		      node->full_name, rc);
++
++	return 0;
++}
++
++static struct of_device_id __devinitdata fsp_of_match_table[] = {
++	{
++		.compatible	= "ibm,buddy-reset-irq",
++		.data		= buddy_reset_irq,
++	},
++	{
++		.compatible	= "ibm,bus-error-irq",
++		.data		= bus_error_irq,
++	},
++	{
++		.compatible	= "ibm,ebc",
++		.data		= ebc_error_irq,
++	},
++	{},
++};
++
++static struct of_platform_driver fsp_of_driver = {
++	.name		= "fsp",
++	.match_table 	= fsp_of_match_table,
++	.probe		= fsp_of_probe,
++};
++
++static int __init fsp_handlers_init(void)
++{
++	return of_register_platform_driver(&fsp_of_driver);
++}
++
++arch_initcall(fsp_handlers_init);
+diff --git a/arch/powerpc/platforms/fsp/fsp1_pra.c b/arch/powerpc/platforms/fsp/fsp1_pra.c
+new file mode 100644
+index 0000000..64d4114
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp1_pra.c
+@@ -0,0 +1,105 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/module.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++
++#include <linux/fsp/pra.h>
++
++#define PRA_START		0x3300
++#define PRA_SIZE		(832 * 4)
++#define PRA_CURRENT_ADDR	PRA_START
++#define PRA_PREVIOUS_ADDR	(PRA_START + (PRA_SIZE/2))
++
++static u32 pra_cache[PRA_NUMENTRIES];
++
++static u32 __pra_read(bool current, unsigned int key)
++{
++	u32 addr = (current ? PRA_CURRENT_ADDR : PRA_PREVIOUS_ADDR) + (key * 4);
++
++	mtdcr(DCRN_DDR_WPA_ADDR,  addr);
++	return mfdcr(DCRN_DDR_WPA_DATA);
++}
++
++static void __pra_write(unsigned int key, u32 data)
++{
++	u32 addr = (current ? PRA_CURRENT_ADDR : PRA_PREVIOUS_ADDR) + (key * 4);
++
++	mtdcr(DCRN_DDR_WPA_ADDR, addr);
++	mtdcr(DCRN_DDR_WPA_DATA, data);
++}
++
++/* verify the PRA cache checksum and return 1 if valid */
++static int pra_cache_validate(void)
++{
++	int i;
++	unsigned int checksum = 0;
++
++	/* the checksum is simply an XOR of all the other PRA registers */
++	for (i = PRA_CHECKSUM+1; i < PRA_NUMENTRIES; i++)
++		checksum ^= pra_cache[i];
++
++	return (checksum == pra_cache[PRA_CHECKSUM]) ? 1 : 0;
++}
++
++/* flush the PRA cache to HW */
++static void pra_cache_flush(void)
++{
++	int i;
++
++	for (i = 0; i < PRA_NUMENTRIES; i++)
++		__pra_write(i, pra_cache[i]);
++}
++
++/* read PRA value from cache, or prev PRA value from HW */
++u32 arch_pra_read(bool current, unsigned int key)
++{
++	/* read previous value directly from HW */
++	if (!current)
++		return __pra_read(current, key);
++
++	/* read current value from cache */
++	return pra_cache[key];
++}
++EXPORT_SYMBOL(arch_pra_read);
++
++/* write a value to the PRA cache and flush cache to HW */
++void arch_pra_write(unsigned int key, u32 data)
++{
++	pra_cache[key] = data;
++	pra_cache_flush();
++}
++EXPORT_SYMBOL(arch_pra_write);
++
++void __init arch_pra_init(void)
++{
++	int i;
++
++	/* populate the cache */
++	for (i = 0; i < PRA_NUMENTRIES; i++)
++		pra_cache[i] = __pra_read(true, i);
++
++	/* make sure the cache checksum is valid */
++	if (!pra_cache_validate()) {
++		printk("Current PRA is invalid - clearing...\n");
++		memset(pra_cache, 0, PRA_NUMENTRIES * 4);
++		pra_cache_flush();
++	}
++}
++EXPORT_SYMBOL(arch_pra_init);
+diff --git a/arch/powerpc/platforms/fsp/fsp1_rtc.c b/arch/powerpc/platforms/fsp/fsp1_rtc.c
+new file mode 100644
+index 0000000..9e44323
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp1_rtc.c
+@@ -0,0 +1,327 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2010
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <asm/fsp1/rtc.h>
++
++int ibmfsp1_is_timecal_valid(void)
++{
++	uint32_t wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++	uint32_t reg_B = rtc_get_word(DCRN_RTC_REG_B);
++
++	/* Be paranoid and check other bits besides timecal valid this
++	   includes reg B bits and update interrupt enable */
++	int valid = (reg_B == (RTC_REGB_UIE | RTC_REGB_DM | RTC_REGB_24HR)) &&
++		((wrapper_cntl & (RTC_WCNTL_VTC | RTC_WCNTL_EUIA)) ==
++		 (RTC_WCNTL_VTC | RTC_WCNTL_EUIA));
++
++	return valid;
++}
++
++void ibmfsp1_start_timecal_sync(void)
++{
++	uint32_t wrapper_cntl;
++
++	/* Be paranoid and use NRST to clear active interrupt requests
++	   if starting sync.  This may be redundant in some cases, but
++	   needed in others */
++	wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++	wrapper_cntl &= ~(RTC_WCNTL_NRST | RTC_WCNTL_EUIA);
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++	wrapper_cntl |= RTC_WCNTL_NRST; /* finish the reset */
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++
++	/* Initiate a TIMECALENDAR Bus Synchronization. */
++	wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++
++	/* Start a synchronization cycle by setting the SYNCTC bit, then
++	   enable the update ended interrupt access bit*/
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, (wrapper_cntl | RTC_WCNTL_SYNCTC));
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, (wrapper_cntl | RTC_WCNTL_EUIA));
++
++	/* Enable the update ended interrupt, preserve binary and 24
++	   hour modes. */
++	rtc_put_word(DCRN_RTC_REG_B, ( RTC_REGB_UIE |
++				       RTC_REGB_DM  |
++				       RTC_REGB_24HR));
++}
++
++int ibmfsp1_set_rtc_time(struct rtc_time *set_tm)
++{
++	uint8_t century;
++	uint32_t wrapper_cntl;
++	struct rtc_time null_tm = {0,};
++	struct rtc_time *tm = set_tm;
++
++	/* Handle case where we need to set time to "0" */
++	if (!tm) {
++		tm = &null_tm;
++	}
++
++	/* Break down the time. */
++	century = tm->tm_year / 100;
++
++	/* Stop and reset the prescaler, clear any rate select. */
++	rtc_put_word(DCRN_RTC_REG_A, RTC_REGA_DIV_RESET);
++
++	/*
++	 * Freeze the user copy of the time registers, clear all
++	 * interrupt enables, set binary and 24 hour modes, reset
++	 * daylight savings enable.
++	 */
++	rtc_put_word(DCRN_RTC_REG_B, (RTC_REGB_SET |
++				      RTC_REGB_DM  |
++				      RTC_REGB_24HR));
++
++	/* Assert and clear the NRST line to clear active interrupt
++	   requests. */
++	wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++	wrapper_cntl |= RTC_WCNTL_NMR;
++	wrapper_cntl &= ~(RTC_WCNTL_NRST | RTC_WCNTL_EUIA);
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++
++	/*finish the reset*/
++	wrapper_cntl |= RTC_WCNTL_NRST;
++	rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++
++	/* Write the time to the user copy of the counter registers. */
++	rtc_put_word(DCRN_RTC_CENTURY, century);
++	rtc_put_word(DCRN_RTC_YEAR, tm->tm_year % 100);
++	rtc_put_word(DCRN_RTC_MONTH, tm->tm_mon);
++	rtc_put_word(DCRN_RTC_DAY_OF_MONTH, tm->tm_mday);
++	rtc_put_word(DCRN_RTC_HOURS, tm->tm_hour);
++	rtc_put_word(DCRN_RTC_MINUTES, tm->tm_min);
++	rtc_put_word(DCRN_RTC_SECONDS, tm->tm_sec);
++
++	/* Transfer the user copy into the counter registers, set binary and
++	 * 24 hour modes, reset daylight savings enable.*/
++	rtc_put_word(DCRN_RTC_REG_B, RTC_REGB_DM | RTC_REGB_24HR);
++
++	/* Allow the RTC to count again */
++	rtc_put_word(DCRN_RTC_REG_A, RTC_REGA_REF_CLCK_32KHZ);
++
++	ibmfsp1_start_timecal_sync();
++
++	return 0;
++}
++
++void ibmfsp1_get_rtc_time(struct rtc_time *tm)
++{
++	uint8_t reg_A, reg_B, century = 0;
++	uint8_t day, wday, mon, year;
++	uint32_t wrapper_cntl;
++	rtc64_hi_t rtc64_hi;
++	rtc64_lo_t rtc64_lo;
++
++	/* Get the RTC control registers for validity checking. */
++	reg_A = rtc_get_word(DCRN_RTC_REG_A);
++	reg_B = rtc_get_word(DCRN_RTC_REG_B);
++	wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++
++	/* check for validity of timecalendar bus.  If valid then use
++	   RTC64, otherwise fallback to the tried and true method of
++	   busy polling base RTCCore */
++	if(ibmfsp1_is_timecal_valid()) {
++		/* The RTC TIMECALENDAR bus is synchronized. Use the
++		   RTC64 register to read the RTC. rtc64_hi must be read
++		   first to latch, then rtc64_lo unlatches*/
++		rtc64_hi.reg = rtc_get_cmu_word(CMUN_RTC64_HI);
++		rtc64_lo.reg = rtc_get_cmu_word(CMUN_RTC64_LO);
++
++		rtc64hi_get_fields(rtc64_hi, &day, &wday,
++				   &mon, &year, &century);
++		tm->tm_mday = day;
++		tm->tm_mon = mon;
++		tm->tm_year = year;
++		tm->tm_sec = rtc64_lo.bits.seconds;
++		tm->tm_min = rtc64_lo.bits.minutes;
++		tm->tm_hour = rtc64_lo.bits.hours;
++	} else {
++#ifndef CONFIG_FSP1
++#error loop_cnt must be revisited on new platforms
++#endif
++		/* Single loop takes ~200 tb ticks on FSP1, so 4000 loops
++		 * should take ~4ms.  Updates to RTC take about 2ms, so 4ms
++		 * window will allow us to get a good read. */
++		unsigned long loop_cnt = 4000;
++
++		do {
++			uint8_t tmp_A, tmp_sec;
++
++			/* Re-read the RTC registers until no update is in
++			   progress. */
++			if (rtc_get_word(DCRN_RTC_REG_A) & RTC_REGA_UIP_BIT)
++				continue;
++
++			tm->tm_sec = rtc_get_word(DCRN_RTC_SECONDS);
++			tm->tm_min = rtc_get_word(DCRN_RTC_MINUTES);
++			tm->tm_hour = rtc_get_word(DCRN_RTC_HOURS);
++			tm->tm_mday = rtc_get_word(DCRN_RTC_DAY_OF_MONTH);
++			tm->tm_mon = rtc_get_word(DCRN_RTC_MONTH);
++			tm->tm_year = rtc_get_word(DCRN_RTC_YEAR);
++			century = rtc_get_word(DCRN_RTC_CENTURY);
++
++			tmp_A = rtc_get_word(DCRN_RTC_REG_A);
++			tmp_sec = rtc_get_word(DCRN_RTC_SECONDS);
++
++			/* Break out of loop if we were able to read all the
++			 * registers while:
++			 * 1) The UIP bit stayed off and
++			 * 2) the seconds field did not change */
++			if (!(tmp_A & RTC_REGA_UIP_BIT) &&
++					tm->tm_sec == tmp_sec) {
++				break;
++			}
++		} while (--loop_cnt > 0);
++	}
++
++	/* Check the validity of the time stamp and control registers. */
++	if (((reg_A & ~RTC_REGA_UIP_BIT) != RTC_REGA_REF_CLCK_32KHZ) ||
++	    /* wrong ref clock freq*/
++	    ((reg_B & ~RTC_REGB_INT_ENABLE_MASK) !=
++	     (RTC_REGB_DM | RTC_REGB_24HR)) || /* BIN, 24 hours, no DSE */
++	    ((wrapper_cntl & (RTC_WCNTL_NMR | RTC_WCNTL_NRST)) !=
++	     (RTC_WCNTL_NMR | RTC_WCNTL_NRST)) || /* Not in Reset */
++	    (tm->tm_sec > 59)  ||
++	    (tm->tm_min > 59)  ||
++	    (tm->tm_hour > 23) ||
++	    (tm->tm_mday > 31) ||
++	    (tm->tm_mon == 0)  ||
++	    (tm->tm_mon > 12)  ||
++	    (tm->tm_year > 99) ||
++	    (century < 19)    ||
++	    (century > 20)) {
++		/* Either the register checks failed or time is invalid.
++		 * Set the returned time to the epoch but leave the RTC alone
++		 * so that raw registers may be dumped if desired.
++		 */
++		tm->tm_sec = 0;
++		tm->tm_min = 0;
++		tm->tm_hour = 0;
++		tm->tm_mday = 1;
++		tm->tm_mon = 1;
++		tm->tm_year = 70;
++		century = 19;
++	}
++
++	/* Add the century to the year */
++	tm->tm_year += century * 100;
++
++}
++
++long ibmfsp1_time_init(void)
++{
++	uint8_t	 reg_A, reg_B, reg_C, reg_D;
++	uint32_t wrapper_cntl;
++
++	/* Read the RTC control/status registers. */
++	reg_A = rtc_get_word(DCRN_RTC_REG_A);
++	reg_B = rtc_get_word(DCRN_RTC_REG_B);
++	reg_C = 0; /* Reading reg_C may disturb rtc64 counter rollover */
++	reg_D = rtc_get_word(DCRN_RTC_REG_D);
++	wrapper_cntl = rtc_get_word(DCRN_RTC_WRAPPER_CNTL);
++
++	printk("RTC Init: Present date/time: "
++	       "%02d%02d/%02d/%02d %02d:%02d:%02d\n",
++	       rtc_get_word(DCRN_RTC_CENTURY),
++	       rtc_get_word(DCRN_RTC_YEAR),
++	       rtc_get_word(DCRN_RTC_MONTH),
++	       rtc_get_word(DCRN_RTC_DAY_OF_MONTH),
++	       rtc_get_word(DCRN_RTC_HOURS),
++	       rtc_get_word(DCRN_RTC_MINUTES),
++	       rtc_get_word(DCRN_RTC_SECONDS));
++	printk("\t Regs A-D, wrapper_cntl: "
++	       "0x%02x 0x%02x 0x%02x 0x%02x 0x%08x\n",
++	       reg_A, reg_B, reg_C, reg_D, wrapper_cntl);
++
++	/* Verify that the RTC is operational and set up as needed. */
++	/* don't check (reg_D != RTC_REGD_VRT)) see bugzilla 873*/
++	if (((reg_A & ~RTC_REGA_UIP_BIT) != RTC_REGA_REF_CLCK_32KHZ) ||
++	    /* wrong ref clock freq, or rate bits set */
++	    ((reg_B & ~RTC_REGB_INT_ENABLE_MASK) !=
++	     (RTC_REGB_DM | RTC_REGB_24HR)) ||
++	    /* Bin,24hr mode not set, or SET,DSE set. */
++	    ((wrapper_cntl & (RTC_WCNTL_NMR | RTC_WCNTL_NRST)) !=
++	     (RTC_WCNTL_NMR | RTC_WCNTL_NRST))) {
++		/* Reset lines must not be low.	 Bug 18036 - don't
++		   check TS bit */
++		printk("RTC - ERROR\n");
++
++		/* The RTC is either not set up correctly or lost power.
++		 * Set up register A and then call the set_rtc_time function
++		 * to set the RTC to start counting at 01/01/1970. */
++
++		/* Bug 18036 need to leave external Clock Mode at POR
++		   default and treat wrapper control as read - modify -
++		   write.  FSP-1 1.0 will have TS set to 0 DD 2.0 and
++		   beyond will have it POR to 0b1*/
++
++		/* Issue an NMR and NRST reset, due to bug 18036 also
++		   force everything else except TS */
++		wrapper_cntl &= ~(RTC_WCNTL_NMR | RTC_WCNTL_NRST |
++				  RTC_WCNTL_UM	| RTC_WCNTL_NRDP |
++				  RTC_WCNTL_ASP | RTC_WCNTL_EUIA |
++				  RTC_WCNTL_SYNCTC);
++		rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++
++		/* Release NMR and NRST to finish the reset*/
++		wrapper_cntl |= RTC_WCNTL_NMR | RTC_WCNTL_NRST;
++		rtc_put_word(DCRN_RTC_WRAPPER_CNTL, wrapper_cntl);
++
++		/* initialize time, calendar, and alarm registers. */
++		ibmfsp1_set_rtc_time(NULL);
++
++		reg_D = rtc_get_word(DCRN_RTC_REG_D);
++		printk("RTC: Read VRT at step 7: %x\n",reg_D);
++		reg_D = rtc_get_word(DCRN_RTC_REG_D);
++		printk("RTC: Read VRT twice at step 7: %x\n",reg_D);
++
++		printk("\t Resetting RTC.\n");
++		printk("\t New date/time: %02d%02d/%02d/%02d %02d:%02d:%02d\n",
++		       rtc_get_word(DCRN_RTC_CENTURY),
++		       rtc_get_word(DCRN_RTC_YEAR),
++		       rtc_get_word(DCRN_RTC_MONTH),
++		       rtc_get_word(DCRN_RTC_DAY_OF_MONTH),
++		       rtc_get_word(DCRN_RTC_HOURS),
++		       rtc_get_word(DCRN_RTC_MINUTES),
++		       rtc_get_word(DCRN_RTC_SECONDS));
++		printk("\t Regs A-D, wrapper_cntl: %x %x %x %x %x\n",
++		       rtc_get_word(DCRN_RTC_REG_A),
++		       rtc_get_word(DCRN_RTC_REG_B),
++		       0, /* Reading reg_C may disturb rtc64 counter
++			     rollover */
++		       rtc_get_word(DCRN_RTC_REG_D),
++		       rtc_get_word(DCRN_RTC_WRAPPER_CNTL));
++	}
++	else if(!ibmfsp1_is_timecal_valid()) {
++		ibmfsp1_start_timecal_sync();
++	}
++
++	/* Always return 0, since time_init() in time.c uses it to set
++	   time_offset. */
++	return 0;
++}
++
++/* FIXME extern qualifier removed when porting to MCP6.x, why was it needed */
++time_t last_rtc_update;	/*this is a hack.. FIXME*/
++
++EXPORT_SYMBOL(last_rtc_update);
++EXPORT_SYMBOL(ibmfsp1_get_rtc_time);
++EXPORT_SYMBOL(ibmfsp1_start_timecal_sync);
++EXPORT_SYMBOL(ibmfsp1_is_timecal_valid);
++EXPORT_SYMBOL(ibmfsp1_set_rtc_time);
++EXPORT_SYMBOL(ibmfsp1_time_init);
+diff --git a/arch/powerpc/platforms/fsp/fsp2.c b/arch/powerpc/platforms/fsp/fsp2.c
+new file mode 100644
+index 0000000..bffa520
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp2.c
+@@ -0,0 +1,152 @@
++/*
++ * FSP-2 board specific routines
++ *
++ * Copyright 2010-2011, IBM Corporation.
++ *
++ * Based on earlier code:
++ *    Matt Porter <mporter@kernel.crashing.org>
++ *    Copyright 2002-2005 MontaVista Software Inc.
++ *
++ *    Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
++ *    Copyright (c) 2003-2005 Zultys Technologies
++ *
++ *    Rewritten and ported to the merged powerpc tree:
++ *    Copyright 2007 David Gibson <dwg@au1.ibm.com>, IBM Corporation.
++ *
++ * This program is free software; you can redistribute  it and/or modify it
++ * under  the terms of  the GNU General  Public License as published by the
++ * Free Software Foundation;  either version 2 of the  License, or (at your
++ * option) any later version.
++ */
++
++#include <linux/init.h>
++#include <linux/of_platform.h>
++#include <linux/rtc.h>
++#include <linux/mmc/arasan_plat.h>
++
++#include <asm/machdep.h>
++#include <asm/prom.h>
++#include <asm/udbg.h>
++#include <asm/time.h>
++#include <asm/uic.h>
++#include <asm/ppc4xx.h>
++
++#include <linux/fsp/fsp.h>
++
++static __initdata struct of_device_id fsp2_of_bus[] = {
++	{ .compatible = "ibm,plb4", },
++	{ .compatible = "ibm,plb6", },
++	{ .compatible = "ibm,opb", },
++	{},
++};
++
++static int __init fsp2_device_probe(void)
++{
++	of_platform_bus_probe(NULL, fsp2_of_bus, NULL);
++
++	return 0;
++}
++machine_device_initcall(fsp2, fsp2_device_probe);
++
++static int arasan_of_probe(struct platform_device * of_dev)
++{
++	struct platform_device * arasan_device = NULL;
++        struct resource res[2] = {0,};
++	static struct arasan_platform_data arasan_pdata = {0,};
++	int rc = 0;
++
++	rc = of_address_to_resource(of_dev->dev.of_node, 0, res);
++	if (rc) {
++		dev_err(&of_dev->dev, "%s resource error!\n",
++			of_dev->dev.of_node->full_name);
++		rc = -ENXIO;
++		goto error;
++	}
++
++	res[1].start = irq_of_parse_and_map(of_dev->dev.of_node, 0);
++	if (res[1].start == NO_IRQ) {
++		dev_err(&of_dev->dev, "%s resource error!\n",
++			of_dev->dev.of_node->full_name);
++		rc = -ENXIO;
++		goto error;
++	}
++
++	res[1].name = "mmcirq";
++	res[1].flags = IORESOURCE_IRQ;
++
++        arasan_device = platform_device_alloc("arasan", 0);
++	if (arasan_device == NULL) {
++		rc = -ENOMEM;
++		goto error;
++	}
++
++	rc = platform_device_add_resources(arasan_device, res, 2);
++	if (rc) {
++		goto error;
++	}
++
++	rc = platform_device_add_data(arasan_device,
++				      &arasan_pdata, sizeof(arasan_pdata));
++	if (rc) {
++		goto error;
++	}
++
++	rc = platform_device_add(arasan_device);
++	if (rc) {
++		goto error;
++	}
++
++	if (rc) {
++error:
++		platform_device_put(arasan_device);
++	}
++
++	return rc;
++}
++
++static struct of_device_id arasan_match_table[] = {
++	{ .compatible	= "arasan,emmc", },
++	{},
++};
++
++static struct platform_driver arasan_of_driver = {
++	.driver = {
++		.name		= "arasan-mmc",
++		.of_match_table	= arasan_match_table,
++	},
++	.probe		= arasan_of_probe,
++};
++
++static int __init arasan_device_init(void)
++{
++	return platform_driver_register(&arasan_of_driver);
++}
++machine_device_initcall(fsp2, arasan_device_init);
++
++/*
++ * Called very early, MMU is off, device-tree isn't unflattened
++ */
++static int __init fsp2_probe(void)
++{
++	unsigned long root = of_get_flat_dt_root();
++
++	if (!of_flat_dt_is_compatible(root, "ibm,fsp2"))
++		return 0;
++
++	return 1;
++}
++
++define_machine(fsp2) {
++	.name			= "FSP-2",
++	.probe			= fsp2_probe,
++	.progress		= udbg_progress,
++	.init_IRQ		= uic_init_tree,
++	.get_irq		= uic_get_irq,
++	.restart		= fsp_restart,
++	.panic			= fsp_panic,
++	//.power_off		= fsp_power_off,
++	.halt			= fsp_halt,
++	.machine_check_exception= fsp_machine_check_exception,
++	.calibrate_decr		= generic_calibrate_decr,
++	//TODO: time_init, set_rtc_time, get_rtc_time, others?
++};
+diff --git a/arch/powerpc/platforms/fsp/fsp2_handlers.c b/arch/powerpc/platforms/fsp/fsp2_handlers.c
+new file mode 100644
+index 0000000..192b1a9
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp2_handlers.c
+@@ -0,0 +1,432 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2012
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/kernel.h>
++#include <linux/interrupt.h>
++#include <linux/of_platform.h>
++#include <linux/crash_dump.h>
++#include <linux/sched.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++#include <asm/io.h>
++
++#include <linux/fsp/pra.h>
++#include <asm/fsp/reg.h>
++#include <linux/fsp/fsp.h>
++
++
++#include <linux/of_irq.h>
++#include <linux/of_address.h>
++
++#include <asm/fsp/reg.h>
++#include <asm/fsp2/dcr.h>
++
++#include <linux/fsp/reboot.h>
++#include <linux/fsp/pra.h>
++#include <linux/fsp/hdcr.h>
++
++
++#define IRQF_DISABLED 0
++
++static u32 mfl2(u32 reg)
++{
++	u32 data;
++	unsigned long flags;
++
++	local_irq_save(flags);
++	mtdcr(DCRN_L2CDCRAI, reg);
++	data = mfdcr(DCRN_L2CDCRDI);
++	local_irq_restore(flags);
++
++	return data;
++}
++
++static void mtl2(u32 reg, u32 data)
++{
++	unsigned long flags;
++
++	local_irq_save(flags);
++	mtdcr(DCRN_L2CDCRAI, reg);
++	mtdcr(DCRN_L2CDCRDI, data);
++	local_irq_restore(flags);
++}
++
++static void show_l2_regs(void)
++{
++	printk("L2 Controller:\n");
++	printk("MCK:      0x%08x\n", mfl2(L2MCK));
++	printk("INT:      0x%08x\n", mfl2(L2INT));
++	printk("PLBSTAT0: 0x%08x\n", mfl2(L2PLBSTAT0));
++	printk("PLBSTAT1: 0x%08x\n", mfl2(L2PLBSTAT1));
++	printk("ARRSTAT0: 0x%08x\n", mfl2(L2ARRSTAT0));
++	printk("ARRSTAT1: 0x%08x\n", mfl2(L2ARRSTAT1));
++	printk("ARRSTAT2: 0x%08x\n", mfl2(L2ARRSTAT2));
++	printk("CPUSTAT:  0x%08x\n", mfl2(L2CPUSTAT));
++	printk("RACSTAT0: 0x%08x\n", mfl2(L2RACSTAT0));
++	printk("WACSTAT0: 0x%08x\n", mfl2(L2WACSTAT0));
++	printk("WACSTAT1: 0x%08x\n", mfl2(L2WACSTAT1));
++	printk("WACSTAT2: 0x%08x\n", mfl2(L2WACSTAT2));
++	printk("WDFSTAT:  0x%08x\n", mfl2(L2WDFSTAT));
++	printk("LOG0:     0x%08x\n", mfl2(L2LOG0));
++	printk("LOG1:     0x%08x\n", mfl2(L2LOG1));
++	printk("LOG2:     0x%08x\n", mfl2(L2LOG2));
++	printk("LOG3:     0x%08x\n", mfl2(L2LOG3));
++	printk("LOG4:     0x%08x\n", mfl2(L2LOG4));
++	printk("LOG5:     0x%08x\n", mfl2(L2LOG5));
++}
++
++static void show_plbopb_regs(u32 base, int num)
++{
++	printk("\nPLBOPB Bridge %d:\n", num);
++	printk("GESR0: 0x%08x\n", mfdcr(base + PLB4OPB_GESR0));
++	printk("GESR1: 0x%08x\n", mfdcr(base + PLB4OPB_GESR1));
++	printk("GESR2: 0x%08x\n", mfdcr(base + PLB4OPB_GESR2));
++	printk("GEARU: 0x%08x\n", mfdcr(base + PLB4OPB_GEARU));
++	printk("GEAR:  0x%08x\n", mfdcr(base + PLB4OPB_GEAR));
++}
++
++static void show_bus_regs(void)
++{
++	show_l2_regs();
++
++	printk("\nPLB6 Controller:\n");
++	printk("BC_SHD: 0x%08x\n", mfdcr(DCRN_PLB6_SHD));
++	printk("BC_ERR: 0x%08x\n", mfdcr(DCRN_PLB6_ERR));
++
++	printk("\nPLB6-to-PLB4 Bridge:\n");
++	printk("ESR:  0x%08x\n", mfdcr(DCRN_PLB6PLB4_ESR));
++	printk("EARH: 0x%08x\n", mfdcr(DCRN_PLB6PLB4_EARH));
++	printk("EARL: 0x%08x\n", mfdcr(DCRN_PLB6PLB4_EARL));
++
++	printk("\nPLB4-to-PLB6 Bridge:\n");
++	printk("ESR:  0x%08x\n", mfdcr(DCRN_PLB4PLB6_ESR));
++	printk("EARH: 0x%08x\n", mfdcr(DCRN_PLB4PLB6_EARH));
++	printk("EARL: 0x%08x\n", mfdcr(DCRN_PLB4PLB6_EARL));
++
++	printk("\nPLB6-to-MCIF Bridge:\n");
++	printk("BESR0: 0x%08x\n", mfdcr(DCRN_PLB6MCIF_BESR0));
++	printk("BESR1: 0x%08x\n", mfdcr(DCRN_PLB6MCIF_BESR1));
++	printk("BEARH: 0x%08x\n", mfdcr(DCRN_PLB6MCIF_BEARH));
++	printk("BEARL: 0x%08x\n", mfdcr(DCRN_PLB6MCIF_BEARL));
++
++	printk("\nPLB4 Arbiter:\n");
++	printk("P0ESRH 0x%08x\n", mfdcr(DCRN_PLB4_P0ESRH));
++	printk("P0ESRL 0x%08x\n", mfdcr(DCRN_PLB4_P0ESRL));
++	printk("P0EARH 0x%08x\n", mfdcr(DCRN_PLB4_P0EARH));
++	printk("P0EARH 0x%08x\n", mfdcr(DCRN_PLB4_P0EARH));
++	printk("P1ESRH 0x%08x\n", mfdcr(DCRN_PLB4_P1ESRH));
++	printk("P1ESRL 0x%08x\n", mfdcr(DCRN_PLB4_P1ESRL));
++	printk("P1EARH 0x%08x\n", mfdcr(DCRN_PLB4_P1EARH));
++	printk("P1EARH 0x%08x\n", mfdcr(DCRN_PLB4_P1EARH));
++
++	show_plbopb_regs(DCRN_PLB4OPB0_BASE, 0);
++	show_plbopb_regs(DCRN_PLB4OPB1_BASE, 1);
++	show_plbopb_regs(DCRN_PLB4OPB2_BASE, 2);
++	show_plbopb_regs(DCRN_PLB4OPB3_BASE, 3);
++
++	printk("\nPLB4-to-AHB Bridge:\n");
++	printk("ESR:   0x%08x\n", mfdcr(DCRN_PLB4AHB_ESR));
++	printk("SEUAR: 0x%08x\n", mfdcr(DCRN_PLB4AHB_SEUAR));
++	printk("SELAR: 0x%08x\n", mfdcr(DCRN_PLB4AHB_SELAR));
++
++	printk("\nAHB-to-PLB4 Bridge:\n");
++	printk("\nESR: 0x%08x\n", mfdcr(DCRN_AHBPLB4_ESR));
++	printk("\nEAR: 0x%08x\n", mfdcr(DCRN_AHBPLB4_EAR));
++}
++
++static irqreturn_t bus_error_irq(int irq, void *data)
++{
++	struct device_node *node = data;
++	const char *name = node->name;
++
++	printk("Bus Error: %s\n", name);
++
++	show_bus_regs();
++	show_regs(get_irq_regs());
++
++	//pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	panic("Bus Error");
++
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t cmu_error_irq(int irq, void *data)
++{
++	printk("CMU Error\n");
++	//printk("FIR0: 0x%08x\n", mfcmu(CMUN_FIR0));
++
++	/*
++	 * TODO: The CONFFIR0-3 registers are broken for dd1, but we might want
++	 * to print them here if we get a dd2.
++	 */
++
++	//pra_write(PRA_CALLOUT, PRA_CMU);
++	panic("CMU Error");
++
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t conf_error_irq(int irq, void *data)
++{
++	printk("Configuration Logic Error\n");
++	printk("CONF_FIR: 0x%08x\n", mfdcr(DCRN_CONF_FIR_RWC));
++	printk("RPERR0:   0x%08x\n", mfdcr(DCRN_CONF_RPERR0));
++	printk("RPERR1:   0x%08x\n", mfdcr(DCRN_CONF_RPERR1));
++
++	//pra_write(PRA_CALLOUT, PRA_CONF_LOGIC);
++	panic("Configuration Logic Error");
++
++	return IRQ_HANDLED;
++}
++
++void __iomem *spad_cfg_addr;
++void __iomem *gpio_addr;
++
++static irqreturn_t opbd_error_irq(int irq, void *data)
++{
++	printk("OPBD Error\n");
++	printk("SPAD FIR: 0x%08x\n", readl_be(spad_cfg_addr + 0x20));
++	printk("GPIO FIR: 0x%08x\n", readl_be(gpio_addr + 0x18));
++
++	//pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	panic("OPBD Error");
++
++	return IRQ_HANDLED;
++}
++
++static void show_mc_regs(void)
++{
++	unsigned int base = DCRN_DDR34_BASE;
++	printk("MCSTAT:            0x%08x\n", mfdcr(base+DCRN_DDR34_MCSTAT));
++	printk("MCOPT1:            0x%08x\n", mfdcr(base+DCRN_DDR34_MCOPT1));
++	printk("MCOPT2:            0x%08x\n", mfdcr(base+DCRN_DDR34_MCOPT2));
++	printk("PHYSTAT:           0x%08x\n", mfdcr(base+DCRN_DDR34_PHYSTAT));
++	printk("CFGR0:             0x%08x\n", mfdcr(base+DCRN_DDR34_CFGR0));
++	printk("CFGR1:             0x%08x\n", mfdcr(base+DCRN_DDR34_CFGR1));
++	printk("CFGR2:             0x%08x\n", mfdcr(base+DCRN_DDR34_CFGR2));
++	printk("CFGR3:             0x%08x\n", mfdcr(base+DCRN_DDR34_CFGR3));
++	printk("SCRUB_CNTL:        0x%08x\n",
++		mfdcr(base+DCRN_DDR34_SCRUB_CNTL));
++	printk("ECCERR_PORT0:      0x%08x\n",
++		mfdcr(base+DCRN_DDR34_ECCERR_PORT0));
++	printk("ECCERR_ADDR_PORT0: 0x%08x\n",
++		mfdcr(base+DCRN_DDR34_ECCERR_ADDR_PORT0));
++	printk("ECCERR_CNT_PORT0:  0x%08x\n",
++		mfdcr(base+DCRN_DDR34_ECCERR_COUNT_PORT0));
++	printk("ECC_CHECK_PORT0:   0x%08x\n",
++		mfdcr(base+DCRN_DDR34_ECC_CHECK_PORT0));
++
++	/* Core Wrapper */
++	base = DCRN_CW_BASE;
++	printk("MCER0:            0x%08x\n", mfdcr(base+DCRN_CW_MCER0));
++	printk("MCER1:            0x%08x\n", mfdcr(base+DCRN_CW_MCER1));
++
++	/* PLB6-MCIF bridge */
++	printk("BESR:             0x%08x\n", mfdcr(DCRN_PLB6MCIF_BESR0));
++	printk("BEARL:            0x%08x\n", mfdcr(DCRN_PLB6MCIF_BEARL));
++	printk("BEARH:            0x%08x\n", mfdcr(DCRN_PLB6MCIF_BEARH));
++}
++
++static irqreturn_t mc_ue_irq(int irq, void *data)
++{
++	printk("DDR: Uncorrectable Error\n");
++
++	show_mc_regs();
++
++	//pra_write(PRA_CALLOUT, PRA_ECCERR);
++	panic("DDR: Uncorrectable Error\n");
++
++	return IRQ_HANDLED;
++}
++
++void WatchdogHandler(struct pt_regs *regs)
++{
++	mtspr(SPRN_TCR, mfspr(SPRN_TCR) & ~TCR_WIE);
++	show_regs(regs);
++	panic("Received Watchdog Critical Interrupt");
++}
++
++int fsp_machine_check_exception(struct pt_regs *regs)
++{
++	u32 mcsr = mfspr(SPRN_MCSR);
++
++	printk("Machine Check: MCSR=0x%x\n", mcsr);
++
++	if (mcsr & MCSR_TLBP) {
++		printk("UTLB Parity Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_TLB);
++	}
++	else if (mcsr & MCSR_ICP) {
++		printk("I-Cache Asynchronous Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_ICACHE);
++	}
++	else if (mcsr & MCSR_DCSP) {
++		printk("D-Cache Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_DCACHE);
++	}
++	else if (mcsr & PPC47x_MCSR_GPR) {
++		printk("GPR Parity Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_GPR);
++	}
++	else if (mcsr & PPC47x_MCSR_FPR) {
++		printk("FPR Parity Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_FPR);
++	}
++	else if (mcsr & MCSR_L2) {
++		//u32 l2mck = mfl2(L2MCK);
++
++		printk("L1/L2 Cache Error\n");
++		//pra_write(PRA_CALLOUT, PRA_TLBCACHEERR | PRA_CALLOUT_L1_L2);
++
++		show_l2_regs();
++	}
++	else if (mcsr & MCSR_DCR) {
++		printk("DCR Timeout\n");
++		//pra_write(PRA_CALLOUT, PRA_HWSWERR);
++	}
++
++	show_regs(regs);
++
++	/* Clear MCSR in case we get another machine check during kexec */
++	mtspr(SPRN_MCSRC, mcsr);
++
++	panic("Machine Check\n");
++}
++
++static int fsp_of_probe(struct platform_device *ofdev)
++{
++	int rc;
++	unsigned int irq;
++	struct device_node *node = ofdev->dev.of_node;
++	irq_handler_t handler = ofdev->dev.driver->of_match_table->data;
++
++	 /* Ignore error interrupts if we're in the capture kernel */
++	/* if (is_kdump_kernel()) FIXME - Error IRQs setup causing kernel panic on MCP 8 */
++		return 0;
++
++	irq = irq_of_parse_and_map(node, 0);
++	if (irq == NO_IRQ)
++		panic("Device tree node %s is missing a valid interrupt",
++		      node->name);
++
++	rc = request_irq(irq, handler, IRQF_DISABLED, node->name, node);
++
++	if (rc)
++		panic("fsp_of_probe: request_irq failed: node=%s rc=%d",
++		      node->full_name, rc);
++
++	return 0;
++}
++
++static struct of_device_id fsp_of_match_table[] = {
++	{
++		.compatible	= "ibm,bus-error-irq",
++		.data		= bus_error_irq,
++	},
++	{
++		.compatible	= "ibm,cmu-error-irq",
++		.data		= cmu_error_irq,
++	},
++	{
++		.compatible	= "ibm,conf-error-irq",
++		.data		= conf_error_irq,
++	},
++	{
++		.compatible	= "ibm,opbd-error-irq",
++		.data		= opbd_error_irq,
++	},
++	{
++		.compatible	= "ibm,mc-ue-irq",
++		.data		= mc_ue_irq,
++	},
++	{
++		//.compatible	= "ibm,reset-warning-irq",
++		//.data		= reset_warning_irq,
++	},
++	{},
++};
++
++static struct platform_driver fsp_of_driver = {
++	.driver = {
++		.name		= "fsp",
++		.of_match_table 	= fsp_of_match_table,
++	},
++	.probe		= fsp_of_probe,
++};
++
++static int __init fsp_handlers_init(void)
++{
++	u32 ccr2;
++
++	/*
++	 * L2 error reporting initialization
++	 *
++	 * The goal here is to configure parity errors and definite HW errors
++	 * as machine checks, handled by fsp_machine_check_exception().  Any
++	 * other errors that could have been caused by SW or other bus errors
++	 * are configured as critical interrupts, handled by bus_error_irq().
++	 */
++
++	/* L2 machine checks */
++	mtl2(L2PLBMCKEN0, 0xffffffff);
++	mtl2(L2PLBMCKEN1, 0x0000ffff);
++	mtl2(L2ARRMCKEN0, 0xffffffff);
++	mtl2(L2ARRMCKEN1, 0xffffffff);
++	mtl2(L2ARRMCKEN2, 0xfffff000);
++	mtl2(L2CPUMCKEN, 0xffffffff);
++	mtl2(L2RACMCKEN0, 0xffffffff);
++	mtl2(L2WACMCKEN0, 0xffffffff);
++	mtl2(L2WACMCKEN1, 0xffffffff);
++	mtl2(L2WACMCKEN2, 0xffffffff);
++	mtl2(L2WDFMCKEN, 0xffffffff);
++
++	/* L2 interrupts */
++	mtl2(L2PLBINTEN1, 0xffff0000);
++
++	/*
++	 * At a global level, enable all L2 machine checks and interrupts
++	 * reported by the L2 subsystems, except for the external machine check
++	 * input (UIC0.1) which we don't plan on using.  Instead, those will be
++	 * coming in on UIC0 as critical interrupts.
++	 */
++	mtl2(L2MCKEN, 0x000007ff);
++	mtl2(L2INTEN, 0x000007ff);
++
++	/* Enable the DCR timeout machine check */
++	ccr2 = mfspr(SPRN_CCR2);
++	ccr2 |= 0x00000400;
++	mtspr(SPRN_CCR2, ccr2);
++
++	/* Enable FSP-2 configuration logic parity errors */
++	mtdcr(DCRN_CONF_EIR_RS, 0x80000000);
++
++	/* Enable SPAD errors through the SPAD EEIR register */
++	/* TODO: get the base address from the device tree and use defines for
++	 * the register accesses */
++	spad_cfg_addr = ioremap(0x10b0027f00ULL, 128);
++	writel_be(0xfe000000, spad_cfg_addr + 0x30);
++
++	/* Enable GPIO errors through the GPIO EIR register */
++	/* TODO: get GPIO driver to do this instead? */
++	gpio_addr = ioremap(0x10b0027f80ULL, 64);
++	writel_be(0x0000c100, gpio_addr + 0x20);
++
++	return platform_driver_register(&fsp_of_driver);
++}
++
++arch_initcall(fsp_handlers_init);
+diff --git a/arch/powerpc/platforms/fsp/fsp2_pra.c b/arch/powerpc/platforms/fsp/fsp2_pra.c
+new file mode 100644
+index 0000000..e08fa2d
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/fsp2_pra.c
+@@ -0,0 +1,95 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/module.h>
++#include <linux/fsp/pra.h>
++#include <linux/mtd/mtd.h>
++#include <linux/err.h>
++#include <asm/io.h>
++
++#define PRA_START		0x10b0025e80ULL
++#define PRA_SIZE		384
++#define PRA_PREVIOUS_OFFSET	(PRA_SIZE/2) /* 0x10b0025f40 */
++#define MTD_OFFSET		0x1e80
++
++static void __iomem *pra_base_addr;
++
++static inline u32 pra_offset(bool current, unsigned int key)
++{
++	return (current ? 0 : PRA_PREVIOUS_OFFSET) + (key * 4);
++}
++
++static inline void __iomem *pra_key_to_address(bool current, unsigned int key)
++{
++	return pra_base_addr + pra_offset(current, key);
++}
++
++u32 arch_pra_read(bool current, unsigned int key)
++{
++	u32 val = 0;
++#ifdef CONFIG_MTD
++	struct mtd_info *mtd = NULL;
++	size_t bytes_read = 0;
++	int32_t rc;
++
++	mtd = get_mtd_device_nm("sram");
++	if (IS_ERR(mtd))
++		goto iomem_read;
++
++	rc = mtd_read(mtd, MTD_OFFSET + pra_offset(current, key),
++			sizeof(u32), &bytes_read, (uint8_t *)&val);
++	put_mtd_device(mtd);
++	if (!rc && bytes_read == sizeof(u32))
++		goto exit;
++#endif
++iomem_read:
++	val = readl_be(pra_key_to_address(current, key));
++exit:
++	return val;
++}
++EXPORT_SYMBOL(arch_pra_read);
++
++void arch_pra_write(unsigned int key, u32 data)
++{
++#ifdef CONFIG_MTD
++	struct mtd_info *mtd = NULL;
++	size_t bytes_written = 0;
++	int32_t rc;
++
++	mtd = get_mtd_device_nm("sram");
++	if (IS_ERR(mtd))
++		goto iomem_write;
++
++	rc = mtd_write(mtd, MTD_OFFSET + pra_offset(true, key),
++			sizeof(u32), &bytes_written, (uint8_t *)&data);
++	put_mtd_device(mtd);
++	if (rc || bytes_written != sizeof(u32))
++		goto iomem_write;
++	else
++		return;
++#endif
++iomem_write:
++	writel_be(data, pra_key_to_address(true, key));
++}
++EXPORT_SYMBOL(arch_pra_write);
++
++void __init arch_pra_init(void)
++{
++	pra_base_addr = ioremap(PRA_START, PRA_SIZE);
++}
++EXPORT_SYMBOL(arch_pra_init);
+diff --git a/arch/powerpc/platforms/fsp/hdcr.c b/arch/powerpc/platforms/fsp/hdcr.c
+new file mode 100644
+index 0000000..ddbb347
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/hdcr.c
+@@ -0,0 +1,312 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2010, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/kernel.h>
++#include <linux/interrupt.h>
++#include <linux/of_platform.h>
++#include <linux/crash_dump.h>
++#include <linux/sched.h>
++#include <asm/io.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++
++#include <linux/of_irq.h>
++#include <linux/of_address.h>
++
++#include <asm/fsp/reg.h>
++#include <asm/fsp2/dcr.h>
++
++#include <linux/fsp/reboot.h>
++#include <linux/fsp/pra.h>
++#include <linux/fsp/hdcr.h>
++
++
++#define IRQF_DISABLED 0
++extern void flush_dcache_all(void);
++
++u32 *drcr_read_addr_ptr;
++u32 *drcr_clear_addr_ptr;
++
++
++void drcr_clear(u32 clear_bits)
++{
++	*(drcr_clear_addr_ptr) = clear_bits;
++}
++EXPORT_SYMBOL(drcr_clear);
++
++u32 drcr_read(void)
++{
++	return *(drcr_read_addr_ptr);
++}
++EXPORT_SYMBOL(drcr_read);
++
++
++u32 *disr_read_addr_ptr;
++u32 *disr_clear_addr_ptr;
++
++/*
++ * This function 'shadows' the DISR register to some unused UIC bits, so a peer
++ * FSP can read them via buddy JTAG.  This functionality and the bit
++ * definitions are defined in the FSP-1 Reboot and Reset/Reload High Level
++ * Design Document, owned by Paul Movall.
++ */
++
++#ifdef CONFIG_FSP1
++
++#define DCRN_UIC_DISR_BASE	0x360 /* UIC 1.3 */
++#define UIC_DISR_SHADOW_MASK	0xEC000000
++
++#endif
++
++/*
++ * TODO: This needs architectural definition.  I just randomly picked some
++ * free UIC bits for now.
++ */
++#define DCRN_UIC_DISR_BASE	0x370 /* UIC 1.5 */
++#define UIC_DISR_SHADOW_MASK	0x000000EC
++
++
++
++#define DCRN_UIC_DISR_SR	(DCRN_UIC_DISR_BASE + 0)
++#define DCRN_UIC_DISR_SRS	(DCRN_UIC_DISR_BASE + 1)
++#define DCRN_UIC_DISR_ER	(DCRN_UIC_DISR_BASE + 2)
++#define DCRN_UIC_DISR_PR	(DCRN_UIC_DISR_BASE + 4)    /* we store DISR here */
++
++static void shadow_disr_to_uic15(u32 disr)
++{
++	u32 uic15_er;
++	u32 uic15_pl;
++	u32 uic15_sr_sdwbits;
++	unsigned long flags;
++
++	local_irq_save(flags);
++
++	/* make sure the shadow bits aren't irq enabled */
++	uic15_er = ~UIC_DISR_SHADOW_MASK & mfdcr(DCRN_UIC_DISR_ER);
++	mtdcr(DCRN_UIC_DISR_ER, uic15_er);
++
++	/* clear the UIC shadow bits */
++	mtdcr(DCRN_UIC_DISR_SR, UIC_DISR_SHADOW_MASK);
++
++	/* set the shadow bits as defined in Paul M's reset spec */
++#if defined(CONFIG_FSP1)
++	uic15_sr_sdwbits =
++		((disr << 31) & 0x80000000) |
++		((disr << 23) & 0x40000000) |
++		((disr << 24) & 0x20000000) |
++		((disr << 21) & 0x08000000) |
++		((disr << 18) & 0x04000000);
++#endif
++	uic15_sr_sdwbits =
++		((disr << 7) & 0x00000080) |
++		((disr >> 1) & 0x00000040) |
++		((disr     ) & 0x00000020) |
++		((disr >> 3) & 0x00000008) |
++		((disr >> 6) & 0x00000004);
++
++
++	/* we only use the Polrity Register as setting in the status is giving us trouble*/
++	/* read Polarity Register and clear the shadow bits*/
++	uic15_pl=mfdcr(DCRN_UIC_DISR_PR) & ~UIC_DISR_SHADOW_MASK;
++	/* now add the disr part */
++	uic15_pl=uic15_pl | uic15_sr_sdwbits;
++
++	mtdcr(DCRN_UIC_DISR_PR, uic15_pl);
++	
++	printk("shadow_disr_to_uic15: 0x%08lx to uic15_pr\n",uic15_pl);
++
++	local_irq_restore(flags);
++}
++
++void disr_set(u32 set_bits)
++{
++	*(disr_read_addr_ptr) = set_bits;
++	shadow_disr_to_uic15(*disr_read_addr_ptr);
++}
++
++void disr_clear(u32 clear_bits)
++{
++	*(disr_clear_addr_ptr) = clear_bits;
++	shadow_disr_to_uic15(*disr_read_addr_ptr);
++}
++
++u32 disr_read(void)
++{
++	return *(disr_read_addr_ptr);
++}
++EXPORT_SYMBOL(disr_read);
++
++void disr_clear_and_set(u32 clear_bits, u32 set_bits, u32 *old_value)
++{
++	u32 temp;
++	unsigned long flags;
++
++	local_irq_save(flags);
++
++	if (old_value) {
++		temp = disr_read();
++		*old_value = temp;
++	}
++
++	disr_set(set_bits);
++	disr_clear(clear_bits);
++
++	local_irq_restore(flags);
++}
++EXPORT_SYMBOL(disr_clear_and_set);
++
++
++#define DRCR_RESERVED 	   0x0000FF00
++#define DRCR_VALID_BIT     0x00008000
++#define DRCR_TERM1_BIT	   0x00004000
++#define DRCR_TERM2_BIT     0x00000100
++#define DRCR_TERM_MASK1    (DRCR_VALID_BIT | DRCR_TERM1_BIT)
++#define DRCR_TERM_MASK2    (DRCR_VALID_BIT | DRCR_TERM2_BIT)
++#define DRCR_TERM_BITMASK  (DRCR_VALID_BIT | DRCR_TERM1_BIT | DRCR_TERM2_BIT)
++
++static int drcr_is_irq_valid(void)
++{
++	u32 drcr_reg = drcr_read();
++	u32 term_bits = drcr_reg & DRCR_TERM_BITMASK;
++
++	/* Check for valid type */
++	if ((term_bits != DRCR_TERM_MASK1) &&
++	    (term_bits != DRCR_TERM_MASK2)) {
++		/* Invalid bit combo, clear and return */
++		drcr_clear(DRCR_TERM1_BIT | DRCR_TERM2_BIT);
++		if(!(drcr_reg & ~DRCR_TERM_BITMASK & DRCR_RESERVED)) {
++			drcr_clear(DRCR_VALID_BIT);
++		}
++		return 0;
++	}
++
++	return 1;
++}
++
++/*
++ * Handle the warning from the host that they are about to reset the FSP.
++ */
++static irqreturn_t drcr_irq_handler(int irq, void *dontcare)
++{
++	//int i;
++	//char *buf = "host initiated reset";
++
++	if(!drcr_is_irq_valid()) return IRQ_NONE;
++
++	printk("Received host initiated reset request\n");
++	show_regs(get_irq_regs());
++
++	mtspr(SPRN_TSR, TSR_ENW | TSR_WIS); /* clear watchdog */
++
++	//pra_write(PRA_SFT_RST_FLAVOR, LINUX_REBOOT_CMD_HOSTINIT);
++	//flush_dcache_all();
++
++	/* Do not clear the DRCR register.  This signals to the host that it is
++	 * safe to proceed with the reset.  We want to defer that until after
++	 * the capture kernel has had a chance to run. */
++	/* drcr_clear(0x0000ff00); */
++
++	mtspr(SPRN_TSR, TSR_ENW | TSR_WIS); /* clear watchdog */
++
++	panic("DRCR: Host Initiated Reset");
++}
++
++static int fsp_hdcr_of_probe(struct platform_device *ofdev)
++{
++	int rc;
++	struct resource res;
++	struct device_node *node = ofdev->dev.of_node;
++	unsigned int size;
++	unsigned int irq;
++	struct irq_desc *desc;
++	static int drcr_dev_id; /* unused, but required by request_irq when
++				   combining IRQF_DISABLED and IRQF_SHARED */
++				   
++	
++	if (of_address_to_resource(node, 0, &res))
++		panic("hdcr_init: of_address_to_resource failure");
++
++	size = res.end - res.start + 1;
++	if (size != 16)
++		panic("hdcr_init: hdcr size of %u not supported", size);
++
++	drcr_read_addr_ptr = ioremap(res.start, size);
++
++	if (!drcr_read_addr_ptr)
++		panic("hdcr_init: of_iomap failure");
++
++	drcr_clear_addr_ptr = drcr_read_addr_ptr + 1;
++	disr_read_addr_ptr = drcr_read_addr_ptr + 2;
++	disr_clear_addr_ptr = drcr_read_addr_ptr + 3;
++
++	shadow_disr_to_uic15(disr_read());
++	
++	irq = irq_of_parse_and_map(node, 0);
++	if (irq == NO_IRQ)
++		panic("Device tree node %s is missing a valid interrupt",
++		      node->name);
++
++	/* Clear out spurious DRCR interrupts prior to enablement (capture
++	 * kernel only).
++	 *
++	 * UIC initialization within the uic_init_one function causes all
++	 * interrupts to be 'level' type interrupts for a period of time until
++	 * further parsing of the device tree changes some interrupts into
++	 * 'edge' type interrupts.
++	 *
++	 * The DRCR write interrupt is an 'edge' type interrupt.  Since we now
++	 * defer clearing the DRCR register until after the capture kernel has
++	 * collected the kdump, this causes a spurious interrupt to be
++	 * recorded during the initialization of the capture kernel when the
++	 * interrupt line toggles briefly from an edge to a level interrupt.
++	 *
++	 * Failure to clear this causes the DRCR IRQ handler to fire and a
++	 * subsequent panic.
++	 */
++	if(is_kdump_kernel()) {
++		desc = irq_to_desc(irq);
++		if(desc && desc->irq_data.chip && desc->irq_data.chip->irq_ack)
++			desc->irq_data.chip->irq_ack(&desc->irq_data);
++	}
++
++	rc = request_irq(irq, drcr_irq_handler, IRQF_SHARED | IRQF_DISABLED,
++			  "DRCR host-initiated reset", &drcr_dev_id);
++	if (rc)
++		panic("Error registering DRCR irq handler");
++
++	return 0;
++}
++
++static struct of_device_id fsp_hdcr_match_table[] = {
++	{ .compatible	= "ibm,hdcr", },
++	{},
++};
++
++static struct platform_driver fsp_hdcr_of_driver = {
++	.driver = {
++		.name		= "hdcr",
++		.of_match_table	= fsp_hdcr_match_table,
++		},
++	.probe		= fsp_hdcr_of_probe,
++};
++
++static int __init fsp_hdcr_init(void)
++{
++	return platform_driver_register(&fsp_hdcr_of_driver);
++}
++arch_initcall(fsp_hdcr_init);
+diff --git a/arch/powerpc/platforms/fsp/reset.c b/arch/powerpc/platforms/fsp/reset.c
+new file mode 100644
+index 0000000..e591381
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/reset.c
+@@ -0,0 +1,1130 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2007, 2013
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <linux/kernel.h>
++#include <linux/fsp/reboot.h>
++#include <linux/proc_fs.h>
++#include <linux/crash_dump.h>
++#include <linux/slab.h>
++#include <asm/uaccess.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++
++#include <asm/fsp/reg.h>
++#include <asm/fsp2/dcr.h>
++
++#include <linux/seq_file.h>
++
++#include <linux/fsp/pra.h>
++#include <linux/fsp/reset.h>
++#include <linux/fsp/hdcr.h>
++#include <linux/fsp/fsp.h>
++
++ATOMIC_NOTIFIER_HEAD(pre_kdump_notifier_list);
++
++EXPORT_SYMBOL(pre_kdump_notifier_list);
++
++//extern void flush_dcache_all(void);
++
++u32 mfcmu(u32 reg)
++{
++	u32 data;
++	unsigned long flags;
++
++	local_irq_save(flags);
++	mtdcr(DCRN_CMU_ADDR, reg);
++	data = mfdcr(DCRN_CMU_DATA);
++	local_irq_restore(flags);
++
++	return data;
++}
++
++void mtcmu(u32 reg, u32 data)
++{
++	unsigned long flags;
++
++	local_irq_save(flags);
++	mtdcr(DCRN_CMU_ADDR, reg);
++	mtdcr(DCRN_CMU_DATA, data);
++	local_irq_restore(flags);
++}
++
++static void crcs_set(u32 new)
++{
++	u32 old;
++	unsigned long flags;
++
++	local_irq_save(flags);
++	old = mfcmu(CMUN_CRCS);
++	mtcmu(CMUN_CRCS, old | new);
++	local_irq_restore(flags);
++}
++
++
++irqreturn_t reset_warning_irq(int irq, void *data)
++{
++	u32 crcs;
++
++	show_regs(get_irq_regs());
++
++	crcs = mfcmu(CMUN_CRCS);
++
++	switch (crcs & CRCS_STAT_MASK) {
++		case CRCS_STAT_CHIP_RST_B:
++			panic("Received chassis-initiated reset request");
++		default:
++			panic("Unknown external reset: CRCS=0x%x", crcs);
++	}
++
++	/* Should never get here */
++	return IRQ_HANDLED;
++}
++
++
++static void reset(u32 crcs, u32 flavor)
++{
++
++	//pra_write(PRA_SFT_RST_FLAVOR, flavor);
++
++	local_irq_disable();
++
++	if (crcs == CRCS_CORE || crcs == CRCS_CHIP)
++		//flush_dcache_all();
++
++
++	/* Disable critical irqs so we don't get a reset timer interrupt */
++	mtmsr(mfmsr() & ~MSR_CE);
++
++
++	isync();
++
++	/* Sayonara! */
++	crcs_set(crcs);
++}
++#define chip_reset(flavor) reset(CRCS_CHIP, flavor)
++#define system_reset(flavor) reset(CRCS_SYS, flavor)
++
++void fsp_restart(char *cmd)
++{
++	if (cmd == NULL)
++		chip_reset(LINUX_REBOOT_CMD_RESTART);
++	else if (!strcmp(cmd, LINUX_REBOOT_CMD_TOOLRESET_STR))
++		system_reset(LINUX_REBOOT_CMD_TOOLRESET);
++	else if (!strncmp(cmd, LINUX_REBOOT_CMD_COREDUMP_STR,
++			  strlen(LINUX_REBOOT_CMD_COREDUMP_STR))) {
++		unsigned int type, data_a, data_b, data_c;
++		sscanf(cmd, LINUX_REBOOT_CMD_COREDUMP_STR " %x %x %x %x",
++		       &type, &data_a, &data_b, &data_c);
++	//	pra_write(PRA_PABEND, type);
++	//	pra_write(PRA_PABEND_A, data_a);
++	//	pra_write(PRA_PABEND_B, data_b);
++	//	pra_write(PRA_PABEND_C, data_c);
++		panic("User-initiated panic");
++	}
++	else
++		panic("Bad restart cmd");
++}
++
++void fsp_panic(char *str)
++{
++	chip_reset(LINUX_REBOOT_CMD_RESTART2);
++}
++
++void fsp_power_off(void)
++{
++	chip_reset(LINUX_REBOOT_CMD_POWER_OFF);
++}
++
++void fsp_halt(void)
++{
++	chip_reset(LINUX_REBOOT_CMD_HALT);
++}
++
++/*
++ * The following code implements an interface to the RESET hardware of
++ * the FSP-1. In the /proc/reset directory the abstract type of
++ * reset can be read out.
++ *
++ * Please note that the bits in the TSR and in the DBSR are cleared
++ * after initializing this driver. Since those bits would survive
++ * a core reset this is needed to make this software function
++ * well.
++ *
++ * For FSP-1 DD1.0 and DD2.0 the reset related registers like DBSR and
++ * CRCS are totally unrelibable.
++ *
++ * Author: Frank Haverkamp <haverkam@de.ibm.com>
++ */
++
++#define PERROR(fmt, args...) printk(KERN_ERR "FSP RESET: "fmt, ## args)
++
++#define TSR_WRS_MASK(x)		(((x)>>28)&0x3)	/* WDT Reset Status Mask */
++#define TSR_WRS_MASK_VALUE	0x30000000	/* last reset */
++
++#define PROCDIR_RESET		"reset"		/* name of proc dir */
++#define PROCDIR_CURRENT		"current"	/* file current reason */
++#define PROCDIR_ORIGINAL        "original"      /* file original reason */
++#define PROCDIR_CALLOUT         "callout"       /* file callout */
++
++#define PROCDIR_CURR		"curr"		/* subdir current status */
++#define PROCDIR_SIDE		"side"		/* subdir side status */
++
++#define PROCDIR_SPECIFIC	"specific"	/* debug */
++#define PROCDIR_WATCHDOG	"bootwatchdog"	/* bootwd status */
++
++#define PROCDIR_DISR		"disr"		/* disr read/write access */
++
++#define PROCDIR_DRCR		"drcr"		/* drcr read/write access */
++
++#define PROCDIR_PANIC		"panic_reason"  /* reason for the panic */
++
++#define WATCHDOG_BANK_NORMAL	"Default"
++#define WATCHDOG_BANK_SWAPPED	"Alternate"
++
++/**
++ * We need those string tables to print out the correct reset originator,
++ * type and reason.
++ */
++
++static const char *rst_origin_str[] = {
++	 "Unknown", "Core", "Asic", "Power", "External",
++};
++
++static const char *rst_type_str[] = {
++	 "Unknown", "Core", "Chip", "System",
++};
++
++static const char *rst_reason_str[] = {
++	"Unknown",
++	"CoreWatchdog",
++	"Restart",
++	"Panic",
++	"Halt",
++	"PowerOff",
++	"PowerCycle",
++	"Pinhole",
++	"Parport",
++	"Bootcode",
++	"HostInitiated",
++	"BootWatchdog",
++	"UnitCheckTimer",
++	"ExternalTool",
++	"PAbend",
++	"ChassisInitiated",
++	"PCIe",
++};
++
++static const char *callout_str[] = {
++	"SoftwareError",
++	"HardwareError",
++	"HardwareSoftwareError",
++	"EccError",
++	"TLBCacheError",
++	"WPAParityError",
++	"OutOfMemory",
++	"FlashError",
++	"CMUError",
++	"ConfigLogicParityError",
++};
++
++/**
++ * data structure to store the internal data
++ */
++typedef struct rstinfo_t {
++	struct proc_dir_entry *procdir_reset; /* ptr to proc entry */
++	struct proc_dir_entry *procdir_curr;
++	struct proc_dir_entry *procdir_currside;
++	unsigned long pvr;
++
++	uint32_t cached_crcs;
++	uint32_t cached_dbsr;
++	uint32_t cached_tsr;
++	uint32_t cached_flavor;
++	uint32_t cached_bwtc;
++	uint32_t cached_pabend;
++	uint32_t cached_pabend_a;
++	uint32_t cached_pabend_b;
++	uint32_t cached_pabend_c;
++
++	rst_origin_t origin;
++	rst_type_t type;
++	rst_reason_t reason;
++} rstinfo_t;
++
++/**
++ * global data to store the module status information.
++ */
++static rstinfo_t rstinfo;
++
++/**
++ * This function reads out and masks the reason for the reset of the
++ * system.
++ */
++static int readproc_specific(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char * buf;
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++	rstinfo_t *info = PDE_DATA(file_inode(file));
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++	/* specific */
++	len += sprintf(buf+len, "DBSR:\t\t0x%08x\n", info->cached_dbsr);
++	len += sprintf(buf+len, "CRCS:\t\t0x%08x\n", info->cached_crcs);
++	len += sprintf(buf+len, "TSR:\t\t0x%08x\n", info->cached_tsr);
++	len += sprintf(buf+len, "BWTC:\t\t0x%08x\n", info->cached_bwtc);
++	len += sprintf(buf+len, "RST_FLAVOR:\t0x%08x\n", info->cached_flavor);
++	len += sprintf(buf+len, "PABEND:\t\t0x%08x\n", info->cached_pabend);
++	len += sprintf(buf+len, "PABEND_A:\t0x%08x\n", info->cached_pabend_a);
++	len += sprintf(buf+len, "PABEND_B:\t0x%08x\n", info->cached_pabend_b);
++	len += sprintf(buf+len, "PABEND_C:\t0x%08x\n", info->cached_pabend_c);
++	len += sprintf(buf+len, "PVR:\t\t0x%08lx\n", info->pvr);
++	len += sprintf(buf+len,
++		       "Debugging information only! May change "
++		       "in the future and is likely not correct\n"
++		       "in the present.  Do not use in your software!\n");
++
++	if (offset >= len)
++		goto exit;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++exit:
++	kfree(buf);
++	return transfer;
++}
++
++
++static const char *timeout_str[] = {
++#ifdef CONFIG_FSP1
++	"500us", "1 ms", "250 ms", "500ms", "1sec", "8sec", "16sec",
++	"32sec (default)"
++#else
++	"100ms", "200ms", "400ms", "800ms", "3sec", "13sec", "26sec",
++	"52sec"
++#endif
++};
++
++/**
++ * Get the status of the boot watchdog.
++ */
++static int readproc_bwd(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char * buf;
++	int len = 0;
++	int enabled = 0;
++	int timeout = 0;
++	int end = 0;
++	int transfer = 0;
++	unsigned int bank = 0;
++	int offset = (int)*ppos;
++	rstinfo_t *info = PDE_DATA(file_inode(file));
++	unsigned int bwtc = info->cached_bwtc;
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++	enabled = ((bwtc & BWTC_WDTE) != 0);
++	timeout = (bwtc >> 8) & 0x07;
++
++#ifdef CONFIG_FSP1
++	bank = (bwtc & BWTC_BANK_MSB) >> 2;
++#endif
++	bank |= (bwtc & BWTC_BANK) >> 1;
++
++	len += sprintf(buf+len, "Status:\t%s\n", enabled?"Enabled":"Disabled");
++	len += sprintf(buf+len, "Time:\t%s\n", timeout_str[timeout]);
++	len += sprintf(buf+len, "Bank:\t%u\n", bank);
++
++	if (offset >= len)
++		goto exit;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++exit:
++	kfree(buf);
++	return transfer;
++}
++
++
++/**
++ * Get the panic reason.  This guides behavior in the KDUMP environment.
++ */
++static int readproc_panic(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char buf[32];
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	u32 flavor, type;
++	const char* reason = "UNKNOWN";
++	int offset = (int)*ppos;
++	
++	/* NOTE: This approach works because PRA keys are set in the production
++	 * kernel and can't be modified in the KDUMP environment. */
++	/* if(!pra_read(PRA_SFT_RST_FLAVOR, &flavor)) {
++		if(flavor == LINUX_REBOOT_CMD_HOSTINIT)
++			reason = "HostInitiated";
++		else if(flavor == LINUX_REBOOT_CMD_RESTART2) {
++			if(!pra_read(PRA_PABEND, &type) && type) {
++				reason = "PAbend";
++			} else {
++				reason = "Panic";
++			}
++		}
++	}
++ */
++	len = sprintf(buf, "REASON:\t%s\n", reason);
++
++	if (offset >= len)
++		return 0;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++	return transfer;
++}
++
++static int readproc_disr(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char buf[32];
++	u32 read_val;
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++
++	read_val = disr_read();
++	len += sprintf(buf+len, "%08x\n", read_val);
++
++	if (offset >= len)
++		return 0;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++	return transfer;
++}
++
++static int writeproc_disr(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
++{
++	int len = 0;
++	u32 bits = 0;
++	char buffer[10]; /* max size is a single 32 bit hex value with '\0',
++			 no 0x prefix */
++	char lbuf[9];
++
++	if (!count)
++	return 0;
++
++	if (count > 9) { /* 8 + '\0' */
++		PERROR("PROC DISR: invalid command\n");
++		return -EFAULT;
++	}
++
++	len = (count > sizeof(buffer) - 1)?(sizeof(buffer) - 1):(count);
++	if (copy_from_user((void*)buffer, (void*)buf, len)) {
++		PERROR("Could not copy user buffer!\n");
++		return -EFAULT;
++	}
++
++	strncpy(lbuf, buffer, 8);
++	lbuf[8]='\0';
++	bits = simple_strtoul(lbuf, NULL, 16);
++
++	if (bits & DISR_RSVD) {
++		PERROR("PROC DISR: attempting write to reserved area: %08x\n",
++		       bits);
++		return -EFAULT;
++	}
++
++	disr_clear_and_set(~bits & ~DISR_RSVD, bits, NULL);
++
++	return len;
++}
++
++
++static int readproc_drcr(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char buf[32];
++	u32 read_val;
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++
++	read_val = drcr_read();
++	len += sprintf(buf+len, "%08x\n", read_val);
++
++	if (offset >= len)
++		return 0;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++	return transfer;
++}
++
++static int writeproc_drcr(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
++{
++	int len = 0;
++	u32 bits = 0;
++	char buffer[10]; /* max size is a single 32 bit hex value with '\0',
++			 no 0x prefix */
++	char lbuf[9];
++
++	if (!count)
++	return 0;
++
++	if (count > 9) { /* 8 + '\0' */
++		PERROR("PROC DRCR: invalid command\n");
++		return -EFAULT;
++	}
++
++	len = (count > sizeof(buffer) - 1)?(sizeof(buffer) - 1):(count);
++	if (copy_from_user((void*)buffer, (void*)buf, len)) {
++		PERROR("Could not copy user buffer!\n");
++		return -EFAULT;
++	}
++
++	strncpy(lbuf, buffer, 8);
++	lbuf[8]='\0';
++	bits = simple_strtoul(lbuf, NULL, 16);
++
++	/* printk("Clearing DRCR bits: 0x%x", bits); */
++	drcr_clear(bits);
++
++	return len;
++}
++
++static int readproc_rstinfo(char *buf, int count, rst_origin_t origin,
++					rst_type_t type, rst_reason_t reason)
++{
++	int len = 0;
++
++	len += sprintf(buf+len, "Code:\t%02d %02d %02d\n",
++		       origin, type, reason);
++	len += sprintf(buf+len, "Origin:\t%s\n", rst_origin_str[origin]);
++	len += sprintf(buf+len, "Type:\t%s\n",	 rst_type_str[type]);
++	len += sprintf(buf+len, "Reason:\t%s\n", rst_reason_str[reason]);
++	return len;
++}
++
++static int readproc_current(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char * buf;
++	int len;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++	rstinfo_t *info =  PDE_DATA(file_inode(file));
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++	len = readproc_rstinfo(buf, count,
++				info->origin,
++				info->type,
++				info->reason);
++
++	if (offset >= len)
++		goto exit;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++exit:
++	kfree(buf);
++	return transfer;
++}
++
++static int readproc_original(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char * buf;
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	rst_reason_t reason = RST_REASON_UNKNOWN;
++	int offset = (int)*ppos;
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++//	pra_read(PRA_ORIG_RESET, &reason);
++
++	if(reason * 4 >= sizeof(rst_reason_str))
++		reason = RST_REASON_UNKNOWN;
++
++	len += sprintf(buf+len, "Code:\t%02d\n", reason);
++	len += sprintf(buf+len, "Reason:\t%s\n", rst_reason_str[reason]);
++
++	if (offset >= len)
++		goto exit;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++exit:
++	kfree(buf);
++	return transfer;
++}
++
++static int readproc_callout(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	char * buf;
++	int len = 0;
++	int end = 0;
++	int transfer = 0;
++	uint32_t callout = PRA_SWERR;
++	int offset = (int)*ppos;
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++	//pra_read(PRA_CALLOUT, &callout);
++	len += sprintf(buf+len, "Code:\t\t\t0x%08x\n", callout);
++	len += sprintf(buf+len, "Summary:\t\t%s\n", callout_str[callout & PRA_MASK_SUMMARY]);
++	len += sprintf(buf+len, "Icache Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_ICACHE) ? "True" : "False");
++	len += sprintf(buf+len, "Dcache Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_DCACHE) ? "True" : "False");
++	len += sprintf(buf+len, "TLB Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_TLB) ? "True" : "False");
++	len += sprintf(buf+len, "GPR Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_GPR) ? "True" : "False");
++	len += sprintf(buf+len, "FPR Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_FPR) ? "True" : "False");
++	len += sprintf(buf+len, "L1/L2 Parity Error:\t%s\n",
++		       (callout & PRA_CALLOUT_L1_L2) ? "True" : "False");
++
++	if (offset >= len)
++		goto exit;
++
++	end = len - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++
++exit:
++	kfree(buf);
++	return transfer;
++}
++
++static int readproc_generic(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
++{
++	const char *what = PDE_DATA(file_inode(file));
++	int ret;
++	uint32_t pra_bootstatus;
++	unsigned long bwtc;
++	unsigned int bank;
++	char * buf;
++	int end = 0;
++	int transfer = 0;
++	int offset = (int)*ppos;
++
++	buf = (char *)kmalloc(1024, GFP_KERNEL);
++
++	switch (what[1]) {
++	case 'o': /* origin */
++		ret = sprintf(buf, "%s\n", rst_origin_str[rstinfo.origin]);
++		goto exit_success;
++	case 't': /* type */
++		ret = sprintf(buf, "%s\n", rst_type_str[rstinfo.type]);
++		goto exit_success;
++	case 'r': /* reason */
++		ret = sprintf(buf, "%s\n", rst_reason_str[rstinfo.reason]);
++		goto exit_success;
++	case 'i': /* ipl */
++		bwtc = rstinfo.cached_bwtc;
++#ifdef CONFIG_FSP1
++		if (bwtc & BWTC_CONFIG1) {
++			printk(KERN_WARNING "FSP RESET: BWTC_CONFIG1 set, "
++			       "ipl state unreliable\n");
++		}
++		bank = (bwtc & BWTC_BANK_LSB ? 1 : 0);
++		if (bwtc & BWTC_NANDBOOT) {
++			bank |= (bwtc & BWTC_BANK_MSB ? 2 : 0);
++		}
++#else
++		bank = bwtc & BWTC_BANK ? 1 : 0;
++#endif
++		ret = sprintf(buf, "%u\n", bank);
++		goto exit_success;
++	default: ;
++	}
++
++	//ret = pra_read(PRA_BOOT_STATUS, &pra_bootstatus);
++	if (ret < 0) {
++		printk("FSP RESET: cannot read PRA\n");
++		goto exit;
++	}
++
++	switch (what[1]) {
++	case 'p': /* progress */
++		ret = sprintf(buf, "%u\n", (pra_bootstatus >> 8) & 0xff);
++		goto exit_success;
++	case 's': /* spl */
++		ret = sprintf(buf, "%u\n", pra_bootstatus & 0x01);
++		goto exit_success;
++	case 'l': /* os (linux) */
++		ret = sprintf(buf, "%u\n", (pra_bootstatus >> 1) & 0x01);
++		goto exit_success;
++	default:
++		BUG();
++		ret = -EINVAL;
++		goto exit;
++	}
++
++exit_success:
++	if (offset >= ret) {
++		ret = 0;
++		goto exit;
++	}
++
++	end = ret - offset;
++	transfer = (count < end) ? count : end;
++
++	copy_to_user(ubuf, &buf[offset], transfer);
++	*ppos = (loff_t)(offset + transfer);
++	ret = transfer;
++
++exit:
++	kfree(buf);
++	return ret;
++}
++
++static int writeproc_progress(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
++{
++	uint32_t pra_bootstatus;
++	char buffer[10]; /* enough for values 0..255, even octal */
++	int len = 0, ret;
++	unsigned int val = 0;
++
++	if (!count) {
++		printk(KERN_INFO "FSP RESET: empty write to progress\n");
++		return 0;
++	}
++
++	len = (count > sizeof(buffer) -1) ? (sizeof(buffer) -1) : count;
++
++	if (copy_from_user(buffer, buf, len)) {
++		printk(KERN_ERR "FSP RESET: Could not copy data from user\n");
++		return -EFAULT;
++	}
++
++	buffer[len] = '\0';
++	if (buffer[len - 1] == '\n')
++		buffer[len - 1] = '\0';
++
++	val = simple_strtoul(buffer, NULL, 0);
++	if (val > 255) {
++		printk(KERN_INFO "FSP RESET: value %u too big for progress\n",
++			val);
++		return -E2BIG;
++	}
++
++	/* read/change/write the PRA field */
++	//ret = pra_read(PRA_BOOT_STATUS, &pra_bootstatus);
++	if (ret < 0) {
++		printk(KERN_ERR "FSP RESET: cannot read PRA\n");
++		return ret;
++	}
++
++	pra_bootstatus = (pra_bootstatus & 0xffff00ff) | ((val & 0xff) << 8);
++
++	//ret = pra_write(PRA_BOOT_STATUS, pra_bootstatus);
++	if (ret < 0) {
++		printk(KERN_ERR "FSP RESET: cannot update PRA\n");
++		return ret;
++	}
++
++	return len;
++}
++
++/******************************************************************************
++ *
++ * Loading and Unloading
++ *
++ *****************************************************************************/
++
++typedef struct procentry_t {
++	char *name;			/* name of the entry */
++	struct file_operations *fo;		/* read proc entry function */
++	void *data;			/* value for proc.data field.
++					   NULL means to put rstinfo there */
++} procentry_t;
++
++static const struct file_operations current_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_current,
++};
++
++static const struct file_operations original_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_original,
++};
++
++static const struct file_operations callout_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_callout,
++};
++
++static const struct file_operations specific_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_specific,
++};
++
++static const struct file_operations watchdog_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_bwd,
++};
++
++static const struct file_operations disr_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_disr,
++.write  = writeproc_disr,
++};
++
++static const struct file_operations drcr_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_drcr,
++.write  = writeproc_drcr,
++};
++
++static const struct file_operations panic_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_panic,
++};
++
++
++static const struct file_operations generic_fo = {
++.owner = THIS_MODULE,
++.read  = readproc_generic,
++.write  = writeproc_progress,
++};
++
++
++static procentry_t procdir_reset_table[] = {
++	{ name: PROCDIR_CURRENT,   fo: &current_fo  },
++	{ name: PROCDIR_ORIGINAL,  fo: &original_fo },
++	{ name: PROCDIR_CALLOUT,   fo: &callout_fo },
++	{ name: PROCDIR_SPECIFIC,  fo: &specific_fo },
++	{ name: PROCDIR_WATCHDOG,  fo: &watchdog_fo },
++	{ name: PROCDIR_DISR,      fo: &disr_fo },
++	{ name: PROCDIR_DRCR,      fo: &drcr_fo },
++	{ name: PROCDIR_PANIC,     fo: &panic_fo },
++	{ NULL, NULL, NULL, NULL },
++};
++
++/* data contains info what to print: cp == curr/progress */
++static procentry_t procdir_curr_table[] = {
++	{ name: "progress", fo: &generic_fo, data: "cp" },
++	{ name: "origin",   fo: &generic_fo, data: "co" },
++	{ name: "type",	    fo: &generic_fo, data: "ct" },
++	{ name: "reason",   fo: &generic_fo, data: "cr" },
++	{ NULL, NULL, NULL, NULL },
++};
++
++static procentry_t procdir_currside_table[] = {
++	{ name: "ipl", fo: &generic_fo, data: "ci" },
++	{ name: "spl", fo: &generic_fo, data: "cs" },
++	{ name: "os",  fo: &generic_fo, data: "cl" },
++	{ NULL, NULL, NULL, NULL },
++};
++
++/**
++ * Thanks to Shaun providing this little example how do deal with proc
++ * entries very nicely.
++ */
++static struct proc_dir_entry *
++shauns_create_proc_entry(const char * name, mode_t mode,
++			 struct proc_dir_entry * base,
++			 struct file_operations *fo,
++			 void * data)
++{
++	struct proc_dir_entry *tmp;
++
++	if (!mode)
++		mode = 0644;
++	tmp = proc_create_data(name, mode, base, fo, data);
++
++	if (tmp == NULL) {
++		PERROR("/proc entry '%s' write_proc[%x] "
++		       "read_proc[%x] data[%x]\n", name,
++		       (int)fo->write, (int)fo->read, (int)data);
++	}
++	return tmp;
++}
++
++
++/**
++ * Create a new subdirectory above rootdir. The initialized NULL terminated
++ * table of entries must be passed to this function and the name the new
++ * directory should have.
++ */
++static struct proc_dir_entry * __init
++new_procdir(void *info, struct proc_dir_entry *rootdir,
++	    procentry_t *table, const char *name)
++{
++	procentry_t *ptr = NULL;
++	struct proc_dir_entry *procdir = NULL;
++
++	/* create directory */
++	procdir = proc_mkdir(name, rootdir);
++	if (procdir == NULL) {
++		PERROR("Cannot create .../%s\n", name);
++		return NULL;
++	}
++
++	/* create entries */
++	for (ptr = table; ptr->name != NULL; ptr++) {
++
++		/* no this will be an entry */
++		if (!shauns_create_proc_entry(ptr->name, 0, procdir,
++					      ptr->fo,
++					      ptr->data ? ptr->data : info)) {
++			PERROR("Cannot create .../%s\n", ptr->name);
++			return NULL;
++		}
++	}
++	return procdir;
++}
++
++#if defined (CONFIG_FSP1)
++static int find_reason_sw(rstinfo_t *info)
++{
++	switch (info->cached_flavor) {
++		case LINUX_REBOOT_CMD_RESTART2:
++			if (info->cached_pabend)
++				return RST_REASON_PABEND;
++			else
++				return RST_REASON_PANIC;
++		case LINUX_REBOOT_CMD_HALT:
++			return RST_REASON_HALT;
++		case LINUX_REBOOT_CMD_BOOTCODE:
++			return RST_REASON_BOOTCODE;
++		case LINUX_REBOOT_CMD_POWER_OFF:
++			return RST_REASON_POWER_OFF;
++		case LINUX_REBOOT_CMD_RESTART:
++			return RST_REASON_RESTART;
++		case LINUX_REBOOT_CMD_HOSTINIT:
++			return RST_REASON_HOST_INITIATED;
++		default:
++			return RST_REASON_UNKNOWN;
++	}
++}
++
++static void find_reason_fsp1(rstinfo_t *info)
++{
++	uint32_t crcs_masked = info->cached_crcs & CRCS_STAT_MASK;
++	uint32_t dbsr_masked = info->cached_dbsr & DBSR_MRR;
++
++	switch (dbsr_masked) {
++		case DBSR_MRR_SYSTEM: info->type = RST_TYPE_SYSTEM; break;
++		case DBSR_MRR_CHIP:   info->type = RST_TYPE_CHIP;   break;
++		case DBSR_MRR_CORE:   info->type = RST_TYPE_CORE;   break;
++	}
++
++	/* Boot watchdog */
++	if (info->cached_crcs & CRCS_WATCHE) {
++		info->reason = RST_REASON_BOOT_WATCHDOG;
++		info->origin = RST_ORIG_ASIC;
++		return;
++	}
++
++	/* Core watchdog */
++	switch (TSR_WRS_MASK(info->cached_tsr)) {
++		case WRS_CORE:
++		case WRS_CHIP:
++		case WRS_SYSTEM:
++			info->reason = RST_REASON_CORE_WATCHDOG;
++			info->origin = RST_ORIG_ASIC;
++			return;
++	}
++
++	/* All other cases */
++	switch (crcs_masked) {
++		case CRCS_STAT_POR:
++			info->reason = RST_REASON_POWER_CYCLE;
++			info->origin = RST_ORIG_EXTERNAL;
++			return;
++		case CRCS_STAT_PHR:
++			info->reason = RST_REASON_PINHOLE;
++			info->origin = RST_ORIG_EXTERNAL;
++			return;
++		case CRCS_STAT_HOST_CORE:
++		case CRCS_STAT_HOST_CHIP:
++		case CRCS_STAT_HOST_SYS:
++		case CRCS_STAT_PSI_CHIP:
++			info->reason = RST_REASON_HOST_INITIATED;
++			info->origin = RST_ORIG_EXTERNAL;
++			return;
++		case CRCS_STAT_CRCS_SYS:
++			info->reason = RST_REASON_EXT_TOOL;
++			info->origin = RST_ORIG_CORE;
++			return;
++		case CRCS_STAT_CRCS_CHIP:
++			info->reason = find_reason_sw(info);
++			info->origin = RST_ORIG_CORE;
++			return;
++		default:
++			info->reason = RST_REASON_UNKNOWN;
++			info->origin = RST_ORIG_UNKNOWN;
++			return;
++	}
++}
++
++#elif defined(CONFIG_FSP2)
++
++static void find_reason_fsp2(rstinfo_t *info)
++{
++	uint32_t tmp;
++
++	//pra_read(PRA_ORIG_RSTINFO, &tmp);
++	info->reason = tmp >> 16;
++	info->origin = (tmp >> 8) & 0xFF;
++	info->type = tmp & 0xFF;
++}
++#endif /* CONFIG_FSP1 */
++
++/* Determine reset reason from hardware (fsp1) or pra (fsp2) */
++static void find_reason(rstinfo_t *info)
++{
++#if defined(CONFIG_FSP1)
++	find_reason_fsp1(info);
++#endif //#elif defined(CONFIG_FSP2)
++	find_reason_fsp2(info);
++//#else
++//#error Only fsp1 and fsp2 are supported
++//#endif
++}
++
++
++static int __init fsp_reset_init(void)
++{
++	memset(&rstinfo, 0, sizeof(rstinfo_t));
++	rstinfo.pvr = mfspr(SPRN_PVR);
++	rstinfo.cached_crcs = mfcmu(CMUN_CRCS);
++	rstinfo.cached_dbsr = mfspr(SPRN_DBSR);
++	rstinfo.cached_tsr = mfspr(SPRN_TSR);
++	rstinfo.cached_bwtc = mfcmu(CMUN_BWTC);
++
++	//pra_read(PRA_SFT_RST_FLAVOR, &rstinfo.cached_flavor);
++	//pra_read(PRA_PABEND, &rstinfo.cached_pabend);
++	//pra_read(PRA_PABEND_A, &rstinfo.cached_pabend_a);
++	//pra_read(PRA_PABEND_B, &rstinfo.cached_pabend_b);
++	//pra_read(PRA_PABEND_C, &rstinfo.cached_pabend_c);
++
++	rstinfo.type = RST_TYPE_UNKNOWN;
++	rstinfo.origin = RST_ORIG_UNKNOWN;
++	rstinfo.reason = RST_REASON_UNKNOWN;
++
++	/* /proc/reset */
++	rstinfo.procdir_reset = new_procdir(&rstinfo, NULL,
++			procdir_reset_table, PROCDIR_RESET);
++	if (rstinfo.procdir_reset == 0)
++		goto errout;
++
++	/* /proc/reset/curr */
++	rstinfo.procdir_curr = new_procdir(&rstinfo, rstinfo.procdir_reset,
++			procdir_curr_table, PROCDIR_CURR);
++	if (rstinfo.procdir_curr == 0)
++		goto err_curr;
++
++	/* /proc/reset/curr/side */
++	rstinfo.procdir_currside = new_procdir(&rstinfo, rstinfo.procdir_curr,
++			procdir_currside_table, PROCDIR_SIDE);
++	if (rstinfo.procdir_currside == 0)
++		goto err_currside;
++
++	/* determine reset reason */
++	find_reason(&rstinfo);
++
++	/**
++	 * We need to clear some registers after we have done the
++	 * detection. The results are cached.  Writing a 1 clears the
++	 * bits.
++	 */
++	mtspr(SPRN_DBSR, (rstinfo.cached_dbsr & DBSR_MRR));
++	mtspr(SPRN_TSR, (rstinfo.cached_tsr & TSR_WRS_MASK_VALUE));
++
++	/*Do not clear PRA keys in a dumped kernel. */
++	if(!(is_kdump_kernel()) )
++	{
++		/*
++	 	 * Clear out the reset flavor so that any future spurious resets will
++	 	 * be correctly interpreted as type "unknown".
++	 	 */
++	//	pra_write(PRA_SFT_RST_FLAVOR,  0);
++
++		/* Clear out the callout information.  Otherwise the next panic could
++	 	 * have unrelated callout information associated with it.
++	 	 */
++	//	pra_write(PRA_CALLOUT, 0);
++
++		/* reset values to be able to detect panic correctly */
++	//	pra_write(PRA_PABEND,   0x00000000);
++	//	pra_write(PRA_PABEND_A, 0x00000000);
++	//	pra_write(PRA_PABEND_B, 0x00000000);
++	//	pra_write(PRA_PABEND_C, 0x00000000);
++	}
++
++//#ifdef CONFIG_FSP2
++{
++	u32 crcs;
++
++	/* Enable CHIP_RST_B (Chassis initiated reset) */
++	crcs = mfcmu(CMUN_CRCS);
++	crcs |= CRCS_EXTCR;
++	mtcmu(CMUN_CRCS, crcs);
++}
++//#endif
++
++	return 0;
++
++err_currside:
++	remove_proc_entry(PROCDIR_CURR, rstinfo.procdir_reset);
++err_curr:
++	remove_proc_entry(PROCDIR_RESET, NULL);
++errout:
++	return -EIO;
++}
++device_initcall(fsp_reset_init);
+diff --git a/arch/powerpc/platforms/fsp/Makefile b/arch/powerpc/platforms/fsp/Makefile
+new file mode 100644
+index 0000000..0729067
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/Makefile
+@@ -0,0 +1,4 @@
++obj-y			+= reset.o hdcr.o crash_regs.o
++obj-$(CONFIG_FSP1)	+= fsp1.o fsp1_pra.o fsp1_rtc.o fsp1_eddr2.o \
++			   fsp1_handlers.o
++obj-$(CONFIG_FSP2)	+= fsp2.o fsp2_pra.o fsp2_handlers.o
+diff --git a/arch/powerpc/platforms/fsp/crash_regs.c b/arch/powerpc/platforms/fsp/crash_regs.c
+new file mode 100644
+index 0000000..047f75b
+--- /dev/null
++++ b/arch/powerpc/platforms/fsp/crash_regs.c
+@@ -0,0 +1,331 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006,2012
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#include <linux/kernel.h>
++#include <asm/reg.h>
++#include <asm/dcr.h>
++#include <asm/fsp/reg.h>
++
++#if defined(CONFIG_FSP1)
++
++#define NUM_TLB_WAYS	1
++#define NUM_TLB_INDEXES 64
++
++struct tlb_0 {
++	unsigned epn		: 22;
++	unsigned v		: 1;
++	unsigned ts		: 1;
++	unsigned size		: 4;
++	unsigned tpar		: 4;
++};
++
++struct tlb_1 {
++	unsigned rpn		: 22;
++	unsigned par1		: 2;
++	unsigned reserved	: 4;
++	unsigned erpn		: 4;
++};
++
++struct tlb_2 {
++	unsigned par2		: 2;
++	unsigned reserved	: 14;
++	unsigned u		: 4;
++	unsigned w		: 1;
++	unsigned i		: 1;
++	unsigned m		: 1;
++	unsigned g		: 1;
++	unsigned e		: 1;
++	unsigned reserved2	: 1;
++	unsigned ux		: 1;
++	unsigned uw		: 1;
++	unsigned ur		: 1;
++	unsigned sx		: 1;
++	unsigned sw		: 1;
++	unsigned sr		: 1;
++};
++
++#endif // defined(CONFIG_FSP2)
++
++#define NUM_TLB_WAYS	4
++#define NUM_TLB_INDEXES	256
++
++struct tlb_0 {
++	unsigned epn		: 20;
++	unsigned v		: 1;
++	unsigned ts		: 1;
++	unsigned dsiz		: 6;
++	unsigned reserved	: 1;
++	unsigned epnpar		: 1;
++	unsigned dsizpar	: 1;
++	unsigned tidpar		: 1;
++};
++
++struct tlb_1 {
++	unsigned rpn		: 20;
++	unsigned rpnpar		: 1;
++	unsigned erpnpar	: 1;
++	unsigned erpn		: 10;
++};
++
++struct tlb_2 {
++	unsigned storpermpar	: 1;
++	unsigned reserved	: 13;
++	unsigned il1i		: 1;
++	unsigned il1d		: 1;
++	unsigned u		: 4;
++	unsigned w		: 1;
++	unsigned i		: 1;
++	unsigned m		: 1;
++	unsigned g		: 1;
++	unsigned e		: 1;
++	unsigned reserved2	: 1;
++	unsigned ux		: 1;
++	unsigned uw		: 1;
++	unsigned ur		: 1;
++	unsigned sx		: 1;
++	unsigned sw		: 1;
++	unsigned sr		: 1;
++};
++
++//#endif /* CONFIG_FSP2 */
++
++struct tlb {
++	struct tlb_0 word0;
++	struct tlb_1 word1;
++	struct tlb_2 word2;
++	u32 tid;
++};
++
++struct sprs {
++	u32 ccr0;
++	u32 ccr1;
++	u32 ccr2;
++	u32 cr;
++	u32 csrr0;
++	u32 csrr1;
++	u32 ctr;
++	u32 dbcr0;
++	u32 dbcr1;
++	u32 dbcr2;
++	u32 dbdr;
++	u32 dbsr;
++	u32 dcesr;
++	u32 dcripr;
++	u32 dear;
++	u32 dec;
++	u32 decar;
++	u32 esr;
++	u32 icesr;
++	u32 ivpr;
++	u32 lr;
++	u32 mcsr;
++	u32 mcsrr0;
++	u32 mcsrr1;
++	u32 mmucr;
++	u32 msr;
++	u32 pid;
++	u32 pvr;
++	u32 rmpd;
++	u32 sprg0;
++	u32 sprg1;
++	u32 sprg2;
++	u32 sprg3;
++	u32 sprg4;
++	u32 sprg5;
++	u32 sprg6;
++	u32 sprg7;
++	u32 sprg8;
++	u32 srr0;
++	u32 srr1;
++	u32 tbl;
++	u32 tbu;
++	u32 tcr;
++	u32 tsr;
++	u32 usprg0;
++	u32 xer;
++};
++
++struct uic {
++	char *name;
++	u32 status;
++	u32 enable;
++};
++
++#define UIC_SR		0
++#define UIC_ER		2
++
++#define DCRN_UIC0	0x2c0
++#define DCRN_UIC0_1	0x380
++#define DCRN_UIC0_2	0x388
++#define DCRN_UIC1_0	0x2c8
++#define DCRN_UIC1_1	0x350
++#define DCRN_UIC1_2	0x358
++#define DCRN_UIC1_3	0x360
++#define DCRN_UIC1_4	0x368
++#define DCRN_UIC1_5	0x370
++#define DCRN_UIC2_0	0x2d0
++#define DCRN_UIC2_1	0x2d8
++#define DCRN_UIC2_2	0x2e0
++#define DCRN_UIC2_3	0x2e8
++#define DCRN_UIC2_4	0x2f0
++#define DCRN_UIC2_5	0x2f8
++#define DCRN_UIC2_6	0x300
++#define DCRN_UIC2_7	0x308
++#define DCRN_UIC2_8	0x310
++#define DCRN_UIC2_9	0x318
++#define DCRN_UIC2_10	0x320
++#define DCRN_UIC2_11	0x328
++#define DCRN_UIC2_12	0x330
++#define DCRN_UIC2_13	0x338
++#define DCRN_UIC2_14	0x340
++#define DCRN_UIC2_15	0x348
++
++struct uic_table {
++	char *name;
++	u32 dcr;
++};
++
++struct uic_table uic_table[] = {
++	{ "0",		DCRN_UIC0},
++//#ifdef CONFIG_FSP2
++	{ "0.1",	DCRN_UIC0_1},
++	{ "0.2",	DCRN_UIC0_2},
++//#endif
++	{ "1.0",	DCRN_UIC1_0},
++	{ "1.1",	DCRN_UIC1_1},
++	{ "1.2",	DCRN_UIC1_2},
++	{ "1.3",	DCRN_UIC1_3},
++//#ifdef CONFIG_FSP2
++	{ "1.4",	DCRN_UIC1_4},
++	{ "1.5",	DCRN_UIC1_5},
++//#endif
++	{ "2.0",	DCRN_UIC2_0},
++	{ "2.1",	DCRN_UIC2_1},
++	{ "2.2",	DCRN_UIC2_2},
++	{ "2.3",	DCRN_UIC2_3},
++	{ "2.4",	DCRN_UIC2_4},
++	{ "2.5",	DCRN_UIC2_5},
++	{ "2.6",	DCRN_UIC2_6},
++	{ "2.7",	DCRN_UIC2_7},
++	{ "2.8",	DCRN_UIC2_8},
++	{ "2.9",	DCRN_UIC2_9},
++	{ "2.10",	DCRN_UIC2_10},
++	{ "2.11",	DCRN_UIC2_11},
++	{ "2.12",	DCRN_UIC2_12},
++	{ "2.13",	DCRN_UIC2_13},
++	{ "2.14",	DCRN_UIC2_14},
++	{ "2.15",	DCRN_UIC2_15},
++};
++#define NUM_UICS ARRAY_SIZE(uic_table)
++
++struct crash_regs {
++	struct sprs sprs;
++	struct tlb tlbs[NUM_TLB_WAYS][NUM_TLB_INDEXES];
++	struct uic uics[NUM_UICS];
++};
++
++struct crash_regs crash_regs;
++
++void crash_save_regs(void)
++{
++	int i, j;
++
++	__asm__ __volatile__("mfcr %0" : "=r" (crash_regs.sprs.cr));
++
++	crash_regs.sprs.ccr0	= mfspr(SPRN_CCR0);
++	crash_regs.sprs.ccr1	= mfspr(SPRN_CCR1);
++	crash_regs.sprs.csrr0	= mfspr(SPRN_CSRR0);
++	crash_regs.sprs.csrr1	= mfspr(SPRN_CSRR1);
++	crash_regs.sprs.ctr	= mfspr(SPRN_CTR);
++	crash_regs.sprs.dbcr0	= mfspr(SPRN_DBCR0);
++	crash_regs.sprs.dbcr1	= mfspr(SPRN_DBCR1);
++	crash_regs.sprs.dbcr2	= mfspr(SPRN_DBCR2);
++	crash_regs.sprs.dbdr	= mfspr(SPRN_DBDR);
++	crash_regs.sprs.dbsr	= mfspr(SPRN_DBSR);
++	crash_regs.sprs.dear	= mfspr(SPRN_DEAR);
++	crash_regs.sprs.dec	= mfspr(SPRN_DEC);
++	crash_regs.sprs.decar	= mfspr(SPRN_DECAR);
++	crash_regs.sprs.esr	= mfspr(SPRN_ESR);
++	crash_regs.sprs.ivpr	= mfspr(SPRN_IVPR);
++	crash_regs.sprs.lr	= mfspr(SPRN_LR);
++	crash_regs.sprs.mcsr	= mfspr(SPRN_MCSR);
++	crash_regs.sprs.mcsrr0	= mfspr(SPRN_MCSRR0);
++	crash_regs.sprs.mcsrr1	= mfspr(SPRN_MCSRR1);
++	crash_regs.sprs.msr	= mfmsr();
++	crash_regs.sprs.pid	= mfspr(SPRN_PID);
++	crash_regs.sprs.pvr	= mfspr(SPRN_PVR);
++	crash_regs.sprs.sprg0	= mfspr(SPRN_SPRG0);
++	crash_regs.sprs.sprg1	= mfspr(SPRN_SPRG1);
++	crash_regs.sprs.sprg2	= mfspr(SPRN_SPRG2);
++	crash_regs.sprs.sprg3	= mfspr(SPRN_SPRG3);
++	crash_regs.sprs.sprg4	= mfspr(SPRN_SPRG4);
++	crash_regs.sprs.sprg5	= mfspr(SPRN_SPRG5);
++	crash_regs.sprs.sprg6	= mfspr(SPRN_SPRG6);
++	crash_regs.sprs.sprg7	= mfspr(SPRN_SPRG7);
++	crash_regs.sprs.srr0	= mfspr(SPRN_SRR0);
++	crash_regs.sprs.srr1	= mfspr(SPRN_SRR1);
++	crash_regs.sprs.tbl	= mfspr(SPRN_TBRL);
++	crash_regs.sprs.tbu	= mfspr(SPRN_TBRU);
++	crash_regs.sprs.tcr	= mfspr(SPRN_TCR);
++	crash_regs.sprs.tsr	= mfspr(SPRN_TSR);
++	crash_regs.sprs.usprg0	= mfspr(SPRN_USPRG0);
++	crash_regs.sprs.xer	= mfspr(SPRN_XER);
++//#ifdef CONFIG_FSP2
++	crash_regs.sprs.ccr2	= mfspr(SPRN_CCR2);
++	crash_regs.sprs.dcesr	= mfspr(SPRN_DCESR);
++	crash_regs.sprs.dcripr	= mfspr(SPRN_DCRIPR);
++	crash_regs.sprs.icesr	= mfspr(SPRN_ICESR);
++	crash_regs.sprs.rmpd	= mfspr(SPRN_RMPD);
++	crash_regs.sprs.sprg8	= mfspr(SPRN_SPRG8);
++//#endif
++
++
++	for (i = 0; i < NUM_TLB_WAYS; i++) {
++
++		u32 way = i << 30;
++
++		for (j = 0; j < NUM_TLB_INDEXES; j++) {
++
++			u32 word0, word1, word2, addr, mmucr;
++
++			addr = way | j;
++
++			__asm__ __volatile__("tlbre %0,%1,0" : "=r" (word0)
++							     : "r" (addr));
++
++			mmucr = mfspr(SPRN_MMUCR);
++
++			__asm__ __volatile__("tlbre %0,%1,1" : "=r" (word1)
++							     : "r" (addr));
++
++			__asm__ __volatile__("tlbre %0,%1,2" : "=r" (word2)
++							     : "r" (addr));
++
++			crash_regs.tlbs[i][j].tid = mmucr & 0xfff;
++			*(u32 *)&crash_regs.tlbs[i][j].word0 = word0;
++			*(u32 *)&crash_regs.tlbs[i][j].word1 = word1;
++			*(u32 *)&crash_regs.tlbs[i][j].word2 = word2;
++		}
++	}
++
++	for (i = 0; i < NUM_UICS; i++) {
++		crash_regs.uics[i].name = uic_table[i].name;
++		crash_regs.uics[i].status = mfdcr(uic_table[i].dcr + UIC_SR);
++		crash_regs.uics[i].enable = mfdcr(uic_table[i].dcr + UIC_ER);
++	}
++}
++
+diff --git a/arch/powerpc/platforms/Makefile b/arch/powerpc/platforms/Makefile
+index 469ef17..29122c5 100644
+--- a/arch/powerpc/platforms/Makefile
++++ b/arch/powerpc/platforms/Makefile
+@@ -22,3 +22,4 @@ obj-$(CONFIG_PPC_CELL)		+= cell/
+ obj-$(CONFIG_PPC_PS3)		+= ps3/
+ obj-$(CONFIG_EMBEDDED6xx)	+= embedded6xx/
+ obj-$(CONFIG_AMIGAONE)		+= amigaone/
++obj-y               += fsp/
++

@@ -1,0 +1,3742 @@
+diff --git a/arch/powerpc/include/asm/fsp/reg.h b/arch/powerpc/include/asm/fsp/reg.h
+new file mode 100644
+index 0000000..d7c51be
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp/reg.h
+@@ -0,0 +1,60 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2012
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifdef CONFIG_FSP1
++#include <asm/fsp1/eddr2.h>
++#include <asm/fsp1/dcr.h>
++#endif
++
++#ifdef CONFIG_FSP2
++#include <asm/fsp2/dcr.h>
++#endif
++
++/* FSP PVR values. */
++#define PVR_FSP1_PASS0  0x114218d0
++#define PVR_FSP1_PASS20 0x114218d1
++#define PVR_FSP1_PASS30 0x114218d2
++
++#define PVR_FSP2	0x7ff520c0
++
++/* These SPRs are missing from reg_booke.h */
++#define SPRN_RMPD	0x339	/* Real Mode Page Description Register */
++#define SPRN_MCSRC	0x33C	/* MCSR Clear */
++#define SPRN_DCESR	0x352	/* Data Cache Exception Syndrome Register */
++#define SPRN_ICESR	0x353	/* I-Cache Exception Syndrome Register */
++#define SPRN_CCR2	0x379	/* Core Configuration Register 2 */
++#define SPRN_DCRIPR	0x37B	/* DCR Immediate Prefix Register */
++#define SPRN_DBDR	0x3F3	/* Debug Data Register */
++
++#define SPRN_DCDBTRH    0x39D   /* Data Cache Debug Tag Register High */
++#define SPRN_DCDBTRL    0x39C   /* Data Cache Debug Tag Register Low */
++#define SPRN_ICDBDR0    0x3D3   /* Instruction Cache Debug Data Register 0 */
++#define SPRN_ICDBDR1    0x3D4   /* Instruction Cache Debug Data Register 1 */
++#define SPRN_ICDBTRH    0x39F   /* Instruction Cache Debug Tag Register High */
++#define SPRN_ICDBTRL    0x39E   /* Instruction Cache Debug Tag Register Low */
++#define SPRN_IOCCR      0x35C   /* Instruction Opcode Compare Control Register */
++#define SPRN_IOCR1      0x35D   /* Instruction Opcode Compare Register 1 */
++#define SPRN_IOCR2      0x35E   /* Instruction Opcode Compare Register 2 */
++#define SPRN_PMUCC0     0x35A   /* PMU Core Control Register */
++#define SPRN_PWM        0x376   /* Pulse Width Margin Register */
++#define SPRN_RSTCFG     0x39B   /* Reset Configuration Register */
++#define SPRN_USPGR0     0x100   /* User SPR General 0 */
++
++/* These MCSR bits are missing from reg_booke.h */
++#define MCSR_L2		0x00200000	/* Error reported through L2 */
++#define MCSR_DCR	0x00100000	/* DCR timeout */
+diff --git a/arch/powerpc/include/asm/fsp1/dcr.h b/arch/powerpc/include/asm/fsp1/dcr.h
+new file mode 100644
+index 0000000..072557c
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/dcr.h
+@@ -0,0 +1,477 @@
++/*******************************************************************************
++ *   Copyright (c) International Business Machines Corp., 2005, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *****************************************************************************/
++#ifndef _ASM_POWERPC_FSP_DCR_H_
++#define _ASM_POWERPC_FSP_DCR_H_
++#ifdef __KERNEL__
++
++#define DCRN_CCL_ADDR		0x006	/* Clock configuration addr */
++#define DCRN_CCL_DATA		0x007	/* Clock configuration data */
++#define DCRN_DDR_REG_ADDR	0x008
++#define DCRN_DDR_REG_DATA 	0x009
++#define DCRN_DDR_WPA_ADDR	0x00A
++#define DCRN_DDR_WPA_DATA	0x00B
++#define DCRN_CMU_ADDR		0x00C	/* Chip management unic addr */
++#define DCRN_CMU_DATA		0x00D	/* Chip management unic data */
++#define DCRN_EBC_ADDR		0x00E
++#define DCRN_EBC_DATA		0x00F
++
++
++/* PLB Arbiter */
++#define DCRN_PLB_PCBI		0x010	/* PLB Crossbar ID/Rev Register */
++#define DCRN_PLB_P0ACR		0x011	/* PLB0 Arbiter Control Register */
++#define DCRN_PLB_P0ESRL		0x012	/* PLB0 Error Status Register Low */
++#define DCRN_PLB_P0ESRH		0x013	/* PLB0 Error Status Register High */
++#define DCRN_PLB_P0EARL		0x014	/* PLB0 Error Address Register Low */
++#define DCRN_PLB_P0EARH		0x015	/* PLB0 Error Address Register High */
++#define DCRN_PLB_P0ESRLS	0x016	/* PLB0 Error Status Register Low Set*/
++#define DCRN_PLB_P0ESRHS	0x017	/* PLB0 Error Status Register High */
++#define DCRN_PLB_PCBC		0x018	/* PLB Crossbar Control Register */
++#define DCRN_PLB_P1ACR		0x019	/* PLB1 Arbiter Control Register */
++#define DCRN_PLB_P1ESRL		0x01A	/* PLB1 Error Status Register Low */
++#define DCRN_PLB_P1ESRH		0x01B	/* PLB1 Error Status Register High */
++#define DCRN_PLB_P1EARL		0x01C	/* PLB1 Error Address Register Low */
++#define DCRN_PLB_P1EARH		0x01D	/* PLB1 Error Address Register High */
++#define DCRN_PLB_P1ESRLS	0x01E	/* PLB1 Error Status Register Low Set*/
++#define DCRN_PLB_P1ESRHS	0x01F	/*PLB1 Error Status Register High Set*/
++
++/* PLB/OPB bridge 0, 1, 2, 3 */
++#define DCRN_PLB0_GESR0		0x020	/* Error status 0: Master Dev 0,1,2,3*/
++#define DCRN_PLB0_GESRS0	0x021	/* Error Status Register Set 0 */
++#define DCRN_PLB0_GEAR		0x022	/* Error Address Register */
++#define DCRN_PLB0_GEARU		0x023	/* Error Upper Address Register */
++#define DCRN_PLB0_GESR1		0x024	/* Error Status 1; Master Dev 4,5,6,7*/
++#define DCRN_PLB0_GESRS1	0x025	/* Error Status Register Set 1 */
++#define DCRN_PLB0_GCONFG	0x026	/* Error Configuration Register */
++#define DCRN_PLB0_GCONFGS	0x027	/* Error Configuration Register Set */
++#define DCRN_PLB0_GLATENCY	0x028	/* Burst Latency Timer */
++#define DCRN_PLB0_GLATENCYS	0x029	/* Burst Latency Timer Set */
++#define DCRN_PLB0_GREV		0x02A	/* Revision ID */
++
++#define DCRN_PLB1_GESR0		0x030	/* Error status 0: Master Dev 0,1,2,3*/
++#define DCRN_PLB1_GESRS0	0x031	/* Error Status Register Set 0 */
++#define DCRN_PLB1_GEAR		0x032	/* Error Address Register */
++#define DCRN_PLB1_GEARU		0x033	/* Error Upper Address Register */
++#define DCRN_PLB1_GESR1		0x034	/* Error Status 1; Master Dev 4,5,6,7*/
++#define DCRN_PLB1_GESRS1	0x035	/* Error Status Register Set 1 */
++#define DCRN_PLB1_GCONFG	0x036	/* Error Configuration Register */
++#define DCRN_PLB1_GCONFGS	0x037	/* Error Configuration Register Set */
++#define DCRN_PLB1_GLATENCY	0x038	/* Burst Latency Timer */
++#define DCRN_PLB1_GLATENCYS	0x039	/* Burst Latency Timer Set */
++#define DCRN_PLB1_GREV		0x03A	/* Revision ID */
++
++#define DCRN_PLB2_GESR0		0x040	/* Error status 0: Master Dev 0,1,2,3*/
++#define DCRN_PLB2_GESRS0	0x041	/* Error Status Register Set 0 */
++#define DCRN_PLB2_GEAR		0x042	/* Error Address Register */
++#define DCRN_PLB2_GEARU		0x043	/* Error Upper Address Register */
++#define DCRN_PLB2_GESR1		0x044	/* Error Status 1; Master Dev 4,5,6,7*/
++#define DCRN_PLB2_GESRS1	0x045	/* Error Status Register Set 1 */
++#define DCRN_PLB2_GCONFG	0x046	/* Error Configuration Register */
++#define DCRN_PLB2_GCONFGS	0x047	/* Error Configuration Register Set */
++#define DCRN_PLB2_GLATENCY	0x048	/* Burst Latency Timer */
++#define DCRN_PLB2_GLATENCYS	0x049	/* Burst Latency Timer Set */
++#define DCRN_PLB2_GREV		0x04A	/* Revision ID */
++
++#define DCRN_PLB3_GESR0		0x050	/* Error status 0: Master Dev 0,1,2,3*/
++#define DCRN_PLB3_GESRS0	0x051	/* Error Status Register Set 0 */
++#define DCRN_PLB3_GEAR		0x052	/* Error Address Register */
++#define DCRN_PLB3_GEARU		0x053	/* Error Upper Address Register */
++#define DCRN_PLB3_GESR1		0x054	/* Error Status 1; Master Dev 4,5,6,7*/
++#define DCRN_PLB3_GESRS1	0x055	/* Error Status Register Set 1 */
++#define DCRN_PLB3_GCONFG	0x056	/* Error Configuration Register */
++#define DCRN_PLB3_GCONFGS	0x057	/* Error Configuration Register Set */
++#define DCRN_PLB3_GLATENCY	0x058	/* Burst Latency Timer */
++#define DCRN_PLB3_GLATENCYS	0x059	/* Burst Latency Timer Set */
++#define DCRN_PLB3_GREV		0x05A	/* Revision ID */
++
++/* RTC */
++#define DCRN_RTC_SECONDS	0x60
++#define DCRN_RTC_SEC_ALRM	0x61
++#define DCRN_RTC_MINUTES	0x62
++#define DCRN_RTC_MIN_ALRM	0x63
++#define DCRN_RTC_HOURS		0x64
++#define DCRN_RTC_HOURS_ALRM	0x65
++#define DCRN_RTC_DAY_OF_WEEK	0x66
++#define DCRN_RTC_DAY_OF_MONTH	0x67
++#define DCRN_RTC_MONTH		0x68
++#define DCRN_RTC_YEAR		0x69
++#define DCRN_RTC_REG_A		0x6A
++#define DCRN_RTC_REG_B		0x6B
++#define DCRN_RTC_REG_C		0x6C
++#define DCRN_RTC_REG_D		0x6D
++#define DCRN_RTC_CENTURY	0x6E
++#define DCRN_RTC_WRAPPER_CNTL	0x70
++
++/* CMU addresses of RTC64 registers */
++#define CMUN_RTC64_HI		0x0B
++#define CMUN_RTC64_LO		0x0C
++#define CMUN_RTC64_ALRM_CNTL	0x0D
++#define CMUN_RTC64A0_HI		0x0E
++#define CMUN_RTC64A0_LO		0x0F
++#define CMUN_RTC64A1_HI		0x10
++#define CMUN_RTC64A1_LO		0x11
++#define CMUN_RTC64A2_HI		0x12
++#define CMUN_RTC64A2_LO		0x13
++
++/* CMU addresses of URCR registers */
++#define CMUN_CRCS		0x00 /* Chip Reset Control Status */
++#define CMUN_URCR0_RS		0x01
++#define CMUN_URCR0_C		0x02
++#define CMUN_URCR1_RS		0x03
++#define CMUN_URCR1_C		0x04
++
++/* addresses of PSI URCR registers */
++#define URCR1_PSI0_MASTER_RESET	0x08000000
++#define URCR1_PSI1_MASTER_RESET	0x04000000
++#define URCR1_PSI2_MASTER_RESET	0x02000000
++#define URCR1_PSI3_MASTER_RESET	0x01000000
++
++/* CMU address for USB configuration */
++#define CMUN_USBADRB		0x25
++
++/* CMU address of boot watchdog status and cntl */
++#define CMUN_BWTC		0x05
++
++/* CRCS bit fields */
++#define CRCS_STAT_MASK		0xF0000000
++#define CRCS_STAT_POR		0x10000000
++#define CRCS_STAT_ALTERNATE_POR 0x00000000 /* See bug 36786 */
++#define CRCS_STAT_PHR		0x20000000
++#define CRCS_STAT_CRCS_SYS	0x40000000 /* Write to bit 24 of this reg */
++#define CRCS_STAT_DBCR_SYS	0x50000000 /* Check TSR */
++#define CRCS_STAT_HOST_SYS	0x60000000
++#define CRCS_STAT_CRCS_CHIP	0x80000000 /* Write to bit 25 of this reg */
++#define CRCS_STAT_DBCR_CHIP	0x90000000 /* Check TSR */
++#define CRCS_STAT_HOST_CHIP	0xA0000000
++#define CRCS_STAT_PSI_CHIP	0xB0000000
++#define CRCS_STAT_CRCS_CORE	0xC0000000 /* Write to bit 26 of this reg */
++#define CRCS_STAT_DBCR_CORE	0xD0000000 /* Check TSR */
++#define CRCS_STAT_HOST_CORE	0xE0000000
++#define CRCS_STAT_SELF_CORE	0x40000000
++#define CRCS_STAT_SELF_CHIP	0x50000000
++#define CRCS_WATCHE		0x08000000
++#define CRCS_CORE		0x04000000 /* Reset PPC440 core */
++#define CRCS_CHIP		0x02000000 /* Chip Reset */
++#define CRCS_SYS		0x01000000 /* System Reset */
++#define CRCS_WRCR		0x00800000 /* Watchdog reset on core reset */
++#define CRCS_PLOCK		0x00000002 /* PLL Locked */
++
++/* CMU_BWTC bit fields */
++#define BWTC_CONFIG0		0x80000000 /* BWD enable pin */
++#define BWTC_CONFIG1		0x40000000 /* BWD mode pin 0:ADDR 1:CS */
++#define BWTC_CONFIG4		0x20000000 /* Boot Fash size */
++#define BWTC_CONFIG3		0x10000000 /* Boot Fash size */
++#define BWTC_CONFIG2		0x08000000 /* Boot Fash size */
++#define BWTC_NANDBOOT		0x04000000 /* NANDBOOT */
++#define BWTC_CONFIG1LT		0x00008000 /* Latched version of BWD mode */
++#define BWTC_CONFIG4LT		0x00004000 /* Latched CONFIG4 */
++#define BWTC_CONFIG3LT		0x00002000 /* Latched CONFIG3 */
++#define BWTC_CONFIG2LT		0x00001000 /* Latched CONFIG2 */
++#define BWTC_WDT_MASK		0x00000700 /* WDT Mask */
++#define BWTC_WDT_500US		0x00000000 /* 500 usec */
++#define BWTC_WDT_1MS		0x00000100 /* 1 msec   */
++#define BWTC_WDT_250MS		0x00000200 /* 250 msec */
++#define BWTC_WDT_500MS		0x00000300 /* 500 msec */
++#define BWTC_WDT_1SEC		0x00000400 /* 1 sec    */
++#define BWTC_WDT_8SEC		0x00000500 /* 8 sec    */
++#define BWTC_WDT_16SEC		0x00000600 /* 16 sec   */
++#define BWTC_WDT_32SEC		0x00000700 /* 32 sec   */
++#define BWTC_BANK_MSB		0x00000008 /* Dual Boot Bank Sel bit 2 (R) */
++#define BWTC_MASK		0x00000004 /* Mask dual boot bank select */
++#define BWTC_BANK		0x00000002 /* Dual Boot Bank Sel (R) */
++#define BWTC_BANK_LSB		0x00000002 /* Dual Boot Bank Sel (R) */
++#define BWTC_WDTE		0x00000001 /* Watchdog Enable (RC)   */
++
++/* MCMAL0 */
++/* MCMAL1 */
++
++/* FSI0 DMA */
++/* FSI1 DMA */
++/* FSI2 DMA */
++/* FSI3 DMA */
++/* PSI DMA */
++/*Define the various engine base addresses*/
++#define DMA_FSI_ENG0	0x180
++#define DMA_FSI_ENG1	0x1C0
++#define DMA_FSI_ENG2	0x200
++#define DMA_FSI_ENG3	0x240
++#define DMA_PSI_ENG	0x280
++
++/*Define the "base" DMA DCR regs, OR these into the base to
++ get the channel you desire  ie FSI_ENG0 Channel CR 0 is (DMA_FSI_ENG0 | DCRN_DMA_CR0) */
++#define DCRN_DMA_CR0(base)	(base + 0x0)	/* Channel Control Register 0*/
++#define DCRN_DMA_CTC0(base)	(base + 0x1)	/* Count and Control Register 0 */
++#define DCRN_DMA_SAH0(base)	(base + 0x2)	/* Source Address High Register 0*/
++#define DCRN_DMA_SAL0(base)	(base + 0x3)	/* Source Address Low Register 0*/
++#define DCRN_DMA_DAH0(base)	(base + 0x4)	/* Dest Addr High Register 0 */
++#define DCRN_DMA_DAL0(base)	(base + 0x5)	/* Dest Addr Low Register 0 */
++#define DCRN_DMA_SGH0(base)	(base + 0x6)	/* S/G Desc Addr High Register 0 */
++#define DCRN_DMA_SGL0(base)	(base + 0x7)	/* S/G Desc Addr Low Register 0 */
++#define DCRN_DMA_CR1(base)	(base + 0x8)	/* Channel Control Register 1*/
++#define DCRN_DMA_CTC1(base)	(base + 0x9)	/* Count and Control Register 1 */
++#define DCRN_DMA_SAH1(base)	(base + 0xA)	/* Source Address High Register 1*/
++#define DCRN_DMA_SAL1(base)	(base + 0xB)	/* Source Address Low Register 1*/
++#define DCRN_DMA_DAH1(base)	(base + 0xC)	/* Dest Addr High Register 1 */
++#define DCRN_DMA_DAL1(base)	(base + 0xD)	/* Dest Addr Low Register 1 */
++#define DCRN_DMA_SGH1(base)	(base + 0xE)	/* S/G Desc Addr High Register 1 */
++#define DCRN_DMA_SGL1(base)	(base + 0xF)	/* S/G Desc Addr Low Register 1 */
++#define DCRN_DMA_CR2(base)	(base + 0x10)	/* Channel Control Register 2*/
++#define DCRN_DMA_CTC2(base)	(base + 0x11)	/* Count and Control Register 2 */
++#define DCRN_DMA_SAH2(base)	(base + 0x12)	/* Source Address High Register 2*/
++#define DCRN_DMA_SAL2(base)	(base + 0x13)	/* Source Address Low Register 2*/
++#define DCRN_DMA_DAH2(base)	(base + 0x14)	/* Dest Addr High Register 2 */
++#define DCRN_DMA_DAL2(base)	(base + 0x15)	/* Dest Addr Low Register 2 */
++#define DCRN_DMA_SGH2(base)	(base + 0x16)	/* S/G Desc Addr High Register 2 */
++#define DCRN_DMA_SGL2(base)	(base + 0x17)	/* S/G Desc Addr Low Register 2 */
++#define DCRN_DMA_CR3(base)	(base + 0x18)	/* Channel Control Register 3*/
++#define DCRN_DMA_CTC3(base)	(base + 0x19)	/* Count and Control Register 3 */
++#define DCRN_DMA_SAH3(base)	(base + 0x1A)	/* Source Address High Register 3*/
++#define DCRN_DMA_SAL3(base)	(base + 0x1B)	/* Source Address Low Register 3*/
++#define DCRN_DMA_DAH3(base)	(base + 0x1C)	/* Dest Addr High Register 3 */
++#define DCRN_DMA_DAL3(base)	(base + 0x1D)	/* Dest Addr Low Register 3 */
++#define DCRN_DMA_SGH3(base)	(base + 0x1E)	/* S/G Desc Addr High Register 3 */
++#define DCRN_DMA_SGL3(base)	(base + 0x1F)	/* S/G Desc Addr Low Register 3 */
++#define DCRN_DMA_SR(base)	(base + 0x20)	/* Status Register */
++						/* Reserved 1A1..1A2 */
++#define DCRN_DMA_SGC(base)	(base + 0x23)	/* S/G Command Register */
++#define DCRN_DMA_PMP(base)	(base + 0x24)	/* PLB Master Priority Register */
++
++/* uic */
++
++#define DCRN_UIC0_BASE		0x2C0
++#define DCRN_UIC1_BASE		0x2C8	/* uic1_0 */
++#define DCRN_UIC2_BASE		0x350	/* uic1_1 */
++#define DCRN_UIC3_BASE		0x358	/* uic1_2 */
++#define DCRN_UIC4_BASE		0x360	/* uic1_3 */
++#define DCRN_UIC5_BASE		0x2D0	/* uic2_0 */
++#define DCRN_UIC6_BASE		0x2D8	/* uic2_1 */
++#define DCRN_UIC7_BASE		0x2E0	/* uic2_2 */
++#define DCRN_UIC8_BASE		0x2E8	/* uic2_3 */
++#define DCRN_UIC9_BASE		0x2F0	/* uic2_4 */
++#define DCRN_UIC10_BASE		0x2F8	/* uic2_5 */
++#define DCRN_UIC11_BASE		0x300	/* uic2_6 */
++#define DCRN_UIC12_BASE		0x308	/* uic2_7 */
++#define DCRN_UIC13_BASE		0x310	/* uic2_8 */
++#define DCRN_UIC14_BASE		0x318	/* uic2_9 */
++#define DCRN_UIC15_BASE		0x320	/* uic2_10 */
++#define DCRN_UIC16_BASE		0x328	/* uic2_11 */
++#define DCRN_UIC17_BASE		0x330	/* uic2_12 */
++#define DCRN_UIC18_BASE		0x338	/* uic2_13 */
++#define DCRN_UIC19_BASE		0x340	/* uic2_14 */
++#define DCRN_UIC20_BASE		0x348	/* uic2_15 */
++
++#define DCRN_UIC0_SR		(DCRN_UIC0_BASE + 0x0 )
++#define DCRN_UIC0_SRS		(DCRN_UIC0_BASE + 0x1 )
++#define DCRN_UIC0_ER		(DCRN_UIC0_BASE + 0x2 )
++#define DCRN_UIC0_CR		(DCRN_UIC0_BASE + 0x3 )
++#define DCRN_UIC0_PR		(DCRN_UIC0_BASE + 0x4 )
++#define DCRN_UIC0_TR		(DCRN_UIC0_BASE + 0x5 )
++#define DCRN_UIC0_MSR		(DCRN_UIC0_BASE + 0x6 )
++#define DCRN_UIC0_VR0		(DCRN_UIC0_BASE + 0x7 )
++
++#define DCRN_UIC1_SR		(DCRN_UIC1_BASE + 0x0 )
++#define DCRN_UIC1_SRS		(DCRN_UIC1_BASE + 0x1 )
++#define DCRN_UIC1_ER		(DCRN_UIC1_BASE + 0x2 )
++#define DCRN_UIC1_CR		(DCRN_UIC1_BASE + 0x3 )
++#define DCRN_UIC1_PR		(DCRN_UIC1_BASE + 0x4 )
++#define DCRN_UIC1_TR		(DCRN_UIC1_BASE + 0x5 )
++#define DCRN_UIC1_MSR		(DCRN_UIC1_BASE + 0x6 )
++#define DCRN_UIC1_VR0		(DCRN_UIC1_BASE + 0x7 )
++
++#define DCRN_UIC2_SR		(DCRN_UIC2_BASE + 0x0 )
++#define DCRN_UIC2_SRS		(DCRN_UIC2_BASE + 0x1 )
++#define DCRN_UIC2_ER		(DCRN_UIC2_BASE + 0x2 )
++#define DCRN_UIC2_CR		(DCRN_UIC2_BASE + 0x3 )
++#define DCRN_UIC2_PR		(DCRN_UIC2_BASE + 0x4 )
++#define DCRN_UIC2_TR		(DCRN_UIC2_BASE + 0x5 )
++#define DCRN_UIC2_MSR		(DCRN_UIC2_BASE + 0x6 )
++#define DCRN_UIC2_VR0		(DCRN_UIC2_BASE + 0x7 )
++
++#define DCRN_UIC3_SR		(DCRN_UIC3_BASE + 0x0 )
++#define DCRN_UIC3_SRS		(DCRN_UIC3_BASE + 0x1 )
++#define DCRN_UIC3_ER		(DCRN_UIC3_BASE + 0x2 )
++#define DCRN_UIC3_CR		(DCRN_UIC3_BASE + 0x3 )
++#define DCRN_UIC3_PR		(DCRN_UIC3_BASE + 0x4 )
++#define DCRN_UIC3_TR		(DCRN_UIC3_BASE + 0x5 )
++#define DCRN_UIC3_MSR		(DCRN_UIC3_BASE + 0x6 )
++#define DCRN_UIC3_VR0		(DCRN_UIC3_BASE + 0x7 )
++
++#define DCRN_UIC4_SR		(DCRN_UIC4_BASE + 0x0 )
++#define DCRN_UIC4_SRS		(DCRN_UIC4_BASE + 0x1 )
++#define DCRN_UIC4_ER		(DCRN_UIC4_BASE + 0x2 )
++#define DCRN_UIC4_CR		(DCRN_UIC4_BASE + 0x3 )
++#define DCRN_UIC4_PR		(DCRN_UIC4_BASE + 0x4 )
++#define DCRN_UIC4_TR		(DCRN_UIC4_BASE + 0x5 )
++#define DCRN_UIC4_MSR		(DCRN_UIC4_BASE + 0x6 )
++#define DCRN_UIC4_VR0		(DCRN_UIC4_BASE + 0x7 )
++
++#define DCRN_UIC5_SR		(DCRN_UIC5_BASE + 0x0 )
++#define DCRN_UIC5_SRS		(DCRN_UIC5_BASE + 0x1 )
++#define DCRN_UIC5_ER		(DCRN_UIC5_BASE + 0x2 )
++#define DCRN_UIC5_CR		(DCRN_UIC5_BASE + 0x3 )
++#define DCRN_UIC5_PR		(DCRN_UIC5_BASE + 0x4 )
++#define DCRN_UIC5_TR		(DCRN_UIC5_BASE + 0x5 )
++#define DCRN_UIC5_MSR		(DCRN_UIC5_BASE + 0x6 )
++#define DCRN_UIC5_VR0		(DCRN_UIC5_BASE + 0x7 )
++
++#define DCRN_UIC6_SR		(DCRN_UIC6_BASE + 0x0 )
++#define DCRN_UIC6_SRS		(DCRN_UIC6_BASE + 0x1 )
++#define DCRN_UIC6_ER		(DCRN_UIC6_BASE + 0x2 )
++#define DCRN_UIC6_CR		(DCRN_UIC6_BASE + 0x3 )
++#define DCRN_UIC6_PR		(DCRN_UIC6_BASE + 0x4 )
++#define DCRN_UIC6_TR		(DCRN_UIC6_BASE + 0x5 )
++#define DCRN_UIC6_MSR		(DCRN_UIC6_BASE + 0x6 )
++#define DCRN_UIC6_VR0		(DCRN_UIC6_BASE + 0x7 )
++
++#define DCRN_UIC7_SR		(DCRN_UIC7_BASE + 0x0 )
++#define DCRN_UIC7_SRS		(DCRN_UIC7_BASE + 0x1 )
++#define DCRN_UIC7_ER		(DCRN_UIC7_BASE + 0x2 )
++#define DCRN_UIC7_CR		(DCRN_UIC7_BASE + 0x3 )
++#define DCRN_UIC7_PR		(DCRN_UIC7_BASE + 0x4 )
++#define DCRN_UIC7_TR		(DCRN_UIC7_BASE + 0x5 )
++#define DCRN_UIC7_MSR		(DCRN_UIC7_BASE + 0x6 )
++#define DCRN_UIC7_VR0		(DCRN_UIC7_BASE + 0x7 )
++
++#define DCRN_UIC8_SR		(DCRN_UIC8_BASE + 0x0 )
++#define DCRN_UIC8_SRS		(DCRN_UIC8_BASE + 0x1 )
++#define DCRN_UIC8_ER		(DCRN_UIC8_BASE + 0x2 )
++#define DCRN_UIC8_CR		(DCRN_UIC8_BASE + 0x3 )
++#define DCRN_UIC8_PR		(DCRN_UIC8_BASE + 0x4 )
++#define DCRN_UIC8_TR		(DCRN_UIC8_BASE + 0x5 )
++#define DCRN_UIC8_MSR		(DCRN_UIC8_BASE + 0x6 )
++#define DCRN_UIC8_VR0		(DCRN_UIC8_BASE + 0x7 )
++
++#define DCRN_UIC9_SR		(DCRN_UIC9_BASE + 0x0 )
++#define DCRN_UIC9_SRS		(DCRN_UIC9_BASE + 0x1 )
++#define DCRN_UIC9_ER		(DCRN_UIC9_BASE + 0x2 )
++#define DCRN_UIC9_CR		(DCRN_UIC9_BASE + 0x3 )
++#define DCRN_UIC9_PR		(DCRN_UIC9_BASE + 0x4 )
++#define DCRN_UIC9_TR		(DCRN_UIC9_BASE + 0x5 )
++#define DCRN_UIC9_MSR		(DCRN_UIC9_BASE + 0x6 )
++#define DCRN_UIC9_VR0		(DCRN_UIC9_BASE + 0x7 )
++
++#define DCRN_UIC10_SR		(DCRN_UIC10_BASE + 0x0 )
++#define DCRN_UIC10_SRS		(DCRN_UIC10_BASE + 0x1 )
++#define DCRN_UIC10_ER		(DCRN_UIC10_BASE + 0x2 )
++#define DCRN_UIC10_CR		(DCRN_UIC10_BASE + 0x3 )
++#define DCRN_UIC10_PR		(DCRN_UIC10_BASE + 0x4 )
++#define DCRN_UIC10_TR		(DCRN_UIC10_BASE + 0x5 )
++#define DCRN_UIC10_MSR		(DCRN_UIC10_BASE + 0x6 )
++#define DCRN_UIC10_VR0		(DCRN_UIC10_BASE + 0x7 )
++
++#define DCRN_UIC11_SR		(DCRN_UIC11_BASE + 0x0 )
++#define DCRN_UIC11_SRS		(DCRN_UIC11_BASE + 0x1 )
++#define DCRN_UIC11_ER		(DCRN_UIC11_BASE + 0x2 )
++#define DCRN_UIC11_CR		(DCRN_UIC11_BASE + 0x3 )
++#define DCRN_UIC11_PR		(DCRN_UIC11_BASE + 0x4 )
++#define DCRN_UIC11_TR		(DCRN_UIC11_BASE + 0x5 )
++#define DCRN_UIC11_MSR		(DCRN_UIC11_BASE + 0x6 )
++#define DCRN_UIC11_VR0		(DCRN_UIC11_BASE + 0x7 )
++
++#define DCRN_UIC12_SR		(DCRN_UIC12_BASE + 0x0 )
++#define DCRN_UIC12_SRS		(DCRN_UIC12_BASE + 0x1 )
++#define DCRN_UIC12_ER		(DCRN_UIC12_BASE + 0x2 )
++#define DCRN_UIC12_CR		(DCRN_UIC12_BASE + 0x3 )
++#define DCRN_UIC12_PR		(DCRN_UIC12_BASE + 0x4 )
++#define DCRN_UIC12_TR		(DCRN_UIC12_BASE + 0x5 )
++#define DCRN_UIC12_MSR		(DCRN_UIC12_BASE + 0x6 )
++#define DCRN_UIC12_VR0		(DCRN_UIC12_BASE + 0x7 )
++
++#define DCRN_UIC13_SR		(DCRN_UIC13_BASE + 0x0 )
++#define DCRN_UIC13_SRS		(DCRN_UIC13_BASE + 0x1 )
++#define DCRN_UIC13_ER		(DCRN_UIC13_BASE + 0x2 )
++#define DCRN_UIC13_CR		(DCRN_UIC13_BASE + 0x3 )
++#define DCRN_UIC13_PR		(DCRN_UIC13_BASE + 0x4 )
++#define DCRN_UIC13_TR		(DCRN_UIC13_BASE + 0x5 )
++#define DCRN_UIC13_MSR		(DCRN_UIC13_BASE + 0x6 )
++#define DCRN_UIC13_VR0		(DCRN_UIC13_BASE + 0x7 )
++
++#define DCRN_UIC14_SR		(DCRN_UIC14_BASE + 0x0 )
++#define DCRN_UIC14_SRS		(DCRN_UIC14_BASE + 0x1 )
++#define DCRN_UIC14_ER		(DCRN_UIC14_BASE + 0x2 )
++#define DCRN_UIC14_CR		(DCRN_UIC14_BASE + 0x3 )
++#define DCRN_UIC14_PR		(DCRN_UIC14_BASE + 0x4 )
++#define DCRN_UIC14_TR		(DCRN_UIC14_BASE + 0x5 )
++#define DCRN_UIC14_MSR		(DCRN_UIC14_BASE + 0x6 )
++#define DCRN_UIC14_VR0		(DCRN_UIC14_BASE + 0x7 )
++
++#define DCRN_UIC15_SR		(DCRN_UIC15_BASE + 0x0 )
++#define DCRN_UIC15_SRS		(DCRN_UIC15_BASE + 0x1 )
++#define DCRN_UIC15_ER		(DCRN_UIC15_BASE + 0x2 )
++#define DCRN_UIC15_CR		(DCRN_UIC15_BASE + 0x3 )
++#define DCRN_UIC15_PR		(DCRN_UIC15_BASE + 0x4 )
++#define DCRN_UIC15_TR		(DCRN_UIC15_BASE + 0x5 )
++#define DCRN_UIC15_MSR		(DCRN_UIC15_BASE + 0x6 )
++#define DCRN_UIC15_VR0		(DCRN_UIC15_BASE + 0x7 )
++
++#define DCRN_UIC16_SR		(DCRN_UIC16_BASE + 0x0 )
++#define DCRN_UIC16_SRS		(DCRN_UIC16_BASE + 0x1 )
++#define DCRN_UIC16_ER		(DCRN_UIC16_BASE + 0x2 )
++#define DCRN_UIC16_CR		(DCRN_UIC16_BASE + 0x3 )
++#define DCRN_UIC16_PR		(DCRN_UIC16_BASE + 0x4 )
++#define DCRN_UIC16_TR		(DCRN_UIC16_BASE + 0x5 )
++#define DCRN_UIC16_MSR		(DCRN_UIC16_BASE + 0x6 )
++#define DCRN_UIC16_VR0		(DCRN_UIC16_BASE + 0x7 )
++
++#define DCRN_UIC17_SR		(DCRN_UIC17_BASE + 0x0 )
++#define DCRN_UIC17_SRS		(DCRN_UIC17_BASE + 0x1 )
++#define DCRN_UIC17_ER		(DCRN_UIC17_BASE + 0x2 )
++#define DCRN_UIC17_CR		(DCRN_UIC17_BASE + 0x3 )
++#define DCRN_UIC17_PR		(DCRN_UIC17_BASE + 0x4 )
++#define DCRN_UIC17_TR		(DCRN_UIC17_BASE + 0x5 )
++#define DCRN_UIC17_MSR		(DCRN_UIC17_BASE + 0x6 )
++#define DCRN_UIC17_VR0		(DCRN_UIC17_BASE + 0x7 )
++
++#define DCRN_UIC18_SR		(DCRN_UIC18_BASE + 0x0 )
++#define DCRN_UIC18_SRS		(DCRN_UIC18_BASE + 0x1 )
++#define DCRN_UIC18_ER		(DCRN_UIC18_BASE + 0x2 )
++#define DCRN_UIC18_CR		(DCRN_UIC18_BASE + 0x3 )
++#define DCRN_UIC18_PR		(DCRN_UIC18_BASE + 0x4 )
++#define DCRN_UIC18_TR		(DCRN_UIC18_BASE + 0x5 )
++#define DCRN_UIC18_MSR		(DCRN_UIC18_BASE + 0x6 )
++#define DCRN_UIC18_VR0		(DCRN_UIC18_BASE + 0x7 )
++
++#define DCRN_UIC19_SR		(DCRN_UIC19_BASE + 0x0 )
++#define DCRN_UIC19_SRS		(DCRN_UIC19_BASE + 0x1 )
++#define DCRN_UIC19_ER		(DCRN_UIC19_BASE + 0x2 )
++#define DCRN_UIC19_CR		(DCRN_UIC19_BASE + 0x3 )
++#define DCRN_UIC19_PR		(DCRN_UIC19_BASE + 0x4 )
++#define DCRN_UIC19_TR		(DCRN_UIC19_BASE + 0x5 )
++#define DCRN_UIC19_MSR		(DCRN_UIC19_BASE + 0x6 )
++#define DCRN_UIC19_VR0		(DCRN_UIC19_BASE + 0x7 )
++
++#define DCRN_UIC20_SR		(DCRN_UIC20_BASE + 0x0 )
++#define DCRN_UIC20_SRS		(DCRN_UIC20_BASE + 0x1 )
++#define DCRN_UIC20_ER		(DCRN_UIC20_BASE + 0x2 )
++#define DCRN_UIC20_CR		(DCRN_UIC20_BASE + 0x3 )
++#define DCRN_UIC20_PR		(DCRN_UIC20_BASE + 0x4 )
++#define DCRN_UIC20_TR		(DCRN_UIC20_BASE + 0x5 )
++#define DCRN_UIC20_MSR		(DCRN_UIC20_BASE + 0x6 )
++#define DCRN_UIC20_VR0		(DCRN_UIC20_BASE + 0x7 )
++
++
++
++/* OPB/PLB bridge */
++#define DCRN_OPLB_GCTRL 	0x3F8	/* Bridge Control Register */
++#define DCRN_OPLB_GSTAT 	0x3F9	/* Bridge Status Register */
++#define DCRN_OPLB_GEARL 	0x3FA	/* Bridge Error Addr Register Low */
++#define DCRN_OPLB_GEARH 	0x3FB	/* Bridge Error Addr Register High */
++#define DCRN_OPLB_GREVID 	0x3FC	/* Bridge Revision ID Register */
++					/* Reserved 3FD..3FF */
++
++#endif /* __KERNEL__ */
++#endif /* _ASM_POWERPC_FSP1_DCR_H_ */
+diff --git a/arch/powerpc/include/asm/fsp1/eddr2.h b/arch/powerpc/include/asm/fsp1/eddr2.h
+new file mode 100644
+index 0000000..9fab2bf
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/eddr2.h
+@@ -0,0 +1,289 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
++ *   Author: Frank Haverkamp <haverkam@de.ibm.com>
++ *
++ ******************************************************************************
++ *
++ * eDDR2 Controller with Write Protection Support
++ *
++ *	MSB ------------------------ LSB
++ *		    11.1111.1111.2222.2222.2233
++ *	0123.4567.8901.2345.6789.0123.4567.8901
++ *
++ */
++#ifndef _ASM_POWERPC_FSP1_EDDR2_H_
++#define _ASM_POWERPC_FSP1_EDDR2_H_
++
++#include <asm/reg.h>
++
++#define EDDR2_BESRDC	0x00 /* PLB Bus Error Status   Clear R/W x0000_0000 */
++#define EDDR2_BESRDS	0x01 /* PLB Bus Error Status	 Set		    */
++#define EDDR2_BEARD	0x02 /* PLB Bus Error Address	     R/W x0000_0000 */
++#define EDDR2_WPESRC	0x03 /* WProtect Array Err Syn Clear R/W x0000_0000 */
++#define EDDR2_WPESRS	0x04 /* WProtect Array Err Syn	 Set		    */
++#define EDDR2_WPEAR	0x05 /* Wrotect Array Error Addr     R/W x0000_0000 */
++#define EDDR2_WMIRQC	0x06 /* PLB Bus Master Inter   Clear R/W x0000_0000 */
++#define EDDR2_WMIRQS	0x07 /* PLB Bus Master Inter	 Set		    */
++#define EDDR2_PLBOPT	0x08 /* PLB Slave Interface Options  R/W x0000_0000 */
++#define EDDR2_PUABA	0x09 /* PLB Upper Address Base Addr  R/W x0000_0000 */
++#define EDDR2_WPAIC	0x10 /* WProtect Array Interf Config R/W x0000_0000 */
++#define EDDR2_WPIRQC	0x11 /* WProtection Interrupt  Clear R/W x0000_0000 */
++#define EDDR2_WPIRQS	0x12 /* WProtection Interrupt	 Set		    */
++#define EDDR2_WPAPE	0x13 /* WProtect Array Parity Enable R/W x0000_0000 */
++#define EDDR2_MCSTAT	0x14 /* Controller Status	    Read x6000_0000 */
++#define EDDR2_MCOPT1	0x20 /* Memory Controller Options 1  R/W x1102_0000 */
++#define EDDR2_MCOPT2	0x21 /* Memory Controller Options 2  R/W x8400_0000 */
++#define EDDR2_MODT0	0x22 /* On Die Term for Rank 0	     R/W x0000_0000 */
++#define EDDR2_MODT1	0x23 /* On Die Term for Rank 1	     R/W x0000_0000 */
++#define EDDR2_CODT	0x26 /* On Die Termination for Contr R/W x0000_0000 */
++#define EDDR2_VVPR	0x27 /* Variable VRef Progr Reg	     R/W x0000_0000 */
++#define EDDR2_OPARS	0x28 /* On Chip Driver Contr Setup   R/W x8000_0037 */
++#define EDDR2_OPART	0x29 /* On Chip Driver Contr Trigger R/W x0000_0000 */
++#define EDDR2_RTR	0x30 /* Refresh Timer Register	     R/W x0BE0_0000 */
++#define EDDR2_MR0CF	0x40 /* Memory Rank 0 Configuration  R/W x0000_0000 */
++#define EDDR2_MR0EA	0x41 /* Memory Rank 0 End Address   Read x0000_0000 */
++#define EDDR2_MR1CF	0x44 /* Memory Rank 1 Configuration  R/W x0000_0000 */
++#define EDDR2_MR1EA	0x45 /* Memory Rank 1 End Address   Read x0000_0000 */
++#define EDDR2_TOM	0x46 /* Top Of Memory x46	 Read x0000_0000 IN */
++#define EDDR2_INITPLR0	0x50 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR1	0x51 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR2	0x52 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR3	0x53 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR4	0x54 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR5	0x55 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR6	0x56 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR7	0x57 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR8	0x58 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR9	0x59 /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR10 0x5A /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR11 0x5B /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR12 0x5C /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR13 0x5D /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR14 0x5E /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_INITPLR15 0x5F /* Manual Init Control Reg	     R/W x0000_0000 */
++#define EDDR2_RQDC	0x70 /* Read DQS Delay Control	     R/W x0000_0000 */
++#define EDDR2_RFDC	0x74 /* Read Feedback Delay Control  R/W x0000_0000 */
++#define EDDR2_RDCC	0x78 /* Read Data Capture Control    R/W x0000_0000 */
++#define EDDR2_DLCR	0x7A /* Delay Line Calibration Reg   R/W autoinit   */
++#define EDDR2_CLKTR	0x80 /* DDR Clock Timing Register    R/W x0000_0000 */
++#define EDDR2_WRDTR	0x81 /* WData, DQS, DM ClkTiming Reg R/W x8600_0800 */
++#define EDDR2_SDTR1	0x85 /* DDR SDRAM Timing Register 1  R/W x8020_1000 */
++#define EDDR2_SDTR2	0x86 /* DDR SDRAM Timing Register 2  R/W x4210_4442 */
++#define EDDR2_SDTR3	0x87 /* DDR SDRAM Timing Register 3  R/W x1010_0C10 */
++#define EDDR2_MMODE	0x88 /* Memory Mode Register	     R/W x0000_0042 */
++#define EDDR2_MEMODE	0x89 /* Memory Extended Mode Reg     R/W x0000_0400 */
++#define EDDR2_ECCES	0x98 /* ECC Error Status	     R/W x0000_0000 */
++#define EDDR2_ECCCEA	0x9D /* ECC Correctable Error Addr  Read x0000_0000 */
++#define EDDR2_SIECR	0xA0 /* Scrub/Init Engine Config     R/W x0000_0000 */
++#define EDDR2_SIESA	0xA1 /* Scrub/Init Engine Start Addr R/W x0000_0000 */
++#define EDDR2_SIEEA	0xA2 /* Scrub/Init Engine End Addr   R/W x0000_0000 */
++#define EDDR2_SEUEA	0xA3 /* Scrub Engine UE Address	    Read x0000_0000 */
++#define EDDR2_SEUES	0xA4 /* Scrub Engine UE Status	     R/W x0000_0000 */
++#define EDDR2_SECEA	0xA5 /* Scrub Engine CE Address	    Read x0000_0000 */
++#define EDDR2_SECES	0xA6 /* Scrub Engine CE Status	     R/W x0000_0000 */
++#define EDDR2_SEES0	0xA7 /* Scrub Engine Err Stat  Clear R/W x0000_0000 */
++#define EDDR2_SEES1	0xA8 /* Scrub Engine Err Stat	 Set		    */
++#define EDDR2_SFPM	0xA9 /* Scrub/Init Eng Fill Pat/Mask R/W x0000_0000 */
++#define EDDR2_SIECA	0xAA /* Scrub/Init Engine Curr Addr Read x0000_0000 */
++#define EDDR2_FCSR	0xB0 /* Feedback Calibration Status Read x0000_0000 */
++#define EDDR2_RTSR	0xB1 /* Runtime Tracking Status	     R/W xFFFF_FF00 */
++#define EDDR2_CID	0xF4 /* Core ID Register	    Read x0DD2_0016 */
++#define EDDR2_RID	0xF8 /* Revision ID Register	    Read xFFFF_FFFF */
++
++/******************************************************************************
++ *
++ * Bus Error Syndrome Register (BESR)
++ *
++ *****************************************************************************/
++
++#define BESR_MxID	      0xF0000000 /* PLB MasterID 0-C */
++#define BESR_MxET	      0x0E000000 /* Indicat. of Err Detect. and Type */
++#define	  BESR_MxET_NOERR     0x00000000 /* 000 No Error */
++#define	  BESR_MxET_ECC	      0x02000000 /* 001 ECC Error */
++#define	  BESR_MxET_PROT      0x04000000 /* 010 Protect Error (Write only) */
++#define BESR_MxRW	      0x01000000 /* Operation Causing Err 0: W, 1: R */
++#define BESR_RES	      0x00FFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * Write Protect Array Error Syndrome Register (WPESR)
++ *
++ *****************************************************************************/
++
++#define WPESR_MxID	      0xF0000000 /* PLB MasterID 0-C */
++#define WPESR_MxET	      0x0C000000 /* Indicat. of Err Detect. and Type */
++#define	  WPESR_MxET_NOERR    0x00000000 /* 00 No Error */
++#define	  WPESR_MxET_WROK     0x04000000 /* 01 Parity Err PLB2Mem Write ok */
++#define	  WPESR_MxET_WRNOK    0x08000000 /* 10 Parity Err PLB2Mem Write nok */
++#define	  WPESR_MxET_PARITY   0x0C000000 /* 11 Parity Err Detected */
++#define WPESR_MxRW	      0x02000000 /* Operation Causing Err
++					  * 0 - Write (PLB to Memory)
++					  * 1 - Read (DCR to WPAI) */
++#define WPESR_RES	      0x01FFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * PLB Master Write Interrupt (WMIRQ)
++ *
++ *****************************************************************************/
++
++#define WMIRQ_M0_IRQ	      0x80000000 /* Master 0 Write Irq 1 - WriteErr */
++#define WMIRQ_M1_IRQ	      0x40000000 /* Master 1 Write Irq 1 - WriteErr */
++#define WMIRQ_M2_IRQ	      0x20000000 /* Master 2 Write Irq 1 - WriteErr */
++#define WMIRQ_M3_IRQ	      0x10000000 /* Master 3 Write Irq 1 - WriteErr */
++#define WMIRQ_M4_IRQ	      0x08000000 /* Master 4 Write Irq 1 - WriteErr */
++#define WMIRQ_M5_IRQ	      0x04000000 /* Master 5 Write Irq 1 - WriteErr */
++#define WMIRQ_M6_IRQ	      0x02000000 /* Master 6 Write Irq 1 - WriteErr */
++#define WMIRQ_M7_IRQ	      0x01000000 /* Master 7 Write Irq 1 - WriteErr */
++#define WMIRQ_M8_IRQ	      0x00800000 /* Master 8 Write Irq 1 - WriteErr */
++#define WMIRQ_M9_IRQ	      0x00400000 /* Master 9 Write Irq 1 - WriteErr */
++#define WMIRQ_M10_IRQ	      0x00200000 /* Master 10 Write Irq 1 - WriteErr */
++#define WMIRQ_M11_IRQ	      0x00100000 /* Master 11 Write Irq 1 - WriteErr */
++#define WMIRQ_RES	      0x000FFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * PLB Slave Interface Options (PLBOPT)
++ *
++ *****************************************************************************/
++
++#define PLBOPT_WR_RE	      0x80000000 /* PLB Slave Write Rearbitrate En. */
++#define PLBOPT_RD_RE	      0x40000000 /* PLB Slave Read Rearbitrate En. */
++#define PLBOPT_RARW	      0x20000000 /* PLB Slave Read Around Write En. */
++#define PLBOPT_RES	      0x1FFFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * PLB Upper Address Base Address Register (PUABA)
++ *
++ *****************************************************************************/
++
++#define PUABA_PUABA	      0x0000000F /* Must be set to 0x0 */
++#define PUABA_RES	      0xFFFFFFF0 /* Reserved */
++
++/******************************************************************************
++ *
++ * Write Protect Array Interface Configuration Register (WPAIC)
++ *
++ *****************************************************************************/
++
++#define WPAIC_EN	      0x80000000 /* Write Protect Interface Enable */
++#define WPAIC_PER	      0x40000000 /* Parity Error Response:
++					  * 0 - PLB to Mem Write Allowed
++					  * 1 - PLB to Mem Write NOT Allowed */
++#define WPAIC_RES	      0x3FFFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * Write Protection Interrupt Request (WPIRQ)
++ *
++ *****************************************************************************/
++
++#define WPIRQ_PR_IRQ	      0x80000000 /* WProt Array Parity Err Intr */
++#define WPIRQ_PT_IRQ	      0x40000000 /* WProt Array Protect Err Intr */
++#define WPIRQ_RES	      0x30000000 /* Reserved */
++
++/******************************************************************************
++ *
++ * Write Protection Array Parity Enable Register (WPAPE)
++ *
++ *****************************************************************************/
++
++#define WPAPE_nWPGS	      0x80000000 /* WPA Write Data Parity Gen/Storage*/
++#define WPAPE_nRPC	      0x40000000 /* WPA Read Data Parity Checking */
++#define WPAPE_RES	      0x3FFFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * Memory Controller Status (MCSTAT)
++ *
++ *****************************************************************************/
++
++#define MCSTAT_MIC	      0x80000000 /* Memory Init Complete */
++#define MCSTAT_SRMS	      0x40000000 /* Self Refresh Mode Status */
++#define MCSTAT_IDLE	      0x20000000 /* Core Idle Status */
++#define MCSTAT_RES	      0x1FFFFFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * Memory Controller Options 1 (MCOPT1)
++ *
++ *****************************************************************************/
++
++#define MCOPT1_MCHK	      0x30000000 /* Memory Data error checking */
++#define	  MCOPT1_MCHK_NOGEN   0x00000000 /* 00 - ECC checking, correction,
++					  *	 error rep. (no generation) */
++#define	  MCOPT1_MCHK_NORPT   0x10000000 /* 01 - ECC checking, correction,
++					  *	 no error reporting */
++#define	  MCOPT1_MCHK_ECC     0x20000000 /* 10 - ECC generation only */
++#define	  MCOPT1_MCHK_ECCCR   0x30000000 /* 01 - ECC checking, correction,
++					  *	 error reporting */
++#define MCOPT1_RDEN	      0x08000000 /* Registered DIMM Enable */
++#define MCOPT1_PMUM	      0x06000000 /* Page Management Unit Mode */
++#define	  MCOPT1_PMUM_CLOSE   0x00000000 /* Close after read/write */
++#define	  MCOPT1_PMUM_AUTO    0x02000000 /* Auto-Close */
++#define	  MCOPT1_PMUM_OPEN    0x04000000 /* Open */
++#define MCOPT1_WDTH	      0x01000000 /* DDR DRAM Interf Width 1: 16bit */
++#define MCOPT1_BCNT	      0x00020000 /* Memory Device Bank Count
++					  * 0 - 4 Bank Devices
++					  * 1 - 8 Bank Devices */
++#define MCOPT1_DDR2	      0x00010000 /* DDR2 Select */
++#define MCOPT1_QDEP	      0x00030000 /* Depth of Cmd Queue for Pg LAhead */
++#define	  MCOPT1_QDEP_4CMD    0x00020000 /* 10 - 4 commands deep */
++#define MCOPT1_DCOO	      0x00002000 /* Disable All Out of Order ops. */
++#define MCOPT1_DREF	      0x00001000 /* Enable Deferred Refresh */
++#define MCOPT1_RES	      0xC0CCCFFF /* Reserved */
++
++/******************************************************************************
++ *
++ * Memory Controller Options 2 (MCOPT2)
++ *
++ *****************************************************************************/
++
++#define MCOPT2_SREN	      0x80000000 /* Self Refresh Entry/Exit Control */
++#define MCOPT2_IPTR	      0x20000000 /* Initialization Trigger Reg */
++#define MCOPT2_XSRP	      0x10000000 /* Exit Self Refresh Prevent */
++#define MCOPT2_DCEN	      0x08000000 /* SDRAM Controller Enable */
++#define MCOPT2_ISIE	      0x04000000 /* Initialization Seq Interruptable */
++#define MCOPT2_RES	      0x43FFFFFF /* Reserved */
++
++#define MAX_WPA_ADDRESS	      0x3FFC /* Highest address for the WPA */
++
++#define SCRUB_SIECR_MODE_MASK			0xE0000000
++#define SCRUB_SIECR_MODE_INTERVAL		0x20000000
++#define SCRUB_SIECR_MODE_FILL_MEMORY		0x40000000
++#define SCRUB_SIECR_MODE_IMMEDIATE_FAST		0x60000000
++#define SCRUB_SIECR_MODE_IMMEDIATE_SINGLE	0x80000000
++#define SCRUB_SIECR_MODE_INTERVAL_CONTINUOUS	0xA0000000
++#define SCRUB_SIECR_SUER			0x10000000
++#define SCRUB_SIECR_SCER			0x08000000
++#define SCRUB_SIECR_LUES			0x04000000
++#define SCRUB_SIECR_LCES			0x02000000
++#define SCRUB_SIECR_IFSX			0x01000000
++#define SCRUB_SIECR_SRIT_MASK			0x00003FFF
++
++
++/*
++ * Scrub Engine Error Status Register (SEES)
++ */
++#define SEES_UEI		0x80000000 /* UE Status */
++#define SEES_CEI		0x40000000 /* CE Status */
++#define SEES_SIES_MASK		0x30000000 /* SIE Status */
++#define SEES_SIEOC		0x08000000 /* SIE Operation Complete */
++
++#endif /* _ASM_POWERPC_FSP1_EDDR2_H_ */
+diff --git a/arch/powerpc/include/asm/fsp1/kickwatchdog.h b/arch/powerpc/include/asm/fsp1/kickwatchdog.h
+new file mode 100644
+index 0000000..6de8f4f
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/kickwatchdog.h
+@@ -0,0 +1,35 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2010
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifndef __FSP1_KICKWATCHDOG_H__
++#define __FSP1_KICKWATCHDOG_H__
++
++#include <asm/processor.h>
++
++#ifdef CONFIG_FSP1
++#define kick_watchdog()					\
++	do {						\
++		mtspr(SPRN_TSR, TSR_ENW | TSR_WIS);	\
++	} while (0)
++	//use this instead.  drivers/watchdog/booge_wdt.c
++	//static void booke_wdt_ping(void)
++#else
++#define kick_watchdog() do { } while (0)
++#endif
++
++#endif
+diff --git a/arch/powerpc/include/asm/fsp1/pic.h b/arch/powerpc/include/asm/fsp1/pic.h
+new file mode 100644
+index 0000000..9165860
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/pic.h
+@@ -0,0 +1,253 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2001, 2010
++ *
++ * Module name: pic.h
++ *
++ * Description:
++ *   Combine prioirq related .h from FSP
++ */
++
++#ifndef __PPC4XX_PIC_PRIOIRQ_H__
++#define __PPC4XX_PIC_PRIOIRQ_H__
++
++#include <asm/ptrace.h>
++#include <linux/irq.h>
++
++/* for lack of a better place, CAH
++	MCP5 arch/ppc/include/asm/irq.h
++
++	Maybe better is arch/powerpc/include/asm/fsp1/irq ... ?
++*/
++#define NR_UICS 21
++
++/* UIC0 irq bitmap */
++#define FSP1_RDMEM_ERR		0
++#define FSP1_WRMEM_ERR		1
++#define FSP1_FSIPORT_ERR	2
++#define FSP1_FSIMASTER_ERR	3
++#define FSP1_UIC1_CASC_CRIT	4
++#define FSP1_UIC2_CASC_CRIT	5
++#define FSP1_UIC3_CASC_CRIT	6
++#define FSP1_UIC4_CASC_CRIT	7
++#define FSP1_ECC_UE		8
++#define FSP1_WPAPARITY_ERR	9
++#define FSP1_WPAPROT_ERR	10
++#define FSP1_ECC_CE		11
++#define FSP1_SCRUB_ECC_UE	12
++#define FSP1_SCRUB_ECC_CE	13
++#define FSP1_SCRUB_OC		14
++#define FSP1_PLBOPB0_ERR	15
++#define FSP1_PLBOPB1_ERR	16
++#define FSP1_PLBOPB2_ERR	17
++#define FSP1_PLBOPB3_ERR	18
++#define FSP1_OPBPLB_ERR		19
++#define FSP1_EBC_ERR		20
++#define FSP1_UIC1_CASC_NC	21
++#define FSP1_UIC2_CASC_NC	22
++#define FSP1_UIC3_CASC_NC	23
++#define FSP1_UIC4_CASC_NC	24
++#define FSP1_RSV01		25
++#define FSP1_WR_HDCR		26
++#define FSP1_FSI_PLUG		27
++#define FSP1_RTC0_CMP		28
++#define FSP1_RTC1_CMP		29
++#define FSP1_RTC2_CMP		30
++#define FSP1_UART		31
++
++/* UIC1.0 irq bitmap
++#define FSP1_UIC20_CASC_CRIT	32
++#define FSP1_UIC21_CASC_CRIT	33
++#define FSP1_UIC22_CASC_CRIT	34
++#define FSP1_UIC23_CASC_CRIT	35
++#define FSP1_UIC24_CASC_CRIT	36
++#define FSP1_UIC25_CASC_CRIT	37
++#define FSP1_UIC26_CASC_CRIT	38
++#define FSP1_UIC27_CASC_CRIT	39
++#define FSP1_UIC28_CASC_CRIT	40
++#define FSP1_UIC29_CASC_CRIT	41
++#define FSP1_UIC2A_CASC_CRIT	42
++#define FSP1_UIC2B_CASC_CRIT	43
++#define FSP1_UIC2C_CASC_CRIT	44
++#define FSP1_UIC2D_CASC_CRIT	45
++#define FSP1_UIC2E_CASC_CRIT	46
++#define FSP1_UIC2F_CASC_CRIT	47
++#define FSP1_UIC20_CASC_NC	48
++#define FSP1_UIC21_CASC_NC	49
++#define FSP1_UIC22_CASC_NC	50
++#define FSP1_UIC23_CASC_NC	51
++#define FSP1_UIC24_CASC_NC	52
++#define FSP1_UIC25_CASC_NC	53
++#define FSP1_UIC26_CASC_NC	54
++#define FSP1_UIC27_CASC_NC	55
++#define FSP1_UIC28_CASC_NC	56
++#define FSP1_UIC29_CASC_NC	57
++#define FSP1_UIC2A_CASC_NC	58
++#define FSP1_UIC2B_CASC_NC	59
++#define FSP1_UIC2C_CASC_NC	60
++#define FSP1_UIC2D_CASC_NC	61
++#define FSP1_UIC2E_CASC_NC	62
++#define FSP1_UIC2F_CASC_NC	63
++*/
++
++/* UIC1.1 irq bitmap */
++#define FSP1_PSI_MBOX		64
++#define FSP1_PSI_LINK0		65
++#define FSP1_PSI_LINK1		66
++#define FSP1_PSI_LINK2		67
++#define FSP1_PSI_LINK3		68
++#define FSP1_RSV20		69
++#define FSP1_RSV21		70
++#define FSP1_RSV22		71
++#define FSP1_RSV23		72
++#define FSP1_RSV24		73
++#define FSP1_RSV25		74
++#define FSP1_RSV26		75
++#define FSP1_PSIDMA_CHAN0	76
++#define FSP1_PSIDMA_CHAN1	77
++#define FSP1_PSIDMA_CHAN2	78
++#define FSP1_PSIDMA_CHAN3	79
++#define FSP1_FSIDMA3_CHAN0	80
++#define FSP1_FSIDMA3_CHAN1	81
++#define FSP1_FSIDMA3_CHAN2	82
++#define FSP1_FSIDMA3_CHAN3	83
++#define FSP1_FSIDMA2_CHAN0	84
++#define FSP1_FSIDMA2_CHAN1	85
++#define FSP1_FSIDMA2_CHAN2	86
++#define FSP1_FSIDMA2_CHAN3	87
++#define FSP1_FSIDMA1_CHAN0	88
++#define FSP1_FSIDMA1_CHAN1	89
++#define FSP1_FSIDMA1_CHAN2	90
++#define FSP1_FSIDMA1_CHAN3	91
++#define FSP1_FSIDMA0_CHAN0	92
++#define FSP1_FSIDMA0_CHAN1	93
++#define FSP1_FSIDMA0_CHAN2	94
++#define FSP1_FSIDMA0_CHAN3	95
++
++/* UIC1.2 irq bitmap
++#define FSP1_EN0_WAKE		96
++#define FSP1_EN0_EMAC		97
++#define FSP1_EN0_MIB		98
++#define FSP1_EN0_MALRXEOB	99
++#define FSP1_EN0_MALTXEOB	100
++#define	FSP1_EN0_MALRXDSRP_ERR	101
++#define FSP1_EN0_MALTXDSRP_ERR	102
++#define FSP1_EN0_MALSYS_ERR	103
++#define FSP1_EN1_WAKE		104
++#define FSP1_EN1_EMAC		105
++#define FSP1_EN1_MIB		106
++#define FSP1_EN1_MALRXEOB	107
++#define FSP1_EN1_MALTXEOB	108
++#define	FSP1_EN1_MALRXDSRP_ERR	109
++#define FSP1_EN1_MALTXDSRP_ERR	110
++#define FSP1_EN1_MALSYS_ERR	111
++#define	FSP1_RSV32		112
++#define	FSP1_RSV33		113
++#define	FSP1_RSV34		114
++#define	FSP1_RSV35		115
++#define	FSP1_RSV36		116
++#define	FSP1_RSV37		117
++#define	FSP1_RSV38		118
++#define	FSP1_RSV39		119
++#define	FSP1_EXTIRQ0		120
++#define	FSP1_EXTIRQ1		121
++#define	FSP1_EXTIRQ2		122
++#define	FSP1_EXTIRQ3		123
++#define FSP1_USB_INT1		124
++#define FSP1_USB_INT2		125
++#define	FSP1_RSV3E		126
++#define	FSP1_RSV3F		127
++*/
++
++/* UIC1.3 irq bitmap (reserved)
++#define FSP1_RSV40		128	// shadow of disr bits
++#define FSP1_RSV41		129	// shadow of disr bits
++#define FSP1_RSV42		130	// shadow of disr bits
++#define FSP1_BUDDY_RESET	131
++#define FSP1_RSV44		132	// shadow of disr bits
++#define FSP1_RSV45		133	// shadow of disr bits
++#define FSP1_RSV46		134
++#define FSP1_RSV47		135
++#define ZHOST_MBX0		136	// on psi link 0
++#define ZHOST_MBX1		137	// on psi link 1
++#define ZHOST_MBX2		138	// on psi link 2
++#define ZHOST_MBX3		139	// on psi link 3
++#define FSP1_RSV4C		140
++#define FSP1_RSV4D		141
++#define FSP1_RSV4E		142
++#define FSP1_RSV4F		143
++#define FSP1_RSV4G		144
++#define FSP1_RSV4H		145
++#define FSP1_RSV4I		146
++#define FSP1_RSV4J		147
++#define FSP1_RSV4K		148
++#define FSP1_RSV4L		149
++#define FSP1_RSV4M		150
++#define FSP1_RSV4N		151
++#define FSP1_RSV4O		152
++#define FSP1_RSV4P		153
++#define FSP1_RSV4Q		154
++#define FSP1_RSV4R		155
++#define FSP1_WRTOUT		156
++#define FSP1_RDTOUT		157
++#define FSP1_WRIRT		158
++#define FSP1_RDIRQ		159
++*/
++
++/* UIC2.x irq bitmap (reserved)
++#define FSP1_UIC20_FIRST	160
++*/
++
++/* interrupt polarity--first set is for level trig; second for edge trig.
++#define FSP_IRQ_POL_NEG			0x00
++#define FSP_IRQ_POL_POS			0x01
++#define FSP_IRQ_POL_FALLING_EDGE	0x00
++#define FSP_IRQ_POL_RISING_EDGE		0x01
++*/
++
++/* interrupt trigger mechanism
++#define FSP_IRQ_TRIG_LEVEL		0x00
++#define FSP_IRQ_TRIG_EDGE		0x02
++*/
++
++/*
++ * cascaded UIC interrupt
++ * indicates if the particular interrupt pin actually fans out further.
++ * not sure why we want to designate this.
++ */
++
++
++/*
++ * critical IRQ bit
++ * indicates if the UIC bit should be set to designate this IRQ as
++ * critical, meaning it will come in on a different exception vector
++ * to the CPU core..
++
++#define FSP_IRQ_NORMAL			0x00
++#define FSP_IRQ_FASTINT			0x04
++#define FSP_IRQ_CRITICAL		0x08
++
++#define FSP_IRQ_NOT_CASCADED		0x00
++#define FSP_IRQ_CASCADED		0x10
++
++#define FSP1_BASEPRI			0
++#define BIT2VEC(bit)			((unsigned long)(0x80000000>>bit))
++
++struct fsp_irq_struct
++{
++	unsigned short irq;
++	unsigned char priority;
++	unsigned char attrs;
++};
++*/
++
++//extern struct hw_interrupt_type *ppc4xx_pic;
++
++/* function prototypes
++extern int set_fsp_irq_critical(int irq);
++extern int set_fsp_cfam_fastint(int linkno, int cfamid);
++extern int reset_fsp_cfam_fastint(int linkno, int cfamid);
++extern int clear_uic_sr_cc(int word, int bit);
++*/
++
++#endif
++
+diff --git a/arch/powerpc/include/asm/fsp1/rtc.h b/arch/powerpc/include/asm/fsp1/rtc.h
+new file mode 100644
+index 0000000..4ff4934
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/rtc.h
+@@ -0,0 +1,334 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2007,2010
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++/* Module Specification ***********************************************/
++/*                                                                    */
++/*  NAME: rtc.h (REAL TIME CLOCK DCR address map)                     */
++/*                                                                    */
++/*  AUTHOR: Tom Warne, Dean Sanner                                    */
++/*                                                                    */
++/*  KEY REVIEWER:                                                     */
++/*                                                                    */
++/*  Description: The FSP0 Base embedded Real Time Clock (RTC) core    */
++/*  resides in the Function 0 BAR 0 space of FSP0 Base. The RTC has   */
++/*  three time-of-day registers, three alarm registers and four       */
++/*  calendar registers all of which are accessible by an 8-bit CPU bus*/
++/*                                                                    */
++/* End Module Specification *******************************************/
++
++#ifndef __FSP1_RTC
++#define __FSP1_RTC
++
++#include <linux/types.h>
++#include <linux/rtc.h>
++#include <asm/dcr.h>
++#include <asm/reg.h>
++
++void ibmfsp1_get_rtc_time(struct rtc_time *);
++int ibmfsp1_set_rtc_time(struct rtc_time *);
++void ibmfsp1_start_timecal_sync(void);
++int ibmfsp1_is_timecal_valid(void);
++
++/**********************************************************************/
++/* DEFINITIONS                                                        */
++/**********************************************************************/
++struct rtc_reg {
++		uint8_t rsvd[3];
++		uint8_t byte;
++};
++typedef struct rtc_reg rtc_reg_t;
++
++union rtc_reg_A {
++	uint8_t reg;
++	struct {
++		uint8_t uip : 1,
++		div_ctl     : 3,
++		rate_select : 4;
++	}bits;
++};
++typedef union rtc_reg_A rtc_reg_A_t;
++
++/* Bit masks for whole byte values. */
++#define RTC_REGA_UIP_BIT           0x80
++#define RTC_REGA_DIV_CTL_MASK      0x70
++#define RTC_REGA_REF_CLCK_4MHZ     0x00
++#define RTC_REGA_REF_CLCK_1MHZ     0x10
++#define RTC_REGA_REF_CLCK_32KHZ    0x20
++#define RTC_REGA_DIV_RESET         0x60
++#define RTC_REGA_RATE_SELECT_MASK  0x0F
++/* Definitions for div_ctl bit field. */
++#define RTC_REGA_BF_REF_CLCK_4MHZ  0x0
++#define RTC_REGA_BF_REF_CLCK_1MHZ  0x1
++#define RTC_REGA_BF_REF_CLCK_32KHZ 0x2
++#define RTC_REGA_BF_DIV_RESET      0x6
++
++union rtc_reg_B {
++	uint8_t reg;
++	struct {
++		uint8_t set  : 1,
++		pie  : 1,
++		aie  : 1,
++		uie  : 1,
++		sqwe : 1,
++		dm   : 1,
++		hr24 : 1,
++		dse  : 1;
++	}bits;
++};
++typedef union rtc_reg_B rtc_reg_B_t;
++
++/* Bit masks for whole byte values. */
++#define RTC_REGB_SET             0x80
++#define RTC_REGB_INT_ENABLE_MASK 0x78
++#define RTC_REGB_INT_CHK_MASK    0xF8
++#define RTC_REGB_PIE             0x40
++#define RTC_REGB_AIE             0x20
++#define RTC_REGB_UIE             0x10
++#define RTC_REGB_SQWE            0x08
++#define RTC_REGB_DM              0x04
++#define RTC_REGB_24HR            0x02
++#define RTC_REGB_DSE             0x01
++
++
++union rtc_reg_C {
++	uint8_t reg;
++	struct {
++		uint8_t irqf  : 1,
++		pf    : 1,
++		af    : 1,
++		uf    : 1,
++		rsvd2 : 4;
++	}bits;
++};
++typedef union rtc_reg_C rtc_reg_C_t;
++/* Bit masks for whole byte values. */
++#define RTC_REGC_IQRF  0x80
++#define RTC_REGC_PF    0x40
++#define RTC_REGC_AF    0x20
++#define RTC_REGC_UF    0x10
++
++
++union rtc_reg_D {
++	uint8_t reg;
++	struct {
++		uint8_t vrt   : 1,
++		rsvd  : 7;
++	}bits;
++};
++typedef union rtc_reg_D rtc_reg_D_t;
++
++/* Bit masks for whole byte values. */
++#define RTC_REGD_VRT   0x80
++
++
++union rtc_wrapper_cntl {
++	uint32_t reg;
++	struct {
++		uint32_t rsvd   : 22,
++		vtc    : 1,
++		ts     : 1,
++		synctc : 1,
++		euia   : 1,
++		asp    : 1,
++		nrdp   : 1,
++		um     : 1,
++		fence  : 1,
++		nrst   : 1,
++		nmr    : 1;
++	}bits;
++};
++typedef union rtc_wrapper_cntl rtc_wrapper_cntl_t;
++
++/* Bit masks for whole word value. */
++#define RTC_WCNTL_NMR    0x00000001
++#define RTC_WCNTL_NRST   0x00000002
++#define RTC_WCNTL_FENCE  0x00000004
++#define RTC_WCNTL_UM     0x00000008
++#define RTC_WCNTL_NRDP   0x00000010
++#define RTC_WCNTL_ASP    0x00000020
++#define RTC_WCNTL_EUIA   0x00000040
++#define RTC_WCNTL_SYNCTC 0x00000080
++#define RTC_WCNTL_TS     0x00000100
++#define RTC_WCNTL_VTC    0x00000200
++#define RTC_WCNTL_RSVD   0xFFFFFC00
++
++union rtc64_hi_dd10 {
++	uint32_t reg;
++	struct {
++		uint32_t rsvd    : 6,
++		century : 7,
++		year    : 7,
++		month   : 4,
++		day     : 5,
++		wday	: 3;
++	} bits;
++};
++typedef union rtc64_hi_dd10 rtc64_hi_dd10_t;
++
++union rtc64_hi {
++	uint32_t reg;
++	struct {
++		uint32_t rsvd    : 9,
++		century : 7,
++		year    : 7,
++		month   : 4,
++		day     : 5;
++	} bits;
++};
++typedef union rtc64_hi rtc64_hi_t;
++
++union rtc64_lo {
++	uint32_t reg;
++	struct {
++		uint32_t hours      : 5,
++		minutes    : 6,
++		seconds    : 6,
++		one32768th : 15;
++	} bits;
++};
++typedef union rtc64_lo rtc64_lo_t;
++
++union rtc64_alrm_cntl {
++	uint32_t reg;
++	struct {
++		uint32_t alarm_0_int  : 1,
++		alarm_1_int  : 1,
++		alarm_2_int  : 1,
++		rsvd_bit28   : 1,
++		alarm_0_cmpr : 1,
++		alarm_1_cmpr : 1,
++		alarm_2_cmpr : 1,
++		rsvd_24_to_7 : 18,
++		alarm_0_int_enbl : 1,
++		alarm_1_int_enbl : 1,
++		alarm_2_int_enbl : 1,
++		rsvd_bit3    : 1,
++		alarm_0_enbl : 1,
++		alarm_1_enbl : 1,
++		alarm_2_enbl : 1;
++	} bits;
++};
++typedef union rtc64_alrm_cntl rtc64_alrm_cntl_t;
++
++#define RTC64_ALRM0_IRQ			0x80000000		/* Bit 31 */
++#define RTC64_ALRM1_IRQ			0x40000000		/* Bit 30 */
++#define RTC64_ALRM2_IRQ			0x20000000		/* But 29 */
++#define RTC64_RW_ALARM_BITS		0x00000077
++#define RTC64_ALRM0_ENABLE		0x00000004
++#define RTC64_ALRM1_ENABLE		0x00000002
++#define RTC64_ALRM2_ENABLE		0x00000001
++#define RTC64_ALRM0_INT_ENABLE	0x00000040
++#define RTC64_ALRM1_INT_ENABLE	0x00000020
++#define RTC64_ALRM2_INT_ENABLE	0x00000010
++
++
++/* All hardware registers, used for data capture. */
++struct rtc_hw_regs {
++		uint8_t  seconds;
++		uint8_t  seconds_alarm;
++		uint8_t  minutes;
++		uint8_t  minutes_alarm;
++		uint8_t  hours;
++		uint8_t  hours_alarm;
++		uint8_t  day_of_week;
++		uint8_t  day_of_month;
++		uint8_t  month;
++		uint8_t  year;
++		uint8_t  reg_A;
++		uint8_t  reg_B;
++		uint8_t  reg_C;
++		uint8_t  reg_D;
++		uint8_t  century;
++		uint8_t  rsvd; /*Maintains 4 byte boundary */
++		uint32_t wrapper_cntl;
++		uint32_t rtc64_hi;
++		uint32_t rtc64_lo;
++		uint32_t rtc64AL_ctl;
++		uint32_t rtc64AL0_hi;
++		uint32_t rtc64AL0_lo;
++		uint32_t rtc64AL1_hi;
++		uint32_t rtc64AL1_lo;
++		uint32_t rtc64AL2_hi;
++		uint32_t rtc64AL2_lo;
++} __attribute__((packed));
++typedef struct rtc_hw_regs rtc_hw_regs_t;
++
++
++
++
++/* Access functions for whole word of a DCR register */
++#define rtc_get_word(addr)		mfdcr(addr)
++#define rtc_put_word(addr, data)	mtdcr(addr, data)
++
++/* Access functions for whole word of a CMU register */
++inline static uint32_t rtc_get_cmu_word(unsigned int addr)
++{
++		uint32_t data = 0;
++
++		mtdcr(DCRN_CMU_ADDR, addr);
++		data = mfdcr(DCRN_CMU_DATA);
++
++		return data;
++}
++
++inline static void rtc_put_cmu_word(unsigned int addr, uint32_t data)
++{
++		mtdcr(DCRN_CMU_ADDR, addr);
++		mtdcr(DCRN_CMU_DATA, data);
++}
++
++/* Settor/Gettor functions for union rtc64_hi  because the HW
++ bit definitions changed between DD 1.0 and DD 2.x*/
++inline static void rtc64hi_get_fields(rtc64_hi_t hi, uint8_t *day, uint8_t *wday,
++					uint8_t *mon, uint8_t *year, uint8_t *cen)
++{
++	if(mfspr(SPRN_PVR) == PVR_FSP1_PASS0){
++		rtc64_hi_dd10_t hi_dd10;
++		hi_dd10.reg = hi.reg;
++		*wday = hi_dd10.bits.wday;
++		*day =  hi_dd10.bits.day;
++		*mon =  hi_dd10.bits.month;
++		*year = hi_dd10.bits.year;
++		*cen =  hi_dd10.bits.century;
++	}else{
++		*wday = 1;
++		*day = hi.bits.day;
++		*mon = hi.bits.month;
++		*year = hi.bits.year;
++		*cen = hi.bits.century;
++	}
++}
++
++inline static void rtc64hi_set_fields(rtc64_hi_t *hi, uint8_t day, uint8_t wday,
++					uint8_t mon, uint8_t year, uint8_t cen)
++{
++	if(mfspr(SPRN_PVR) == PVR_FSP1_PASS0){
++		rtc64_hi_dd10_t *hi_dd10 = (rtc64_hi_dd10_t*)(hi);
++		hi_dd10->bits.wday = wday;
++		hi_dd10->bits.day = day;
++		hi_dd10->bits.month = mon;
++		hi_dd10->bits.year = year;
++		hi_dd10->bits.century = cen;
++	}else{
++		hi->bits.day = day;
++		hi->bits.month = mon;
++		hi->bits.year = year;
++		hi->bits.century = cen;
++	}
++}
++
++#endif /* __FSP1_RTC */
+diff --git a/arch/powerpc/include/asm/fsp1/tbutils.h b/arch/powerpc/include/asm/fsp1/tbutils.h
+new file mode 100644
+index 0000000..eb889ba
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp1/tbutils.h
+@@ -0,0 +1,92 @@
++/* *****************************************************************************
++ *   Copyright (c) International Business Machines Corp., 2005, 2010
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ * *****************************************************************************
++ * TB utils - Time base utilities for powerpc timebase
++ *
++ * @file tbutils.h
++ *
++ * @author Dean Sanner <dsanner@us.ibm.com>
++ * @author Corey Hyllested <chylles@us.ibm.com>
++ *
++ * @brief This file contains some inline utility functions to capture and
++ * and manipulate the powerpc timebase provided on the 40x and 4xx powerpc
++ * processors.
++ * ****************************************************************************/
++
++#ifndef _ASM_POWERPC_TBUTILS_H_
++#define _ASM_POWERPC_TBUTILS_H_
++
++#warning tbutils.h is deprecated.  Please use ktime_get_ts() or get_tb() instead!
++
++#include <linux/errno.h>
++#include <asm/reg.h>
++#include <asm/time.h>
++
++/**
++ *  @struct  tbtime_t
++ * This structure contains the processor timebase.  Used for very granular time measurements
++ * The 405/440 timebase is a 64bit value so a structure is used to represent the full value.
++*/
++typedef union {
++	uint64_t tb;		/* full 64 bit portion of timebase*/
++	struct {
++		uint32_t high;		/* High portion of the time base */
++		uint32_t low;		/* Low portion of the time base */
++	}half;
++} tbtime_t;
++
++
++
++/*=======================================================*/
++/*=               Time base functions                    */
++/*=======================================================*/
++
++inline static int tbtime_get(tbtime_t * tb)
++{
++	int rc = -EINVAL;
++
++	if (tb) {
++		uint32_t tmp = 0;
++
++		do {
++			tmp = mfspr(SPRN_TBRU);
++			tb->half.low = mfspr(SPRN_TBRL);
++			tb->half.high = mfspr(SPRN_TBRU);
++		} while (tmp != tb->half.high);
++
++		rc = 0;
++	}
++
++	return rc;
++}
++
++static inline void tbtime_to_timeval(struct timeval *timev, uint64_t ticks)
++{
++        uint64_t time;
++
++	/* convert ticks to nanoseconds */
++	time = ticks * (1000000000 / (ppc_tb_freq - 1));
++
++	/* convert time to microseconds */
++	do_div(time, NSEC_PER_USEC);
++
++	/* save seconds, microseconds in timeval. */
++	timev->tv_usec = do_div(time, USEC_PER_SEC);
++	timev->tv_sec = (uint32_t) time;
++}
++
++#endif /* _ASM_POWERPC_TBUTILS_H_ */
+diff --git a/arch/powerpc/include/asm/fsp2/dcr.h b/arch/powerpc/include/asm/fsp2/dcr.h
+new file mode 100644
+index 0000000..26c62f0
+--- /dev/null
++++ b/arch/powerpc/include/asm/fsp2/dcr.h
+@@ -0,0 +1,381 @@
++/*******************************************************************************
++ *   Copyright (c) International Business Machines Corp., 2005, 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;	without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *****************************************************************************/
++#ifndef _ASM_POWERPC_FSP_DCR_H_
++#define _ASM_POWERPC_FSP_DCR_H_
++#ifdef __KERNEL__
++
++/*
++ * FIXME!!!  The following defines come from FSP-1 and should be removed once
++ * we can fix the device drivers (PSI) that depend on them.
++ */
++#define DCRN_CCL_ADDR		0x006	/* FIXME: FSP-1 */
++#define DCRN_CCL_DATA		0x007	/* FIXME: FSP-1 */
++#define DCRN_UIC3_SR		0x358	/* FIXME: FSP-1 */
++#define DCRN_UIC4_SRS		0x361	/* FIXME: FSP-1 */
++
++
++#define DCRN_CMU_ADDR		0x00C	/* Chip management unic addr */
++#define DCRN_CMU_DATA		0x00D	/* Chip management unic data */
++
++/* PLB4 Arbiter */
++#define DCRN_PLB4_PCBI		0x010	/* PLB Crossbar ID/Rev Register */
++#define DCRN_PLB4_P0ACR		0x011	/* PLB0 Arbiter Control Register */
++#define DCRN_PLB4_P0ESRL	0x012	/* PLB0 Error Status Register Low */
++#define DCRN_PLB4_P0ESRH	0x013	/* PLB0 Error Status Register High */
++#define DCRN_PLB4_P0EARL	0x014	/* PLB0 Error Address Register Low */
++#define DCRN_PLB4_P0EARH	0x015	/* PLB0 Error Address Register High */
++#define DCRN_PLB4_P0ESRLS	0x016	/* PLB0 Error Status Register Low Set*/
++#define DCRN_PLB4_P0ESRHS	0x017	/* PLB0 Error Status Register High */
++#define DCRN_PLB4_PCBC		0x018	/* PLB Crossbar Control Register */
++#define DCRN_PLB4_P1ACR		0x019	/* PLB1 Arbiter Control Register */
++#define DCRN_PLB4_P1ESRL	0x01A	/* PLB1 Error Status Register Low */
++#define DCRN_PLB4_P1ESRH	0x01B	/* PLB1 Error Status Register High */
++#define DCRN_PLB4_P1EARL	0x01C	/* PLB1 Error Address Register Low */
++#define DCRN_PLB4_P1EARH	0x01D	/* PLB1 Error Address Register High */
++#define DCRN_PLB4_P1ESRLS	0x01E	/* PLB1 Error Status Register Low Set*/
++#define DCRN_PLB4_P1ESRHS	0x01F	/*PLB1 Error Status Register High Set*/
++
++/* PLB4/OPB bridge 0, 1, 2, 3 */
++#define DCRN_PLB4OPB0_BASE	0x020
++#define DCRN_PLB4OPB1_BASE	0x030
++#define DCRN_PLB4OPB2_BASE	0x040
++#define DCRN_PLB4OPB3_BASE	0x050
++
++#define PLB4OPB_GESR0		0x0	/* Error status 0: Master Dev 0-3 */
++#define PLB4OPB_GEAR		0x2	/* Error Address Register */
++#define PLB4OPB_GEARU		0x3	/* Error Upper Address Register */
++#define PLB4OPB_GESR1		0x4	/* Error Status 1: Master Dev 4-7 */
++#define PLB4OPB_GESR2		0xC	/* Error Status 2: Master Dev 8-11 */
++
++/* MCMAL0 */
++/* MCMAL1 */
++
++/* FSI0 DMA */
++/* FSI1 DMA */
++/* FSI2 DMA */
++/* FSI3 DMA */
++/* PSI DMA */
++/*Define the various engine base addresses*/
++#define DMA_FSI_ENG0	0x180
++#define DMA_FSI_ENG1	0x1C0
++#define DMA_FSI_ENG2	0x200
++#define DMA_FSI_ENG3	0x240
++#define DMA_PSI_ENG	0x280
++
++/*Define the "base" DMA DCR regs, OR these into the base to
++ get the channel you desire  ie FSI_ENG0 Channel CR 0 is (DMA_FSI_ENG0 | DCRN_DMA_CR0) */
++#define DCRN_DMA_CR0(base)	(base + 0x0)	/* Channel Control Register 0*/
++#define DCRN_DMA_CTC0(base)	(base + 0x1)	/* Count and Control Register 0 */
++#define DCRN_DMA_SAH0(base)	(base + 0x2)	/* Source Address High Register 0*/
++#define DCRN_DMA_SAL0(base)	(base + 0x3)	/* Source Address Low Register 0*/
++#define DCRN_DMA_DAH0(base)	(base + 0x4)	/* Dest Addr High Register 0 */
++#define DCRN_DMA_DAL0(base)	(base + 0x5)	/* Dest Addr Low Register 0 */
++#define DCRN_DMA_SGH0(base)	(base + 0x6)	/* S/G Desc Addr High Register 0 */
++#define DCRN_DMA_SGL0(base)	(base + 0x7)	/* S/G Desc Addr Low Register 0 */
++#define DCRN_DMA_CR1(base)	(base + 0x8)	/* Channel Control Register 1*/
++#define DCRN_DMA_CTC1(base)	(base + 0x9)	/* Count and Control Register 1 */
++#define DCRN_DMA_SAH1(base)	(base + 0xA)	/* Source Address High Register 1*/
++#define DCRN_DMA_SAL1(base)	(base + 0xB)	/* Source Address Low Register 1*/
++#define DCRN_DMA_DAH1(base)	(base + 0xC)	/* Dest Addr High Register 1 */
++#define DCRN_DMA_DAL1(base)	(base + 0xD)	/* Dest Addr Low Register 1 */
++#define DCRN_DMA_SGH1(base)	(base + 0xE)	/* S/G Desc Addr High Register 1 */
++#define DCRN_DMA_SGL1(base)	(base + 0xF)	/* S/G Desc Addr Low Register 1 */
++#define DCRN_DMA_CR2(base)	(base + 0x10)	/* Channel Control Register 2*/
++#define DCRN_DMA_CTC2(base)	(base + 0x11)	/* Count and Control Register 2 */
++#define DCRN_DMA_SAH2(base)	(base + 0x12)	/* Source Address High Register 2*/
++#define DCRN_DMA_SAL2(base)	(base + 0x13)	/* Source Address Low Register 2*/
++#define DCRN_DMA_DAH2(base)	(base + 0x14)	/* Dest Addr High Register 2 */
++#define DCRN_DMA_DAL2(base)	(base + 0x15)	/* Dest Addr Low Register 2 */
++#define DCRN_DMA_SGH2(base)	(base + 0x16)	/* S/G Desc Addr High Register 2 */
++#define DCRN_DMA_SGL2(base)	(base + 0x17)	/* S/G Desc Addr Low Register 2 */
++#define DCRN_DMA_CR3(base)	(base + 0x18)	/* Channel Control Register 3*/
++#define DCRN_DMA_CTC3(base)	(base + 0x19)	/* Count and Control Register 3 */
++#define DCRN_DMA_SAH3(base)	(base + 0x1A)	/* Source Address High Register 3*/
++#define DCRN_DMA_SAL3(base)	(base + 0x1B)	/* Source Address Low Register 3*/
++#define DCRN_DMA_DAH3(base)	(base + 0x1C)	/* Dest Addr High Register 3 */
++#define DCRN_DMA_DAL3(base)	(base + 0x1D)	/* Dest Addr Low Register 3 */
++#define DCRN_DMA_SGH3(base)	(base + 0x1E)	/* S/G Desc Addr High Register 3 */
++#define DCRN_DMA_SGL3(base)	(base + 0x1F)	/* S/G Desc Addr Low Register 3 */
++#define DCRN_DMA_SR(base)	(base + 0x20)	/* Status Register */
++						/* Reserved 1A1..1A2 */
++#define DCRN_DMA_SGC(base)	(base + 0x23)	/* S/G Command Register */
++#define DCRN_DMA_PMP(base)	(base + 0x24)	/* PLB Master Priority Register */
++
++/* PLB4-to-AHB Bridge */
++#define DCRN_PLB4AHB_BASE	0x400
++#define DCRN_PLB4AHB_SEUAR	(DCRN_PLB4AHB_BASE + 1)
++#define DCRN_PLB4AHB_SELAR	(DCRN_PLB4AHB_BASE + 2)
++#define DCRN_PLB4AHB_ESR	(DCRN_PLB4AHB_BASE + 3)
++#define DCRN_AHBPLB4_ESR	(DCRN_PLB4AHB_BASE + 8)
++#define DCRN_AHBPLB4_EAR	(DCRN_PLB4AHB_BASE + 9)
++
++/* L2 */
++#define DCRN_L2CDCRAI		0x11111100
++#define DCRN_L2CDCRDI		0x11111104
++
++/* PLB6 Controller */
++#define DCRN_PLB6_BASE		0x11111300
++#define DCRN_PLB6_ERR		(DCRN_PLB6_BASE + 0x0B)
++#define DCRN_PLB6_SHD		(DCRN_PLB6_BASE + 0x10)
++
++/* PLB4-to-PLB6 Bridge */
++#define DCRN_PLB4PLB6_BASE	0x11111320
++#define DCRN_PLB4PLB6_ESR	(DCRN_PLB4PLB6_BASE + 1)
++#define DCRN_PLB4PLB6_EARH	(DCRN_PLB4PLB6_BASE + 3)
++#define DCRN_PLB4PLB6_EARL	(DCRN_PLB4PLB6_BASE + 4)
++
++/* PLB6-to-PLB4 Bridge */
++#define DCRN_PLB6PLB4_BASE	0x11111350
++#define DCRN_PLB6PLB4_ESR	(DCRN_PLB6PLB4_BASE + 1)
++#define DCRN_PLB6PLB4_EARH	(DCRN_PLB6PLB4_BASE + 3)
++#define DCRN_PLB6PLB4_EARL	(DCRN_PLB6PLB4_BASE + 4)
++
++/* PLB6-to-MCIF Bridge */
++#define DCRN_PLB6MCIF_BASE	0x11111380
++#define DCRN_PLB6MCIF_BESR0	(DCRN_PLB6MCIF_BASE + 0)
++#define DCRN_PLB6MCIF_BESR1	(DCRN_PLB6MCIF_BASE + 1)
++#define DCRN_PLB6MCIF_BEARL	(DCRN_PLB6MCIF_BASE + 2)
++#define DCRN_PLB6MCIF_BEARH	(DCRN_PLB6MCIF_BASE + 3)
++
++/* Configuration Logic Registers */
++#define DCRN_CONF_BASE		0x11111400
++#define DCRN_CONF_FIR_RWC	(DCRN_CONF_BASE + 0x3A)
++#define DCRN_CONF_EIR_RS	(DCRN_CONF_BASE + 0x3E)
++#define DCRN_CONF_RPERR0	(DCRN_CONF_BASE + 0x4D)
++#define DCRN_CONF_RPERR1	(DCRN_CONF_BASE + 0x4E)
++
++/* DDR3/4 Memory Controller */
++#define DCRN_DDR34_BASE			0x11120000
++#define DCRN_DDR34_MCSTAT		0x10
++#define DCRN_DDR34_MCOPT1		0x20
++#define DCRN_DDR34_MCOPT2		0x21
++#define DCRN_DDR34_PHYSTAT		0x32
++#define DCRN_DDR34_CFGR0		0x40
++#define DCRN_DDR34_CFGR1		0x41
++#define DCRN_DDR34_CFGR2		0x42
++#define DCRN_DDR34_CFGR3		0x43
++#define DCRN_DDR34_SCRUB_CNTL		0xAA
++#define DCRN_DDR34_SCRUB_INT		0xAB
++#define DCRN_DDR34_SCRUB_START_ADDR	0xB0
++#define DCRN_DDR34_SCRUB_END_ADDR	0xD0
++#define DCRN_DDR34_ECCERR_ADDR_PORT0	0xE0
++#define DCRN_DDR34_ECCERR_ADDR_PORT1	0xE1
++#define DCRN_DDR34_ECCERR_ADDR_PORT2	0xE2
++#define DCRN_DDR34_ECCERR_ADDR_PORT3	0xE3
++#define DCRN_DDR34_ECCERR_COUNT_PORT0	0xE4
++#define DCRN_DDR34_ECCERR_COUNT_PORT1	0xE5
++#define DCRN_DDR34_ECCERR_COUNT_PORT2	0xE6
++#define DCRN_DDR34_ECCERR_COUNT_PORT3	0xE7
++#define DCRN_DDR34_ECCERR_PORT0		0xF0
++#define DCRN_DDR34_ECCERR_PORT1		0xF2
++#define DCRN_DDR34_ECCERR_PORT2		0xF4
++#define DCRN_DDR34_ECCERR_PORT3		0xF6
++#define DCRN_DDR34_ECC_CHECK_PORT0	0xF8
++#define DCRN_DDR34_ECC_CHECK_PORT1	0xF9
++#define DCRN_DDR34_ECC_CHECK_PORT2	0xF9
++#define DCRN_DDR34_ECC_CHECK_PORT3	0xFB
++
++#define DDR34_SCRUB_CNTL_STOP		0x00000000
++#define DDR34_SCRUB_CNTL_SCRUB		0x80000000
++#define DDR34_SCRUB_CNTL_UE_STOP	0x20000000
++#define DDR34_SCRUB_CNTL_CE_STOP	0x10000000
++#define DDR34_SCRUB_CNTL_RANK_EN	0x00008000
++
++/* PLB-Attached DDR3/4 Core Wrapper */
++#define DCRN_CW_BASE			0x11111800
++#define DCRN_CW_MCER0			0x00
++#define DCRN_CW_MCER1			0x01
++#define DCRN_CW_MCER_AND0		0x02
++#define DCRN_CW_MCER_AND1		0x03
++#define DCRN_CW_MCER_OR0		0x04
++#define DCRN_CW_MCER_OR1		0x05
++#define DCRN_CW_MCER_MASK0		0x06
++#define DCRN_CW_MCER_MASK1		0x07
++#define DCRN_CW_MCER_MASK_AND0		0x08
++#define DCRN_CW_MCER_MASK_AND1		0x09
++#define DCRN_CW_MCER_MASK_OR0		0x0A
++#define DCRN_CW_MCER_MASK_OR1		0x0B
++#define DCRN_CW_MCER_ACTION0		0x0C
++#define DCRN_CW_MCER_ACTION1		0x0D
++#define DCRN_CW_MCER_WOF0		0x0E
++#define DCRN_CW_MCER_WOF1		0x0F
++#define DCRN_CW_LFIR			0x10
++#define DCRN_CW_LFIR_AND		0x11
++#define DCRN_CW_LFIR_OR			0x12
++#define DCRN_CW_LFIR_MASK		0x13
++#define DCRN_CW_LFIR_MASK_AND		0x14
++#define DCRN_CW_LFIR_MASK_OR		0x15
++
++#define CW_MCER0_MEM_CE			0x00020000
++/* CMU addresses */
++#define CMUN_CRCS		0x00 /* Chip Reset Control/Status */
++#define CMUN_URCR0_RS		0x01 /* Unit Reset Control Reg 0 Set */
++#define CMUN_URCR0_C		0x02 /* Unit Reset Control Reg 0 Clear */
++#define CMUN_URCR1_RS		0x03 /* Unit Reset Control Reg 1 Set */
++#define CMUN_URCR1_C		0x04 /* Unit Reset Control Reg 1 Clear */
++#define CMUN_BWTC		0x05 /* Boot Watchdog Timer Control */
++#define CMUN_ECID0		0x07 /* Electronic Chip Identification 0 */
++#define CMUN_ECID1		0x08 /* Electronic Chip Identification 1 */
++#define CMUN_ECID2		0x09 /* Electronic Chip Identification 2 */
++#define CMUN_ECID3		0x0A /* Electronic Chip Identification 3 */
++#define CMUN_CONFFIR0		0x20 /* Config Reg Parity FIR 0 */
++#define CMUN_CONFFIR1		0x21 /* Config Reg Parity FIR 1 */
++#define CMUN_CONFFIR2		0x22 /* Config Reg Parity FIR 2 */
++#define CMUN_CONFFIR3		0x23 /* Config Reg Parity FIR 3 */
++#define CMUN_URCR3_RS		0x24 /* Unit Reset Control Reg 3 Set */
++#define CMUN_URCR3_C		0x25 /* Unit Reset Control Reg 3 Clear */
++#define CMUN_URCR3_P		0x26 /* Unit Reset Control Reg 3 Pulse */
++#define CMUN_PW0		0x2C /* Pulse Width Register */
++#define CMUN_URCR0_P		0x2D /* Unit Reset Control Reg 0 Pulse */
++#define CMUN_URCR1_P		0x2E /* Unit Reset Control Reg 1 Pulse */
++#define CMUN_URCR2_P		0x2F /* Unit Reset Control Reg 2 Pulse */
++#define CMUN_CLS_RW		0x30 /* Code Load Status (Read/Write) */
++#define CMUN_CLS_S		0x31 /* Code Load Status (Set) */
++#define CMUN_CLS_C		0x32 /* Code Load Status (Clear */
++#define CMUN_URCR2_RS		0x33 /* Unit Reset Control Reg 2 Set */
++#define CMUN_URCR2_C		0x34 /* Unit Reset Control Reg 2 Clear */
++#define CMUN_CLKEN0		0x35 /* Clock Enable 0 */
++#define CMUN_CLKEN1		0x36 /* Clock Enable 1 */
++#define CMUN_PCD0		0x37 /* PSI clock divider 0 */
++#define CMUN_PCD1		0x38 /* PSI clock divider 1 */
++#define CMUN_TMR0		0x39 /* Reset Timer */
++#define CMUN_TVS0		0x3A /* TV Sense Reg 0 */
++#define CMUN_TVS1		0x3B /* TV Sense Reg 1 */
++#define CMUN_MCCR		0x3C /* DRAM Configuration Reg */
++#define CMUN_FIR0		0x3D /* Fault Isolation Reg 0 */
++#define CMUN_FMR0		0x3E /* FIR Mask Reg 0 */
++#define CMUN_ETDRB		0x3F /* ETDR Backdoor */
++
++#define MCCR_LFIRUE		0x00000100
++#define MCCR_LFIRCE		0x00000080
++
++/* L2 indirect addresses */
++#define L2MCK		0x120
++#define L2MCKEN		0x130
++#define L2INT		0x150
++#define L2INTEN		0x160
++#define L2LOG0		0x180
++#define L2LOG1		0x184
++#define L2LOG2		0x188
++#define L2LOG3		0x18C
++#define L2LOG4		0x190
++#define L2LOG5		0x194
++#define L2PLBSTAT0	0x300
++#define L2PLBSTAT1	0x304
++#define L2PLBMCKEN0	0x330
++#define L2PLBMCKEN1	0x334
++#define L2PLBINTEN0	0x360
++#define L2PLBINTEN1	0x364
++#define L2ARRSTAT0	0x500
++#define L2ARRSTAT1	0x504
++#define L2ARRSTAT2	0x508
++#define L2ARRMCKEN0	0x530
++#define L2ARRMCKEN1	0x534
++#define L2ARRMCKEN2	0x538
++#define L2ARRINTEN0	0x560
++#define L2ARRINTEN1	0x564
++#define L2ARRINTEN2	0x568
++#define L2CPUSTAT	0x700
++#define L2CPUMCKEN	0x730
++#define L2CPUINTEN	0x760
++#define L2RACSTAT0	0x900
++#define L2RACMCKEN0	0x930
++#define L2RACINTEN0	0x960
++#define L2WACSTAT0	0xD00
++#define L2WACSTAT1	0xD04
++#define L2WACSTAT2	0xD08
++#define L2WACMCKEN0	0xD30
++#define L2WACMCKEN1	0xD34
++#define L2WACMCKEN2	0xD38
++#define L2WACINTEN0	0xD60
++#define L2WACINTEN1	0xD64
++#define L2WACINTEN2	0xD68
++#define L2WDFSTAT	0xF00
++#define L2WDFMCKEN	0xF30
++#define L2WDFINTEN	0xF60
++
++
++/* addresses of PSI URCR registers */
++#define URCR1_PSI0_MASTER_RESET	0x08000000
++#define URCR1_PSI1_MASTER_RESET	0x04000000
++#define URCR1_PSI2_MASTER_RESET	0x02000000
++#define URCR1_PSI3_MASTER_RESET	0x01000000
++
++
++/* CRCS bit fields */
++#define CRCS_STAT_MASK		0xF0000000
++#define CRCS_STAT_POR		0x10000000
++#define CRCS_STAT_ALTERNATE_POR 0x00000000 /* See bug 36786 */
++#define CRCS_STAT_PHR		0x20000000
++#define CRCS_STAT_PCIE		0x30000000
++#define CRCS_STAT_CRCS_SYS	0x40000000 /* Write to bit 24 of this reg */
++#define CRCS_STAT_DBCR_SYS	0x50000000 /* Check TSR */
++#define CRCS_STAT_HOST_SYS	0x60000000
++#define CRCS_STAT_CHIP_RST_B	0x70000000
++#define CRCS_STAT_CRCS_CHIP	0x80000000 /* Write to bit 25 of this reg */
++#define CRCS_STAT_DBCR_CHIP	0x90000000 /* Check TSR */
++#define CRCS_STAT_HOST_CHIP	0xA0000000
++#define CRCS_STAT_PSI_CHIP	0xB0000000
++#define CRCS_STAT_CRCS_CORE	0xC0000000 /* Write to bit 26 of this reg */
++#define CRCS_STAT_DBCR_CORE	0xD0000000 /* Check TSR */
++#define CRCS_STAT_HOST_CORE	0xE0000000
++#define CRCS_STAT_PCIE_HOT	0xF0000000
++#define CRCS_STAT_SELF_CORE	0x40000000
++#define CRCS_STAT_SELF_CHIP	0x50000000
++#define CRCS_WATCHE		0x08000000
++#define CRCS_CORE		0x04000000 /* Reset PPC440 core */
++#define CRCS_CHIP		0x02000000 /* Chip Reset */
++#define CRCS_SYS		0x01000000 /* System Reset */
++#define CRCS_WRCR		0x00800000 /* Watchdog reset on core reset */
++#define CRCS_EXTCR		0x00080000 /* CHIP_RST_B triggers chip reset */
++#define CRCS_PLOCK		0x00000002 /* PLL Locked */
++
++/* CMU_BWTC bit fields */
++#define BWTC_CONFIG0		0x80000000 /* BWD enable pin */
++#define BWTC_CONFIG1		0x40000000 /* BWD mode pin 0:ADDR 1:CS */
++#define BWTC_CONFIG4		0x20000000 /* Boot Fash size */
++#define BWTC_CONFIG3		0x10000000 /* Boot Fash size */
++#define BWTC_CONFIG2		0x08000000 /* Boot Fash size */
++#define BWTC_NANDBOOT		0x04000000 /* NANDBOOT */
++#define BWTC_CONFIG1LT		0x00008000 /* Latched version of BWD mode */
++#define BWTC_CONFIG4LT		0x00004000 /* Latched CONFIG4 */
++#define BWTC_CONFIG3LT		0x00002000 /* Latched CONFIG3 */
++#define BWTC_CONFIG2LT		0x00001000 /* Latched CONFIG2 */
++#define BWTC_WDT_MASK		0x00000700 /* WDT Mask */
++#define BWTC_WDT_500US		0x00000000 /* 500 usec */
++#define BWTC_WDT_1MS		0x00000100 /* 1 msec   */
++#define BWTC_WDT_250MS		0x00000200 /* 250 msec */
++#define BWTC_WDT_500MS		0x00000300 /* 500 msec */
++#define BWTC_WDT_1SEC		0x00000400 /* 1 sec    */
++#define BWTC_WDT_8SEC		0x00000500 /* 8 sec    */
++#define BWTC_WDT_16SEC		0x00000600 /* 16 sec   */
++#define BWTC_WDT_32SEC		0x00000700 /* 32 sec   */
++#define BWTC_BANK_MSB		0x00000008 /* Dual Boot Bank Sel bit 2 (R) */
++#define BWTC_MASK		0x00000004 /* Mask dual boot bank select */
++#define BWTC_BANK		0x00000002 /* Dual Boot Bank Sel (R) */
++#define BWTC_BANK_LSB		0x00000002 /* Dual Boot Bank Sel (R) */
++#define BWTC_WDTE		0x00000001 /* Watchdog Enable (RC)   */
++
++#ifndef __ASSEMBLY__
++/* CMU access functions */
++extern u32 mfcmu(u32 reg);
++extern void mtcmu(u32 reg, u32 data);
++#endif
++
++#endif /* __KERNEL__ */
++#endif /* _ASM_POWERPC_FSP1_DCR_H_ */
+diff --git a/include/linux/fsp/Kbuild b/include/linux/fsp/Kbuild
+new file mode 100644
+index 0000000..0d13ae5
+--- /dev/null
++++ b/include/linux/fsp/Kbuild
+@@ -0,0 +1 @@
++header-y += reboot.h
+diff --git a/include/linux/fsp/checkpoints.h b/include/linux/fsp/checkpoints.h
+new file mode 100644
+index 0000000..2831558
+--- /dev/null
++++ b/include/linux/fsp/checkpoints.h
+@@ -0,0 +1,117 @@
++#ifndef __CHKP_H__
++#define __CHKP_H__
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2010
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <asm/processor.h>
++
++#define CHKP_KICKOFF		0x00000100 /* Not yet started the kernel */
++#define CHKP_START		0x00000200 /* IAC have last two bits 0 */
++#define CHKP_WMMUCR		0x00000300
++#define CHKP_KBASE		0x00000400
++#define CHKP_CONTEXTCHANGE0	0x00000500
++#define CHKP_CONTEXTCHANGE1	0x00000600
++#define CHKP_EXCEPTIONVECT	0x00000700
++
++#define CHKP_EINIT		0x00000800 /* early_init */
++#define CHKP_RELOC_OFFSET	0x00000900
++#define CHKP_MEMSET_IO		0x00000A00
++#define CHKP_IDENTIFY_CPU	0x00000B00
++#define CHKP_EINIT_DONE		0x00000C00
++
++#define CHKP_MINIT		0x00000D00 /* machine_init */
++#define CHKP_PINIT		0x00000F00
++#define CHKP_PINIT1		0x00001000
++#define CHKP_MINIT_DONE		0x00001100
++
++#define CHKP_MMU_INIT		0x00001200 /* MMU_init */
++#define CHKP_MMUSETUP		0x00001300
++#define CHKP_MMUINITHW		0x00001400
++#define CHKP_MMUCONTEXT		0x00001500
++#define CHKP_SWAPPER_INIT	0x00001600
++
++#define CHKP_START_KERNEL	0x00002000
++#define CHKP_SETUP_ARCH_B	0x00002100
++#define CHKP_SETUP_ARCH_E	0x00002200
++
++#define CHKP_SA_INITBMEM_C	0x00002280 /* setup_arch */
++#define CHKP_SA_SETUP_C		0x00002300 /* setup_arch */
++#define CHKP_SA_RETR_MAC_C	0x00002400 /* ..._setup_arch */
++#define CHKP_SA_GETCLOCKS_C	0x00002500 /* ..._setup_arch */
++#define CHKP_SA_SETUPHOSE_C	0x00002600 /* ..._setup_arch */
++#define CHKP_SA_EARLYSER_C	0x00002700 /* ..._setup_arch */
++#define CHKP_SA_PAGING_C	0x00002800 /* setup_arch */
++
++#define CHKP_FREEBM_CORE_C	0x00002900 /* free_bootmem_core */
++#define CHKP_FREEBM_C		0x00002A00 /* free_bootmem */
++
++#define CHKP_BUILD_ZLIST_C	0x00002B00
++#define CHKP_PALLOC_INIT_C	0x00002C00
++#define CHKP_SORT_EXTTAB_C	0x00002D00
++#define CHKP_TRAP_INIT_C	0x00002E00
++
++#define CHKP_INIT_ROOTFS_B	0x00003200
++#define CHKP_INIT_ROOTFS_E	0x00003200
++
++#define CHKP_INITCALLS_B	0x00003600
++#define CHKP_INITCALLS_E	0x00003700
++
++#define CHKP_NAMESPACE_B	0x00003A00
++#define CHKP_NAMESPACE_E	0x00003B00
++
++#define CHKP_OPEN_CONSOLE_C	0x00004000 /* open("/dev/console") */
++#define CHKP_RUN_INIT_C		0x00004100 /* run_init_process(...) */
++
++#define CHKP_FSI1		0x00005000 /* FSI init done */
++#define CHKP_FSI2		0x00005100 /* FSI init done */
++
++
++#if defined(__ASSEMBLY__)
++
++#if defined(CONFIG_ETXX)
++#define CHECKPOINT(reg1, checkpoint)			\
++		mftbl	reg1 ;				\
++		mtspr	SPRN_DVC1, reg1 ;		\
++		lis	reg1, checkpoint@h ;		\
++		ori	reg1, reg1, checkpoint@l ;	\
++		mtspr	SPRN_DAC1, reg1 ;
++#else
++#define CHECKPOINT(reg1, checkpoint)
++#endif
++
++#else /* not assembly */
++
++#define CHKPT_PREFIX(chkpt) ((chkpt) | 0x20000000)
++
++#include <linux/fsp/pra.h>
++
++static void
++checkpoint(unsigned long checkpoint)
++{
++#if defined(CONFIG_ETXX)
++	unsigned long tbl = mfspr(SPRN_TBRL);
++	mtspr(SPRN_DVC1, tbl);
++	mtspr(SPRN_DAC1, CHKPT_PREFIX(checkpoint));
++#elif defined(CONFIG_FSP)
++	pra_write(PRA_CURR_CHKPT, CHKPT_PREFIX(checkpoint));
++#endif
++}
++
++#endif /* defined(__ASSEMBLY__) */
++
++#endif /* __CHKP_H__ */
+diff --git a/include/linux/fsp/console.h b/include/linux/fsp/console.h
+new file mode 100644
+index 0000000..e285365
+--- /dev/null
++++ b/include/linux/fsp/console.h
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_CONSOLE_H_
++#define _LINUX_FSP_CONSOLE_H_
++
++#include <linux/tty.h>
++
++struct fsptrace_ops {
++	int (*trace_register)(const char *name, size_t size);
++	int (*trace_unregister)(int td);
++	int (*trace_binary)(int td, int level, unsigned int traceid,
++			    unsigned int line, const char *address,
++			    unsigned int size);
++};
++
++int register_fsptrace_callbacks(struct fsptrace_ops *);
++int unregister_fsptrace_callbacks(struct fsptrace_ops *);
++
++extern int silent_console;
++
++void fsp_console_trace(struct tty_struct *tty, struct file *file,
++		       const unsigned char *buf, size_t nr);
++
++
++#endif
+diff --git a/include/linux/fsp/fsitlb.h b/include/linux/fsp/fsitlb.h
+new file mode 100644
+index 0000000..d3145960
+--- /dev/null
++++ b/include/linux/fsp/fsitlb.h
+@@ -0,0 +1,42 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_FSITLB_H_
++#define _LINUX_FSP_FSITLB_H_
++
++#warning fsitlb.h is deprecated
++
++#ifdef CONFIG_FSP_FSITLB
++#ifndef CONFIG_FSP1
++#error only FSP-1 is supported
++#endif
++extern void fsitlb_write_enable(unsigned long address);
++extern void fsitlb_write_disable(unsigned long address);
++extern void fsitlb_read_enable(unsigned long address);
++extern void fsitlb_read_disable(unsigned long address);
++extern void fsitlb_readwrite_enable(unsigned long address);
++extern void fsitlb_readwrite_disable(unsigned long address);
++#else
++#define fsitlb_write_enable(a)
++#define fsitlb_write_disable(a)
++#define fsitlb_read_enable(a)
++#define fsitlb_read_disable(a)
++#define fsitlb_readwrite_enable(a)
++#define fsitlb_readwrite_disable(a)
++#endif
++
++#endif
+diff --git a/include/linux/fsp/hdcr.h b/include/linux/fsp/hdcr.h
+new file mode 100644
+index 0000000..55d6879
+--- /dev/null
++++ b/include/linux/fsp/hdcr.h
+@@ -0,0 +1,49 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2010, 2011
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_HDCR_H_
++#define _LINUX_FSP_HDCR_H_
++
++/* DRCR access functions */
++void drcr_clear(u32 clear_bits);
++u32 drcr_read(void);
++
++/* DISR access functions */
++u32 disr_read(void);
++void disr_set(u32 set_bits);
++void disr_clear_and_set(u32 clear_bits, u32 set_bits, u32 *old_value);
++
++/* DISR bits */
++#define DISR_STAT_ACK                   0x00000001
++/* Reserved, was Interface Error        0x00000002 */
++/* unused                               0x00000004 */
++#define DISR_CRIT_OP                    0x00000008
++#define DISR_REBOOT_INPROG              0x00000010
++#define DISR_RR_INPROG                  0x00000020
++#define DISR_DEBUG                      0x00000040
++#define DISR_STAT_SYNC                  0x00000080
++#define DISR_FLASH_TERM                 0x00000100
++#define DISR_RR_COMPLT                  0x00000200
++#define DISR_RUNTIME_TERM               0x00000400
++/* unused                               0x00000800 */
++/* unused                               0x00001000 */
++/* unused                               0x00002000 */
++/* Reserved, was Chip Reset Requested   0x00004000 */
++#define DISR_RSVD                       0xFFFF8000
++
++
++#endif
+diff --git a/include/linux/fsp/memprof.h b/include/linux/fsp/memprof.h
+new file mode 100644
+index 0000000..4cc1383
+--- /dev/null
++++ b/include/linux/fsp/memprof.h
+@@ -0,0 +1,83 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2007,2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifndef _MEMPROF_H
++#define _MEMPROF_H
++
++/* support for profiling memory allocator */
++#include <asm/atomic.h>
++#include <linux/list.h>
++#include <linux/spinlock.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/sched.h>
++
++
++/* backtrace hash support */
++#define BTDEPTH		4
++
++#define KMALLOC		1
++#define KFREE		2
++
++
++extern uint32_t slab_traceon;
++
++typedef struct btinfo_struct {
++	struct list_head list;		/* hash list */
++	unsigned long cachep;		/* cachep | wrapped */
++#define WRAP_MASK 0x1			/* cachep low bit set indicates that
++					   nhits has wrapped */
++	atomic_t nhits;			/* number of bt hits */
++	unsigned long bt[BTDEPTH];	/* backtrace */
++} btinfo_t;
++
++btinfo_t *btinfo_lookup_insert(unsigned int, unsigned long, unsigned long,
++			       unsigned long *);
++
++/* instrumentation for kmalloc */
++#define GET_BT(backtrace)						\
++{									\
++	uint cnt = 0;							\
++	unsigned long *prev_sp = (unsigned long *)(current->stack + 1); \
++	unsigned long *stack_top = 					\
++		(unsigned long *)current->stack + THREAD_SIZE;		\
++	unsigned long *sp;						\
++	asm("mr %0,1" : "=r" (sp));					\
++	__get_user(sp, (unsigned long **)sp);				\
++	while ((cnt < BTDEPTH) && (sp > prev_sp) && (sp < stack_top)) {	\
++		if (__get_user(backtrace[cnt], &sp[1]))			\
++			break;						\
++		if (__get_user(sp, (unsigned long **)sp))		\
++			break;						\
++		cnt++;							\
++	}								\
++}
++
++
++#define KMALLOC_TRACE(flag, size, ptr)					\
++{									\
++	if (slab_traceon) {						\
++		unsigned long backtrace[BTDEPTH] = {0};			\
++		GET_BT(backtrace);					\
++		(void)btinfo_lookup_insert(flag, size, (unsigned long)ptr, \
++					   backtrace);			\
++	}								\
++}
++
++
++#endif
+diff --git a/include/linux/fsp/pra.h b/include/linux/fsp/pra.h
+new file mode 100644
+index 0000000..bba77122
+--- /dev/null
++++ b/include/linux/fsp/pra.h
+@@ -0,0 +1,110 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_PRA_H_
++#define _LINUX_FSP_PRA_H_
++
++#include <linux/types.h>
++
++/*
++ * NOTE: These values are also defined in FSP boot code.  If you change or add
++ * any values, be sure to make corresponding changes to the boot code PRA
++ * defines!
++ *
++ * For more information, see the FSP architecture and FSP kernel design
++ * documents.
++ */
++#define PRA_CHECKSUM			0
++#define PRA_CALLOUT			1
++#define PRA_BCU_STATE			2
++#define PRA_RR_COUNT			3
++#define PRA_SFT_RST_FLAVOR		4
++#define PRA_CURR_CHKPT			5
++#define PRA_MEM_INIT			6
++#define PRA_MEM_INIT_STATIC		7
++#define PRA_USER0			8
++#define PRA_USER1			9
++#define PRA_USER2			10
++#define PRA_USER3			11
++#define PRA_USER4			12
++#define PRA_USER5			13
++#define PRA_USER6			14
++#define PRA_USER7			15
++#define PRA_BOOT_FLAGS			16
++#define PRA_ANCHOR_SND			17
++#define PRA_BOOTSCRIPT			18
++#define PRA_BOOT_STATUS			19
++#define PRA_FFDC_LR			20
++#define PRA_BOOT_DUMP			21
++#define PRA_PABEND			22
++#define PRA_PABEND_A			23
++#define PRA_PABEND_B			24
++#define PRA_PABEND_C			25
++#define PRA_ORIG_RESET			26
++#define PRA_NETBOOT_DHCP_ERR		27
++#define PRA_NETBOOT_TFTP_ERR		28
++#define PRA_BOOT_ERR_VALUE		29
++#define PRA_BOOT_ERR_FLAGS		30
++#define PRA_BOOT_THRESHOLD_TIME		31
++#define PRA_BOOT_THRESHOLD_COUNT	32
++#define PRA_ANCHOR_FFS			33
++#define PRA_ANCHOR_ALT_FFS		34
++#define PRA_ORIG_RSTINFO		35
++#define PRA_BOOT_RR_COUNT		36
++#define PRA_NUMENTRIES			37 /* Must always be the largest key */
++
++/*
++ * PRA_CALLOUT
++ *
++ * 0000.0000.0011.1111.1111.2222.2222.2233
++ * 0123.4567.8901.2345.6789.0123.4567.8901
++ *			 TT TTTT XXXX XXXX
++ *			 || |||| callout summary: SW,HW,ECC error ...
++ *			 || |||icache parity error
++ *			 || ||dcache parity error
++ *			 || |tlb parity error
++ *                       || gpr parity error
++ *                       |fpr parity error
++ *                       L1/L2 error
++ */
++
++#define PRA_SWERR		0 /* SW error */
++#define PRA_HWERR		1 /* HW error */
++#define PRA_HWSWERR		2 /* HW or SW error */
++#define PRA_ECCERR		3 /* Uncorrectable ECC error */
++#define PRA_TLBCACHEERR		4 /* TLB cache parity error */
++#define PRA_WPAPARERR		5 /* wpa parity error */
++#define PRA_OOM			6 /* out of memory */
++#define PRA_FLASHERR		7 /* flash data integrity problems Nov2008 */
++#define PRA_CMU			8 /* CMU error */
++#define PRA_CONF_LOGIC		9 /* Configuration Logic parity error */
++#define PRA_MASK_SUMMARY	0xff /* mask for callout summary */
++
++/* The following bits are or'ed into PRA_CALLOUT, if the err occurs */
++#define PRA_CALLOUT_ICACHE	0x00000100 /* icache parity error */
++#define PRA_CALLOUT_DCACHE	0x00000200 /* dcache parity error */
++#define PRA_CALLOUT_TLB		0x00000400 /* tlb parity error */
++#define PRA_CALLOUT_GPR		0x00000800 /* GPR parity error */
++#define PRA_CALLOUT_FPR		0x00001000 /* FPR parity error */
++#define PRA_CALLOUT_L1_L2	0x00002000 /* L1/L2 error */
++
++int pra_read(unsigned int key, u32 *data);
++int pra_read_previous(unsigned int key, u32 *data);
++int pra_write(unsigned int key, u32 data);
++void pra_crash_save(void);
++
++#endif /* _LINUX_FSP_PRA_H_ */
+diff --git a/include/linux/fsp/reboot.h b/include/linux/fsp/reboot.h
+new file mode 100644
+index 0000000..62ea8f3
+--- /dev/null
++++ b/include/linux/fsp/reboot.h
+@@ -0,0 +1,32 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_REBOOT_H_
++#define _LINUX_FSP_REBOOT_H_
++
++#include <linux/reboot.h>
++
++#define LINUX_REBOOT_CMD_COREDUMP	0x9A8BCCDD
++#define LINUX_REBOOT_CMD_TOOLRESET	0xF5900011
++#define LINUX_REBOOT_CMD_PINHOLE	0xFFFFFFFF
++#define LINUX_REBOOT_CMD_HOSTINIT	0xC0FEBABE
++#define LINUX_REBOOT_CMD_BOOTCODE	0xDEADBEEF
++
++#define LINUX_REBOOT_CMD_COREDUMP_STR	"NEWPABEND"
++#define LINUX_REBOOT_CMD_TOOLRESET_STR	"TOOL RESET"
++
++#endif
+diff --git a/include/linux/fsp/reset.h b/include/linux/fsp/reset.h
+new file mode 100644
+index 0000000..058a112
+--- /dev/null
++++ b/include/linux/fsp/reset.h
+@@ -0,0 +1,81 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2012, 2013
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifndef _FSP_RESET_H_
++#define _FSP_RESET_H_
++
++#define DBSR_IDE        0x80000000      /* Imprecise Debug Event */
++#define DBSR_UDE        0x40000000      /* Unconditional Debug Event */
++#define DBSR_MRR        0x30000000      /* MRR Mask */
++#define DBSR_MRR_SYSTEM 0x30000000      /* MRR System */
++#define DBSR_MRR_CHIP   0x20000000      /* MRR Chip */
++#define DBSR_MRR_CORE   0x10000000      /* MRR Core */
++#define DBSR_MRR_NONE   0x00000000      /* MRR None */
++#define DBSR_ICMP       0x08000000      /* Instruction Compl Debug Event */
++#define DBSR_BRT        0x04000000      /* Branch Taken Debug Event */
++
++
++/**
++ * Specified reset originators.
++ */
++typedef enum {
++	RST_ORIG_UNKNOWN = 0,
++	RST_ORIG_CORE,
++	RST_ORIG_ASIC,
++	RST_ORIG_POWER,
++	RST_ORIG_EXTERNAL,
++} rst_origin_t;
++
++
++/**
++ * Specified reset types.
++ */
++typedef enum {
++	RST_TYPE_UNKNOWN = 0,
++	RST_TYPE_CORE,
++	RST_TYPE_CHIP,
++	RST_TYPE_SYSTEM,
++} rst_type_t;
++
++
++/**
++ * Specified reset reasons.
++ */
++typedef enum {
++	RST_REASON_UNKNOWN,
++	RST_REASON_CORE_WATCHDOG,
++	RST_REASON_RESTART,
++	RST_REASON_PANIC,
++	RST_REASON_HALT,
++	RST_REASON_POWER_OFF,
++	RST_REASON_POWER_CYCLE,
++	RST_REASON_PINHOLE,
++	RST_REASON_PARPORT,		/* No longer used */
++	RST_REASON_BOOTCODE,
++	RST_REASON_HOST_INITIATED,
++	RST_REASON_BOOT_WATCHDOG,
++	RST_REASON_UNIT_CHECK_TIMER,	/* No longer used */
++	RST_REASON_EXT_TOOL,
++	RST_REASON_PABEND,
++	RST_REASON_CHASSIS,
++	RST_REASON_PCIE,
++} rst_reason_t;
++
++extern struct atomic_notifier_head pre_kdump_notifier_list;
++
++#endif /* _FSP_RESET_H_ */
+diff --git a/include/linux/fsp/snd.h b/include/linux/fsp/snd.h
+new file mode 100644
+index 0000000..1aebae4
+--- /dev/null
++++ b/include/linux/fsp/snd.h
+@@ -0,0 +1,221 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2010
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
++ * **********************************************************************
++ *
++ * Safetynet driver header file.
++ *
++ * @author Gary Lowe <garylowe@us.ibm.com>
++ *
++ * @brief This file contains the header for the FSP-1 base Safetynet
++ * register function and Safetynet driver.
++ *
++ * **********************************************************************
++ */
++
++#ifndef _LINUX_SND_H
++#define _LINUX_SND_H
++
++#warning snd.h is deprecated.
++
++#ifdef __KERNEL__
++#include <linux/types.h>
++#else
++#include <stdint.h>
++#endif
++
++#define SND_MAGIC_NUMBER     (0x00D6B7EDUL)
++#define SND_SAFETY_NET_PAGES	3 /* main table */
++#define SND_INTERRUPT_PAGES	4 /* interrupt table */
++#if CONFIG_MODULES
++#define SND_MODULE_PAGES	1 /* list of modules */
++#else
++#define SND_MODULE_PAGES	0 /* no module support */
++#endif
++#define SND_SAFETY_NET_SIZE	(SND_SAFETY_NET_PAGES * PAGE_SIZE)
++#define SND_INTERRUPT_SIZE	(SND_INTERRUPT_PAGES * PAGE_SIZE)
++#define SND_MODULE_SIZE		(SND_MODULE_PAGES * PAGE_SIZE)
++#define SND_MAINAREA_SIZE	(SND_SAFETY_NET_SIZE+SND_INTERRUPT_SIZE+SND_MODULE_SIZE)
++#define SND_MAX_ENTRIES		((SND_SAFETY_NET_SIZE - sizeof(trace_safety_net_table)) / sizeof(trace_safety_net_entry))
++#define SND_MAX_TRACEBUFS	(SND_MAX_ENTRIES - 5)	/* 5 = 3 LTT buffers (irq, proc, trc), printk, and insmod */
++
++//#define SND_PROC_SIZE            PAGE_SIZE   /* size of process table     */
++#define SND_SAFETY_NET_NAME_SIZE 16 /* size of name in SAFETY_NET table   */
++#define SND_INTR_CTRL_NAME_SIZE  28 /* max size of interrupt ctrl name    */
++#define SND_INTR_OWNER_NAME_SIZE 28 /* max size of interrupt owner name   */
++#define SND_MODULE_NAME_SIZE     SND_SAFETY_NET_NAME_SIZE /* max size of module name */
++#define SND_FSP_TRACE_NAME_SIZE  16 /* max size of fsp-trace comp name    */
++#define SND_PROC_NAME_SIZE       6  /* max size of process names          */
++#define SND_PROC_NUM_PID         5  /* number of pid's to record          */
++
++#define SND_SAFETY_NET_VERSION   2
++#define SND_INTERRUPT_VERSION    1
++#define SND_MODULE_VERSION       2
++#define SND_PROC_VERSION         1
++#define SND_FSP_TRACE_VERSION    2
++
++#define SND_CURRENT              0
++#define SND_SAVED                1
++
++#define SND_GET_TABLE_HEAD		SND_MAGIC_NUMBER + 64
++#define SND_GET_TABLE_BUFFER		SND_MAGIC_NUMBER + 65
++#define SND_FREE_SAVED_TABLE		SND_MAGIC_NUMBER + 66
++
++/* ioctl buffer read commands need a buffer name, a pointer and a size.
++ * trace_safety_net_entry is useed for this: it has all the fields (name, virt, size).
++ * additionally the field "real" is used to select current (0) or saved (1) snd.
++ */
++
++/* define entry format in SAFETY_NET table */
++typedef struct _trace_safety_net_entry
++{
++	char name[SND_SAFETY_NET_NAME_SIZE];
++	uint32_t virt;
++	uint32_t real;
++	uint32_t size;
++} trace_safety_net_entry;
++
++/* define entry format for interrupt table */
++typedef struct _trace_interrupt_entry
++{
++	uint32_t num;
++	char handler[SND_INTR_CTRL_NAME_SIZE];
++	char owner[SND_INTR_OWNER_NAME_SIZE];
++} trace_interrupt_entry;
++
++/* define entry format for module entry */
++typedef struct _trace_safety_net_entry trace_module_entry;
++
++typedef struct _trace_proc_entry
++{
++	char name[SND_PROC_NAME_SIZE];
++	uint16_t pid[SND_PROC_NUM_PID];
++	uint16_t ppid[SND_PROC_NUM_PID];
++	uint16_t  cntr;
++} trace_proc_entry;
++
++/* define entry format in fsp-trace entry */
++typedef struct _trace_safety_net_entry trace_fsp_trace_entry;
++
++/* head of table information */
++typedef struct _trace_safety_net_table {
++	uint32_t magic;
++	uint32_t version;
++	uint32_t used;
++	uint32_t size;
++	trace_safety_net_entry entry[0];
++} trace_safety_net_table;
++
++/* head of interrupt table */
++typedef struct _trace_interrupt_table {
++	uint32_t version;
++	uint32_t used;
++	trace_interrupt_entry entry[0];
++} trace_interrupt_table;
++
++/* head of module table */
++typedef struct _trace_safety_net_table trace_module_table;
++
++/* header for proc table */
++typedef struct _trace_proc_table
++{
++	uint16_t version;
++	uint16_t wrapped;
++	uint32_t used;
++	trace_proc_entry entry[0];
++} trace_proc_table;
++
++/* header for fsp trace table */
++typedef struct _trace_fsp_trace_table
++{
++	uint32_t magic;
++	uint32_t version;
++	uint32_t used;
++	uint32_t size;
++	trace_fsp_trace_entry entry[0];
++} trace_fsp_trace_table;
++
++/* define names of FFDC items */
++#define SND_LTT_TRACE  "snd_ltt_trace"   /* ltt trace buffer       */
++#define SND_LTT_PROC   "snd_ltt_proc"    /* proc/interrupt info    */
++#define SND_LTT_INTR   "snd_ltt_intr"    /* interrupt information  */
++#define SND_PRINTK_BUF "snd_printk_buf"  /* printk buffer          */
++#define SND_PRINTK_IDX "snd_printk_idx"  /* last entry in printk   */
++#define SND_INSMOD_BUF "snd_insmod_buf"  /* location of insmod buf */
++#define SND_FSP_TRACE  "snd_fsp_trace"   /* fsp-trace buffer table */
++
++#define SND_FLAG_AVAIL   (0x80000000U)
++#define SND_FLAG_SAVED   (0x40000000U)
++#define SND_SIZE_SIZE(size)  ((size) & 0x00ffffff)
++
++#ifdef __KERNEL__
++
++#include <linux/interrupt.h>
++#include <linux/irq.h>
++#include <linux/module.h>
++
++/* avoid ifdef's each time snd is used */
++#ifdef CONFIG_FSP_SAFETYNET
++
++/* interfaces for registering SafetyNet items. */
++void snd_register(const char *, const void *, uint32_t);
++void snd_register_module_info(const struct module *);
++void snd_register_interrupt(const char *, uint32_t, const char *);
++
++/* get snd table pointer and size */
++int snd_get_table_pointer(trace_safety_net_table **paddr,
++			  size_t *psize,
++			  int whichone); /* SND_CURRENT or SND_SAVED */
++
++/* free saved snd */
++int snd_free_old_snd(void);
++
++/* initialize snd. to be called from do_init_bootmem */
++void snd_early_init(trace_safety_net_table *pdefault);
++
++static inline unsigned long snd_pages_needed(void) {
++	return SND_SAFETY_NET_PAGES + SND_INTERRUPT_PAGES;
++}
++
++
++/* register address in SafetyNet table */
++#define SND_REGISTER(NAME, ADDR, SIZE)		\
++	snd_register(NAME,ADDR,SIZE)
++#define SND_REGISTER_INTERRUPT(NAME, IRQ, HANDLER)	\
++	snd_register_interrupt(NAME, IRQ, HANDLER)
++
++#ifdef CONFIG_MODULES
++#define SND_REGISTER_MODULE(MOD)		\
++	snd_register_module_info(MOD)
++#else
++/* shouldn't be used anywhere. should we BUG? */
++#define SND_REGISTER_MODULE(MOD) do {} while(0)
++#endif
++
++#else
++
++#define SND_REGISTER(NAME, ADDR, SIZE) do {} while(0)
++#define SND_REGISTER_INTERRUPT(NAME, IRQ, IRQ_DESC) do {} while(0)
++#define SND_REGISTER_MODULE(MOD) do {} while(0)
++#define snd_pages_needed() (0)
++#define snd_early_init(x) do {} while(0)
++
++#endif
++
++#endif /* KERNEL */
++
++#endif
+diff --git a/include/linux/mmc/arasan_plat.h b/include/linux/mmc/arasan_plat.h
+new file mode 100644
+index 0000000..0573fef
+--- /dev/null
++++ b/include/linux/mmc/arasan_plat.h
+@@ -0,0 +1,49 @@
++/*
++ * Author: Giuseppe Cavallaro <peppe.cavall...@st.com>
++ *
++ * include/linux/mmc/arsan_plat.h
++ *
++ * platform data for the Arasan MMC/SD/SDI HC driver
++ *
++ * Copyright (C) 2010  STMicroelectronics Ltd
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License.
++ *
++ */
++
++#ifndef __ARASAN_PLAT_H__
++#define __ARASAN_PLAT_H__
++
++struct arasan_platform_data {
++       unsigned int need_poll;
++#ifdef CONFIG_STM_DRIVERS
++       struct stm_pad_config *pad_config;
++#endif
++};
++
++/* ARASAN Resource configuration */
++#ifdef CONFIG_STM_DRIVERS
++#include <linux/stm/platform.h>
++#include <linux/stm/pad.h>
++static inline int arasan_claim_resource(struct platform_device *pdev)
++{
++       int ret = 0;
++       struct arasan_platform_data *plat_dat = pdev->dev.platform_data;
++
++       /* Pad routing setup required on STM platforms */
++       if (!devm_stm_pad_claim(&pdev->dev, plat_dat->pad_config,
++                               dev_name(&pdev->dev))) {
++               pr_err("%s: Failed to request pads!\n", __func__);
++               ret = -ENODEV;
++       }
++       return ret;
++}
++#else
++static inline int arasan_claim_resource(struct platform_device *pdev)
++{
++       return 0;
++}
++#endif
++#endif
+diff --git a/include/uapi/linux/fsp/Kbuild b/include/uapi/linux/fsp/Kbuild
+new file mode 100644
+index 0000000..0d13ae5
+--- /dev/null
++++ b/include/uapi/linux/fsp/Kbuild
+@@ -0,0 +1 @@
++header-y += reboot.h
+diff --git a/include/uapi/linux/fsp/checkpoints.h b/include/uapi/linux/fsp/checkpoints.h
+new file mode 100644
+index 0000000..2831558
+--- /dev/null
++++ b/include/uapi/linux/fsp/checkpoints.h
+@@ -0,0 +1,117 @@
++#ifndef __CHKP_H__
++#define __CHKP_H__
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2010
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#include <asm/processor.h>
++
++#define CHKP_KICKOFF		0x00000100 /* Not yet started the kernel */
++#define CHKP_START		0x00000200 /* IAC have last two bits 0 */
++#define CHKP_WMMUCR		0x00000300
++#define CHKP_KBASE		0x00000400
++#define CHKP_CONTEXTCHANGE0	0x00000500
++#define CHKP_CONTEXTCHANGE1	0x00000600
++#define CHKP_EXCEPTIONVECT	0x00000700
++
++#define CHKP_EINIT		0x00000800 /* early_init */
++#define CHKP_RELOC_OFFSET	0x00000900
++#define CHKP_MEMSET_IO		0x00000A00
++#define CHKP_IDENTIFY_CPU	0x00000B00
++#define CHKP_EINIT_DONE		0x00000C00
++
++#define CHKP_MINIT		0x00000D00 /* machine_init */
++#define CHKP_PINIT		0x00000F00
++#define CHKP_PINIT1		0x00001000
++#define CHKP_MINIT_DONE		0x00001100
++
++#define CHKP_MMU_INIT		0x00001200 /* MMU_init */
++#define CHKP_MMUSETUP		0x00001300
++#define CHKP_MMUINITHW		0x00001400
++#define CHKP_MMUCONTEXT		0x00001500
++#define CHKP_SWAPPER_INIT	0x00001600
++
++#define CHKP_START_KERNEL	0x00002000
++#define CHKP_SETUP_ARCH_B	0x00002100
++#define CHKP_SETUP_ARCH_E	0x00002200
++
++#define CHKP_SA_INITBMEM_C	0x00002280 /* setup_arch */
++#define CHKP_SA_SETUP_C		0x00002300 /* setup_arch */
++#define CHKP_SA_RETR_MAC_C	0x00002400 /* ..._setup_arch */
++#define CHKP_SA_GETCLOCKS_C	0x00002500 /* ..._setup_arch */
++#define CHKP_SA_SETUPHOSE_C	0x00002600 /* ..._setup_arch */
++#define CHKP_SA_EARLYSER_C	0x00002700 /* ..._setup_arch */
++#define CHKP_SA_PAGING_C	0x00002800 /* setup_arch */
++
++#define CHKP_FREEBM_CORE_C	0x00002900 /* free_bootmem_core */
++#define CHKP_FREEBM_C		0x00002A00 /* free_bootmem */
++
++#define CHKP_BUILD_ZLIST_C	0x00002B00
++#define CHKP_PALLOC_INIT_C	0x00002C00
++#define CHKP_SORT_EXTTAB_C	0x00002D00
++#define CHKP_TRAP_INIT_C	0x00002E00
++
++#define CHKP_INIT_ROOTFS_B	0x00003200
++#define CHKP_INIT_ROOTFS_E	0x00003200
++
++#define CHKP_INITCALLS_B	0x00003600
++#define CHKP_INITCALLS_E	0x00003700
++
++#define CHKP_NAMESPACE_B	0x00003A00
++#define CHKP_NAMESPACE_E	0x00003B00
++
++#define CHKP_OPEN_CONSOLE_C	0x00004000 /* open("/dev/console") */
++#define CHKP_RUN_INIT_C		0x00004100 /* run_init_process(...) */
++
++#define CHKP_FSI1		0x00005000 /* FSI init done */
++#define CHKP_FSI2		0x00005100 /* FSI init done */
++
++
++#if defined(__ASSEMBLY__)
++
++#if defined(CONFIG_ETXX)
++#define CHECKPOINT(reg1, checkpoint)			\
++		mftbl	reg1 ;				\
++		mtspr	SPRN_DVC1, reg1 ;		\
++		lis	reg1, checkpoint@h ;		\
++		ori	reg1, reg1, checkpoint@l ;	\
++		mtspr	SPRN_DAC1, reg1 ;
++#else
++#define CHECKPOINT(reg1, checkpoint)
++#endif
++
++#else /* not assembly */
++
++#define CHKPT_PREFIX(chkpt) ((chkpt) | 0x20000000)
++
++#include <linux/fsp/pra.h>
++
++static void
++checkpoint(unsigned long checkpoint)
++{
++#if defined(CONFIG_ETXX)
++	unsigned long tbl = mfspr(SPRN_TBRL);
++	mtspr(SPRN_DVC1, tbl);
++	mtspr(SPRN_DAC1, CHKPT_PREFIX(checkpoint));
++#elif defined(CONFIG_FSP)
++	pra_write(PRA_CURR_CHKPT, CHKPT_PREFIX(checkpoint));
++#endif
++}
++
++#endif /* defined(__ASSEMBLY__) */
++
++#endif /* __CHKP_H__ */
+diff --git a/include/uapi/linux/fsp/console.h b/include/uapi/linux/fsp/console.h
+new file mode 100644
+index 0000000..e285365
+--- /dev/null
++++ b/include/uapi/linux/fsp/console.h
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_CONSOLE_H_
++#define _LINUX_FSP_CONSOLE_H_
++
++#include <linux/tty.h>
++
++struct fsptrace_ops {
++	int (*trace_register)(const char *name, size_t size);
++	int (*trace_unregister)(int td);
++	int (*trace_binary)(int td, int level, unsigned int traceid,
++			    unsigned int line, const char *address,
++			    unsigned int size);
++};
++
++int register_fsptrace_callbacks(struct fsptrace_ops *);
++int unregister_fsptrace_callbacks(struct fsptrace_ops *);
++
++extern int silent_console;
++
++void fsp_console_trace(struct tty_struct *tty, struct file *file,
++		       const unsigned char *buf, size_t nr);
++
++
++#endif
+diff --git a/include/uapi/linux/fsp/fsitlb.h b/include/uapi/linux/fsp/fsitlb.h
+new file mode 100644
+index 0000000..d3145960
+--- /dev/null
++++ b/include/uapi/linux/fsp/fsitlb.h
+@@ -0,0 +1,42 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_FSITLB_H_
++#define _LINUX_FSP_FSITLB_H_
++
++#warning fsitlb.h is deprecated
++
++#ifdef CONFIG_FSP_FSITLB
++#ifndef CONFIG_FSP1
++#error only FSP-1 is supported
++#endif
++extern void fsitlb_write_enable(unsigned long address);
++extern void fsitlb_write_disable(unsigned long address);
++extern void fsitlb_read_enable(unsigned long address);
++extern void fsitlb_read_disable(unsigned long address);
++extern void fsitlb_readwrite_enable(unsigned long address);
++extern void fsitlb_readwrite_disable(unsigned long address);
++#else
++#define fsitlb_write_enable(a)
++#define fsitlb_write_disable(a)
++#define fsitlb_read_enable(a)
++#define fsitlb_read_disable(a)
++#define fsitlb_readwrite_enable(a)
++#define fsitlb_readwrite_disable(a)
++#endif
++
++#endif
+diff --git a/include/uapi/linux/fsp/hdcr.h b/include/uapi/linux/fsp/hdcr.h
+new file mode 100644
+index 0000000..55d6879
+--- /dev/null
++++ b/include/uapi/linux/fsp/hdcr.h
+@@ -0,0 +1,49 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2010, 2011
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_HDCR_H_
++#define _LINUX_FSP_HDCR_H_
++
++/* DRCR access functions */
++void drcr_clear(u32 clear_bits);
++u32 drcr_read(void);
++
++/* DISR access functions */
++u32 disr_read(void);
++void disr_set(u32 set_bits);
++void disr_clear_and_set(u32 clear_bits, u32 set_bits, u32 *old_value);
++
++/* DISR bits */
++#define DISR_STAT_ACK                   0x00000001
++/* Reserved, was Interface Error        0x00000002 */
++/* unused                               0x00000004 */
++#define DISR_CRIT_OP                    0x00000008
++#define DISR_REBOOT_INPROG              0x00000010
++#define DISR_RR_INPROG                  0x00000020
++#define DISR_DEBUG                      0x00000040
++#define DISR_STAT_SYNC                  0x00000080
++#define DISR_FLASH_TERM                 0x00000100
++#define DISR_RR_COMPLT                  0x00000200
++#define DISR_RUNTIME_TERM               0x00000400
++/* unused                               0x00000800 */
++/* unused                               0x00001000 */
++/* unused                               0x00002000 */
++/* Reserved, was Chip Reset Requested   0x00004000 */
++#define DISR_RSVD                       0xFFFF8000
++
++
++#endif
+diff --git a/include/uapi/linux/fsp/memprof.h b/include/uapi/linux/fsp/memprof.h
+new file mode 100644
+index 0000000..4cc1383
+--- /dev/null
++++ b/include/uapi/linux/fsp/memprof.h
+@@ -0,0 +1,83 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2007,2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifndef _MEMPROF_H
++#define _MEMPROF_H
++
++/* support for profiling memory allocator */
++#include <asm/atomic.h>
++#include <linux/list.h>
++#include <linux/spinlock.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/sched.h>
++
++
++/* backtrace hash support */
++#define BTDEPTH		4
++
++#define KMALLOC		1
++#define KFREE		2
++
++
++extern uint32_t slab_traceon;
++
++typedef struct btinfo_struct {
++	struct list_head list;		/* hash list */
++	unsigned long cachep;		/* cachep | wrapped */
++#define WRAP_MASK 0x1			/* cachep low bit set indicates that
++					   nhits has wrapped */
++	atomic_t nhits;			/* number of bt hits */
++	unsigned long bt[BTDEPTH];	/* backtrace */
++} btinfo_t;
++
++btinfo_t *btinfo_lookup_insert(unsigned int, unsigned long, unsigned long,
++			       unsigned long *);
++
++/* instrumentation for kmalloc */
++#define GET_BT(backtrace)						\
++{									\
++	uint cnt = 0;							\
++	unsigned long *prev_sp = (unsigned long *)(current->stack + 1); \
++	unsigned long *stack_top = 					\
++		(unsigned long *)current->stack + THREAD_SIZE;		\
++	unsigned long *sp;						\
++	asm("mr %0,1" : "=r" (sp));					\
++	__get_user(sp, (unsigned long **)sp);				\
++	while ((cnt < BTDEPTH) && (sp > prev_sp) && (sp < stack_top)) {	\
++		if (__get_user(backtrace[cnt], &sp[1]))			\
++			break;						\
++		if (__get_user(sp, (unsigned long **)sp))		\
++			break;						\
++		cnt++;							\
++	}								\
++}
++
++
++#define KMALLOC_TRACE(flag, size, ptr)					\
++{									\
++	if (slab_traceon) {						\
++		unsigned long backtrace[BTDEPTH] = {0};			\
++		GET_BT(backtrace);					\
++		(void)btinfo_lookup_insert(flag, size, (unsigned long)ptr, \
++					   backtrace);			\
++	}								\
++}
++
++
++#endif
+diff --git a/include/uapi/linux/fsp/pra.h b/include/uapi/linux/fsp/pra.h
+new file mode 100644
+index 0000000..bba77122
+--- /dev/null
++++ b/include/uapi/linux/fsp/pra.h
+@@ -0,0 +1,110 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2006, 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_PRA_H_
++#define _LINUX_FSP_PRA_H_
++
++#include <linux/types.h>
++
++/*
++ * NOTE: These values are also defined in FSP boot code.  If you change or add
++ * any values, be sure to make corresponding changes to the boot code PRA
++ * defines!
++ *
++ * For more information, see the FSP architecture and FSP kernel design
++ * documents.
++ */
++#define PRA_CHECKSUM			0
++#define PRA_CALLOUT			1
++#define PRA_BCU_STATE			2
++#define PRA_RR_COUNT			3
++#define PRA_SFT_RST_FLAVOR		4
++#define PRA_CURR_CHKPT			5
++#define PRA_MEM_INIT			6
++#define PRA_MEM_INIT_STATIC		7
++#define PRA_USER0			8
++#define PRA_USER1			9
++#define PRA_USER2			10
++#define PRA_USER3			11
++#define PRA_USER4			12
++#define PRA_USER5			13
++#define PRA_USER6			14
++#define PRA_USER7			15
++#define PRA_BOOT_FLAGS			16
++#define PRA_ANCHOR_SND			17
++#define PRA_BOOTSCRIPT			18
++#define PRA_BOOT_STATUS			19
++#define PRA_FFDC_LR			20
++#define PRA_BOOT_DUMP			21
++#define PRA_PABEND			22
++#define PRA_PABEND_A			23
++#define PRA_PABEND_B			24
++#define PRA_PABEND_C			25
++#define PRA_ORIG_RESET			26
++#define PRA_NETBOOT_DHCP_ERR		27
++#define PRA_NETBOOT_TFTP_ERR		28
++#define PRA_BOOT_ERR_VALUE		29
++#define PRA_BOOT_ERR_FLAGS		30
++#define PRA_BOOT_THRESHOLD_TIME		31
++#define PRA_BOOT_THRESHOLD_COUNT	32
++#define PRA_ANCHOR_FFS			33
++#define PRA_ANCHOR_ALT_FFS		34
++#define PRA_ORIG_RSTINFO		35
++#define PRA_BOOT_RR_COUNT		36
++#define PRA_NUMENTRIES			37 /* Must always be the largest key */
++
++/*
++ * PRA_CALLOUT
++ *
++ * 0000.0000.0011.1111.1111.2222.2222.2233
++ * 0123.4567.8901.2345.6789.0123.4567.8901
++ *			 TT TTTT XXXX XXXX
++ *			 || |||| callout summary: SW,HW,ECC error ...
++ *			 || |||icache parity error
++ *			 || ||dcache parity error
++ *			 || |tlb parity error
++ *                       || gpr parity error
++ *                       |fpr parity error
++ *                       L1/L2 error
++ */
++
++#define PRA_SWERR		0 /* SW error */
++#define PRA_HWERR		1 /* HW error */
++#define PRA_HWSWERR		2 /* HW or SW error */
++#define PRA_ECCERR		3 /* Uncorrectable ECC error */
++#define PRA_TLBCACHEERR		4 /* TLB cache parity error */
++#define PRA_WPAPARERR		5 /* wpa parity error */
++#define PRA_OOM			6 /* out of memory */
++#define PRA_FLASHERR		7 /* flash data integrity problems Nov2008 */
++#define PRA_CMU			8 /* CMU error */
++#define PRA_CONF_LOGIC		9 /* Configuration Logic parity error */
++#define PRA_MASK_SUMMARY	0xff /* mask for callout summary */
++
++/* The following bits are or'ed into PRA_CALLOUT, if the err occurs */
++#define PRA_CALLOUT_ICACHE	0x00000100 /* icache parity error */
++#define PRA_CALLOUT_DCACHE	0x00000200 /* dcache parity error */
++#define PRA_CALLOUT_TLB		0x00000400 /* tlb parity error */
++#define PRA_CALLOUT_GPR		0x00000800 /* GPR parity error */
++#define PRA_CALLOUT_FPR		0x00001000 /* FPR parity error */
++#define PRA_CALLOUT_L1_L2	0x00002000 /* L1/L2 error */
++
++int pra_read(unsigned int key, u32 *data);
++int pra_read_previous(unsigned int key, u32 *data);
++int pra_write(unsigned int key, u32 data);
++void pra_crash_save(void);
++
++#endif /* _LINUX_FSP_PRA_H_ */
+diff --git a/include/uapi/linux/fsp/reboot.h b/include/uapi/linux/fsp/reboot.h
+new file mode 100644
+index 0000000..62ea8f3
+--- /dev/null
++++ b/include/uapi/linux/fsp/reboot.h
+@@ -0,0 +1,32 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2011
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _LINUX_FSP_REBOOT_H_
++#define _LINUX_FSP_REBOOT_H_
++
++#include <linux/reboot.h>
++
++#define LINUX_REBOOT_CMD_COREDUMP	0x9A8BCCDD
++#define LINUX_REBOOT_CMD_TOOLRESET	0xF5900011
++#define LINUX_REBOOT_CMD_PINHOLE	0xFFFFFFFF
++#define LINUX_REBOOT_CMD_HOSTINIT	0xC0FEBABE
++#define LINUX_REBOOT_CMD_BOOTCODE	0xDEADBEEF
++
++#define LINUX_REBOOT_CMD_COREDUMP_STR	"NEWPABEND"
++#define LINUX_REBOOT_CMD_TOOLRESET_STR	"TOOL RESET"
++
++#endif
+diff --git a/include/uapi/linux/fsp/reset.h b/include/uapi/linux/fsp/reset.h
+new file mode 100644
+index 0000000..058a112
+--- /dev/null
++++ b/include/uapi/linux/fsp/reset.h
+@@ -0,0 +1,81 @@
++/*
++ * Copyright (c) International Business Machines Corp., 2012, 2013
++ *
++ * This program is free software;  you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See
++ * the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program;  if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++
++#ifndef _FSP_RESET_H_
++#define _FSP_RESET_H_
++
++#define DBSR_IDE        0x80000000      /* Imprecise Debug Event */
++#define DBSR_UDE        0x40000000      /* Unconditional Debug Event */
++#define DBSR_MRR        0x30000000      /* MRR Mask */
++#define DBSR_MRR_SYSTEM 0x30000000      /* MRR System */
++#define DBSR_MRR_CHIP   0x20000000      /* MRR Chip */
++#define DBSR_MRR_CORE   0x10000000      /* MRR Core */
++#define DBSR_MRR_NONE   0x00000000      /* MRR None */
++#define DBSR_ICMP       0x08000000      /* Instruction Compl Debug Event */
++#define DBSR_BRT        0x04000000      /* Branch Taken Debug Event */
++
++
++/**
++ * Specified reset originators.
++ */
++typedef enum {
++	RST_ORIG_UNKNOWN = 0,
++	RST_ORIG_CORE,
++	RST_ORIG_ASIC,
++	RST_ORIG_POWER,
++	RST_ORIG_EXTERNAL,
++} rst_origin_t;
++
++
++/**
++ * Specified reset types.
++ */
++typedef enum {
++	RST_TYPE_UNKNOWN = 0,
++	RST_TYPE_CORE,
++	RST_TYPE_CHIP,
++	RST_TYPE_SYSTEM,
++} rst_type_t;
++
++
++/**
++ * Specified reset reasons.
++ */
++typedef enum {
++	RST_REASON_UNKNOWN,
++	RST_REASON_CORE_WATCHDOG,
++	RST_REASON_RESTART,
++	RST_REASON_PANIC,
++	RST_REASON_HALT,
++	RST_REASON_POWER_OFF,
++	RST_REASON_POWER_CYCLE,
++	RST_REASON_PINHOLE,
++	RST_REASON_PARPORT,		/* No longer used */
++	RST_REASON_BOOTCODE,
++	RST_REASON_HOST_INITIATED,
++	RST_REASON_BOOT_WATCHDOG,
++	RST_REASON_UNIT_CHECK_TIMER,	/* No longer used */
++	RST_REASON_EXT_TOOL,
++	RST_REASON_PABEND,
++	RST_REASON_CHASSIS,
++	RST_REASON_PCIE,
++} rst_reason_t;
++
++extern struct atomic_notifier_head pre_kdump_notifier_list;
++
++#endif /* _FSP_RESET_H_ */
+diff --git a/include/uapi/linux/fsp/snd.h b/include/uapi/linux/fsp/snd.h
+new file mode 100644
+index 0000000..1aebae4
+--- /dev/null
++++ b/include/uapi/linux/fsp/snd.h
+@@ -0,0 +1,221 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2005, 2010
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ *
++ * **********************************************************************
++ *
++ * Safetynet driver header file.
++ *
++ * @author Gary Lowe <garylowe@us.ibm.com>
++ *
++ * @brief This file contains the header for the FSP-1 base Safetynet
++ * register function and Safetynet driver.
++ *
++ * **********************************************************************
++ */
++
++#ifndef _LINUX_SND_H
++#define _LINUX_SND_H
++
++#warning snd.h is deprecated.
++
++#ifdef __KERNEL__
++#include <linux/types.h>
++#else
++#include <stdint.h>
++#endif
++
++#define SND_MAGIC_NUMBER     (0x00D6B7EDUL)
++#define SND_SAFETY_NET_PAGES	3 /* main table */
++#define SND_INTERRUPT_PAGES	4 /* interrupt table */
++#if CONFIG_MODULES
++#define SND_MODULE_PAGES	1 /* list of modules */
++#else
++#define SND_MODULE_PAGES	0 /* no module support */
++#endif
++#define SND_SAFETY_NET_SIZE	(SND_SAFETY_NET_PAGES * PAGE_SIZE)
++#define SND_INTERRUPT_SIZE	(SND_INTERRUPT_PAGES * PAGE_SIZE)
++#define SND_MODULE_SIZE		(SND_MODULE_PAGES * PAGE_SIZE)
++#define SND_MAINAREA_SIZE	(SND_SAFETY_NET_SIZE+SND_INTERRUPT_SIZE+SND_MODULE_SIZE)
++#define SND_MAX_ENTRIES		((SND_SAFETY_NET_SIZE - sizeof(trace_safety_net_table)) / sizeof(trace_safety_net_entry))
++#define SND_MAX_TRACEBUFS	(SND_MAX_ENTRIES - 5)	/* 5 = 3 LTT buffers (irq, proc, trc), printk, and insmod */
++
++//#define SND_PROC_SIZE            PAGE_SIZE   /* size of process table     */
++#define SND_SAFETY_NET_NAME_SIZE 16 /* size of name in SAFETY_NET table   */
++#define SND_INTR_CTRL_NAME_SIZE  28 /* max size of interrupt ctrl name    */
++#define SND_INTR_OWNER_NAME_SIZE 28 /* max size of interrupt owner name   */
++#define SND_MODULE_NAME_SIZE     SND_SAFETY_NET_NAME_SIZE /* max size of module name */
++#define SND_FSP_TRACE_NAME_SIZE  16 /* max size of fsp-trace comp name    */
++#define SND_PROC_NAME_SIZE       6  /* max size of process names          */
++#define SND_PROC_NUM_PID         5  /* number of pid's to record          */
++
++#define SND_SAFETY_NET_VERSION   2
++#define SND_INTERRUPT_VERSION    1
++#define SND_MODULE_VERSION       2
++#define SND_PROC_VERSION         1
++#define SND_FSP_TRACE_VERSION    2
++
++#define SND_CURRENT              0
++#define SND_SAVED                1
++
++#define SND_GET_TABLE_HEAD		SND_MAGIC_NUMBER + 64
++#define SND_GET_TABLE_BUFFER		SND_MAGIC_NUMBER + 65
++#define SND_FREE_SAVED_TABLE		SND_MAGIC_NUMBER + 66
++
++/* ioctl buffer read commands need a buffer name, a pointer and a size.
++ * trace_safety_net_entry is useed for this: it has all the fields (name, virt, size).
++ * additionally the field "real" is used to select current (0) or saved (1) snd.
++ */
++
++/* define entry format in SAFETY_NET table */
++typedef struct _trace_safety_net_entry
++{
++	char name[SND_SAFETY_NET_NAME_SIZE];
++	uint32_t virt;
++	uint32_t real;
++	uint32_t size;
++} trace_safety_net_entry;
++
++/* define entry format for interrupt table */
++typedef struct _trace_interrupt_entry
++{
++	uint32_t num;
++	char handler[SND_INTR_CTRL_NAME_SIZE];
++	char owner[SND_INTR_OWNER_NAME_SIZE];
++} trace_interrupt_entry;
++
++/* define entry format for module entry */
++typedef struct _trace_safety_net_entry trace_module_entry;
++
++typedef struct _trace_proc_entry
++{
++	char name[SND_PROC_NAME_SIZE];
++	uint16_t pid[SND_PROC_NUM_PID];
++	uint16_t ppid[SND_PROC_NUM_PID];
++	uint16_t  cntr;
++} trace_proc_entry;
++
++/* define entry format in fsp-trace entry */
++typedef struct _trace_safety_net_entry trace_fsp_trace_entry;
++
++/* head of table information */
++typedef struct _trace_safety_net_table {
++	uint32_t magic;
++	uint32_t version;
++	uint32_t used;
++	uint32_t size;
++	trace_safety_net_entry entry[0];
++} trace_safety_net_table;
++
++/* head of interrupt table */
++typedef struct _trace_interrupt_table {
++	uint32_t version;
++	uint32_t used;
++	trace_interrupt_entry entry[0];
++} trace_interrupt_table;
++
++/* head of module table */
++typedef struct _trace_safety_net_table trace_module_table;
++
++/* header for proc table */
++typedef struct _trace_proc_table
++{
++	uint16_t version;
++	uint16_t wrapped;
++	uint32_t used;
++	trace_proc_entry entry[0];
++} trace_proc_table;
++
++/* header for fsp trace table */
++typedef struct _trace_fsp_trace_table
++{
++	uint32_t magic;
++	uint32_t version;
++	uint32_t used;
++	uint32_t size;
++	trace_fsp_trace_entry entry[0];
++} trace_fsp_trace_table;
++
++/* define names of FFDC items */
++#define SND_LTT_TRACE  "snd_ltt_trace"   /* ltt trace buffer       */
++#define SND_LTT_PROC   "snd_ltt_proc"    /* proc/interrupt info    */
++#define SND_LTT_INTR   "snd_ltt_intr"    /* interrupt information  */
++#define SND_PRINTK_BUF "snd_printk_buf"  /* printk buffer          */
++#define SND_PRINTK_IDX "snd_printk_idx"  /* last entry in printk   */
++#define SND_INSMOD_BUF "snd_insmod_buf"  /* location of insmod buf */
++#define SND_FSP_TRACE  "snd_fsp_trace"   /* fsp-trace buffer table */
++
++#define SND_FLAG_AVAIL   (0x80000000U)
++#define SND_FLAG_SAVED   (0x40000000U)
++#define SND_SIZE_SIZE(size)  ((size) & 0x00ffffff)
++
++#ifdef __KERNEL__
++
++#include <linux/interrupt.h>
++#include <linux/irq.h>
++#include <linux/module.h>
++
++/* avoid ifdef's each time snd is used */
++#ifdef CONFIG_FSP_SAFETYNET
++
++/* interfaces for registering SafetyNet items. */
++void snd_register(const char *, const void *, uint32_t);
++void snd_register_module_info(const struct module *);
++void snd_register_interrupt(const char *, uint32_t, const char *);
++
++/* get snd table pointer and size */
++int snd_get_table_pointer(trace_safety_net_table **paddr,
++			  size_t *psize,
++			  int whichone); /* SND_CURRENT or SND_SAVED */
++
++/* free saved snd */
++int snd_free_old_snd(void);
++
++/* initialize snd. to be called from do_init_bootmem */
++void snd_early_init(trace_safety_net_table *pdefault);
++
++static inline unsigned long snd_pages_needed(void) {
++	return SND_SAFETY_NET_PAGES + SND_INTERRUPT_PAGES;
++}
++
++
++/* register address in SafetyNet table */
++#define SND_REGISTER(NAME, ADDR, SIZE)		\
++	snd_register(NAME,ADDR,SIZE)
++#define SND_REGISTER_INTERRUPT(NAME, IRQ, HANDLER)	\
++	snd_register_interrupt(NAME, IRQ, HANDLER)
++
++#ifdef CONFIG_MODULES
++#define SND_REGISTER_MODULE(MOD)		\
++	snd_register_module_info(MOD)
++#else
++/* shouldn't be used anywhere. should we BUG? */
++#define SND_REGISTER_MODULE(MOD) do {} while(0)
++#endif
++
++#else
++
++#define SND_REGISTER(NAME, ADDR, SIZE) do {} while(0)
++#define SND_REGISTER_INTERRUPT(NAME, IRQ, IRQ_DESC) do {} while(0)
++#define SND_REGISTER_MODULE(MOD) do {} while(0)
++#define snd_pages_needed() (0)
++#define snd_early_init(x) do {} while(0)
++
++#endif
++
++#endif /* KERNEL */
++
++#endif
+diff --git a/include/linux/fsp/fsp.h b/include/linux/fsp/fsp.h
+new file mode 100644
+index 0000000..3294701
+--- /dev/null
++++ b/include/linux/fsp/fsp.h
+@@ -0,0 +1,40 @@
++/*
++ *   Copyright (c) International Business Machines Corp., 2012
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _PLATFORMS_FSP_FSP_H_
++#define _PLATFORMS_FSP_FSP_H_
++
++#include <linux/interrupt.h>
++
++extern void fsp_restart(char *);
++extern void fsp_panic(char *);
++extern void fsp_power_off(void);
++extern void fsp_halt(void);
++
++extern int fsp_machine_check_exception(struct pt_regs *);
++
++#if defined(CONFIG_FSP1)
++
++extern void show_eddr2_regs(void);
++
++#elif defined(CONFIG_FSP2)
++
++extern irqreturn_t reset_warning_irq(int irq, void *data);
++
++#endif
++
++#endif
