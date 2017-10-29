@@ -1,0 +1,142 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Samsung Electronics </manufacturerName>
+        <deviceAlgorithm> I2C EEPROM </deviceAlgorithm>
+        <maxBitrate> 400 </maxBitrate>
+        <writeTime> 5000 </writeTime>
+        <baseDeviceAddress> 0x50 </baseDeviceAddress>
+        <addressWidth> 2 </addressWidth>
+    </default>
+
+    <device version="1.0">
+        <deviceName> S524A40X10 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X10 128 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A40X11 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X11 128 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A40X20 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X20 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A40X21 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X21 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A40X40 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X40 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A40X41 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X41 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A60X81 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X81 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524A60X51 </deviceName>
+        <deviceDescription>
+            Samsung S524A40X51 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524AB0X91 </deviceName>
+        <deviceDescription>
+            Samsung S524AB0X91 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 4*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524AB0XB1 </deviceName>
+        <deviceDescription>
+            Samsung S524AB0XB1 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524AD0XD1 </deviceName>
+        <deviceDescription>
+            Samsung S524AD0XD1 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524AD0XF1 </deviceName>
+        <deviceDescription>
+            Samsung S524AD0XF1 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 32*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S524AE0XH1 </deviceName>
+        <deviceDescription>
+            Samsung S524AE0XH1 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 128 </writeSize>
+    </device>
+
+</devices>

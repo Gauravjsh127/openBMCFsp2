@@ -1,0 +1,54 @@
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<h2>Aardvark Control Center</h2>
+
+<h4>SPI Write Command</h4>
+
+<p align=right><a href="help.html"><img src="back-icon.png" width="15" height="15" border="0"></a>
+
+<pre>
+&lt;spi_write count="<i>count</i>"
+           radix="<i>radix</i>"&gt;
+     <i>message</i>
+&lt;/spi_write&gt;
+</pre>
+
+<p>Write a stream of bytes to the downstream SPI slave device and
+read back the full-duplex response.
+
+<p><b>Parameters</b>
+
+<dl>
+    <dt><b>count</b></dt>
+    <dd>The number of bytes to write (maximum 65535).
+    </dd>
+    <dt><b>radix</b></dt>
+    <dd>The base of the number system of the message, with the value being 10 for decimal, or 16 for hexadecimal.
+    </dd>
+    <dt><b>message</b></dt>
+    <dd>The message to transmit as a space separated list of
+numbers.
+    </dd>
+</dl>
+
+<p><b>Details</b>
+
+<p>If count is 0, no bytes will be written to the slave. However,
+the slave select line will be dropped for 5-10 microseconds.
+This can be useful in sending a signal to a downstream SPI slave
+without actually sending any bytes. For example, if an SPI slave has
+tied the slave select to an interrupt line and it sees the line is
+toggled without any bytes sent, it can interpret the action as a
+command to prepare its firmware for an subsequent reception of
+bytes. 
+
+<p>Please see the Aardvark I2C/SPI Embedded Systems Interface
+Datasheet for more information.
+
+<p align=right><a href="#top"><img src="top-icon.png" width="15" height="15" border="0"></a>
+
+</body>
+</html>

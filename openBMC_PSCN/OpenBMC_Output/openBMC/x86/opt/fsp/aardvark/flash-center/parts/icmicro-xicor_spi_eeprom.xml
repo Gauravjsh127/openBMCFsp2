@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> IC Microsystems / Xicor </manufacturerName>
+        <writeTime> 5000 </writeTime>
+        <deviceAlgorithm> SPI EEPROM </deviceAlgorithm>
+        <addressWidth> 2 </addressWidth>
+        <blockProtectBits> 0xC </blockProtectBits>
+    </default>
+
+    <device version="1.0">
+        <deviceName> X25020 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25020 256 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+        <maxBitrate> 1*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25021 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25021 256 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25040 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25040 512 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+        <maxBitrate> 1*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25041 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25041 512 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+        <maxBitrate> 1*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25080 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25080 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25128 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25128 16 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 16*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25160 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25160 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25170 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25170 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25256 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25256 32 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 32*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 64 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+        <blockProtectBits> 0x1c </blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25320 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 4*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25330 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25330 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 4*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25640 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25640 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 1*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25642 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25642 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25650 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25650 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25057 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25057 512 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+        <deviceBusyBit> 0x00</deviceBusyBit>
+        <writeEnableBits> 0x00 </writeEnableBits>
+        <blockProtectBits> 0x7 </blockProtectBits>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0xf8</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25097 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25097 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity> 1*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 5*1000 </maxBitrate>
+        <deviceBusyBit> 0x00</deviceBusyBit>
+        <writeEnableBits> 0x00 </writeEnableBits>
+        <blockProtectBits> 0x7 </blockProtectBits>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0xf8</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X25C02 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X25C02 256 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+        <maxBitrate> 1*1000 </maxBitrate>
+        <writeStatusRegisterInstruction>0</writeStatusRegisterInstruction>
+        <readStatusRegisterInstruction>0</readStatusRegisterInstruction>
+        <blockProtectBits>0</blockProtectBits>
+        <writeEnableBits>0</writeEnableBits>
+        <deviceBusyBit>0</deviceBusyBit>
+    </device>
+
+</devices>

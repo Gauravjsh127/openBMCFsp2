@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Atmel </manufacturerName>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <maxBitrate>33000</maxBitrate>
+        <addressWidth>3</addressWidth>
+        <writeSize>256</writeSize>
+        <writeTime>256*30</writeTime>
+        <readDummyBytes>0</readDummyBytes>
+        <writeStatusRegisterTime>60000</writeStatusRegisterTime>
+        <eraseTime>1000000</eraseTime>
+        <eraseInstruction>0x52</eraseInstruction>
+        <hasEraseAll>true</hasEraseAll>
+        <eraseAllInstruction>0x62</eraseAllInstruction>
+        <eraseAllTime>8000000</eraseAllTime>
+        <readDeviceIdInstruction>0x15</readDeviceIdInstruction>
+        <blockProtectBits>0x0c</blockProtectBits>
+    </default>
+
+    <device version="1.0">
+        <deviceName>AT25F1024A</deviceName>
+        <deviceDescription>
+           Atmel AT25F1024A 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>128*1024</capacity>
+        <expectedDeviceId>\x1f\x60</expectedDeviceId>
+        <eraseSize>32*1024</eraseSize>
+        <eraseTime>1100000</eraseTime>
+        <eraseAllTime>3500000</eraseAllTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25F2048</deviceName>
+        <deviceDescription>
+           Atmel AT25F2048 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>256*1024</capacity>
+        <expectedDeviceId>\x1f\x63</expectedDeviceId>
+        <eraseSize>64*1024</eraseSize>
+        <eraseAllTime>4000000</eraseAllTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25F4096</deviceName>
+        <deviceDescription>
+           Atmel AT25F4096 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>512*1024</capacity>
+        <writeStatusRegisterTime>40000</writeStatusRegisterTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <expectedDeviceId>\x1f\x64</expectedDeviceId>
+        <eraseSize>64*1024</eraseSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25F512A</deviceName>
+        <deviceDescription>
+            Atmel AT25F512A 64 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>64*1024</capacity>
+        <expectedDeviceId>\x1f\x65</expectedDeviceId>
+        <eraseSize>32*1024</eraseSize>
+        <writeSize>128</writeSize>
+        <writeTime>128*75</writeTime>
+        <eraseTime>1100000</eraseTime>
+        <eraseAllTime>2000000</eraseAllTime>
+        <blockProtectBits>0x04</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25FS010</deviceName>
+        <deviceDescription>
+            Atmel AT25FS010 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>50000</maxBitrate>
+        <capacity>128*1024</capacity>
+        <eraseSize>4*1024</eraseSize>
+        <eraseTime>50000</eraseTime>
+        <eraseAllTime>8000000</eraseAllTime>
+        <blockProtectBits>0x6c</blockProtectBits>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+        <readInstruction>0x0b</readInstruction>
+        <readDummyBytes>1</readDummyBytes>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\x1f\x66\x01</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25FS040</deviceName>
+        <deviceDescription>
+            Atmel AT25FS040 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>50000</maxBitrate>
+        <capacity>512*1024</capacity>
+        <eraseSize>4*1024</eraseSize>
+        <writeSize>256</writeSize>
+        <eraseTime>50000</eraseTime>
+        <eraseAllTime>8000000</eraseAllTime>
+        <blockProtectBits>0x7c</blockProtectBits>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+        <readInstruction>0x0b</readInstruction>
+        <readDummyBytes>1</readDummyBytes>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\x1f\x66\x04</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT25DF041A</deviceName>
+        <deviceDescription>
+            Atmel AT25DF041A 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>512*1024</capacity>
+        <maxBitrate>70*1000</maxBitrate>
+        <writeTime>1200</writeTime>
+        <readDummyBytes>1</readDummyBytes>
+        <readInstruction>0x0b</readInstruction>
+        <writeStatusRegisterTime>1</writeStatusRegisterTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\x1f\x44\x01\x00</expectedDeviceId>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <eraseTime>50000</eraseTime>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+        <eraseAllTime>3000000</eraseAllTime>
+    </device>
+
+</devices>

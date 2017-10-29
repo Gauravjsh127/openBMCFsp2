@@ -1,0 +1,6 @@
+check in kernel and rootfs binary
+cvs tag is recoveryImageBinary 
+This is done as the ubi image does not work correctly
+kernel is build using fsp1recover_defconfig
+rootfs is build in /opt/fsp/buildrootfs/rootfs.mfg.initrd.gz date 04/07 
+u-boot is tag recoverImageUBootBinary  

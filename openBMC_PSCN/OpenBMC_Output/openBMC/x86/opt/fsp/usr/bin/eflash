@@ -1,0 +1,1313 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import time
+import zlib
+import getopt
+import struct
+import socket
+import logging
+import select
+import traceback
+
+__author__ = "Ivan Mikhaylov <ivan@ru.ibm.com>, Bradley Bishop <bradleyb@us.ibm.com>"
+__license__ = "GPLv2"
+__copyright__ = "Copyright (c) IBM Corp. 2013-2014 "
+__version__ = 0.7
+
+DEFAULT_PORT = 31337
+
+def fmt_except():
+	error_type, error_value, trbk = sys.exc_info()
+	tb_list = traceback.format_tb(trbk)
+	info = "\nDescription: %s \n" %(error_value)
+	info += "Traceback:\n"
+	for tb in tb_list:
+		info += tb
+	return info + "\n"
+
+class Log(object):
+	__rootLogger = None
+
+	def __init__(self, fobj  = sys.stdout):
+		if self.__rootLogger == None:
+			logging.basicConfig(level = logging.ERROR,
+					format = "%(asctime)s%(message)s",
+					datefmt = "[%d-%m-%Y][%H:%M:%S]",
+					stream = fobj)
+			self.__rootLogger = logging.getLogger()
+
+	def getLogger(self):
+		return self.__rootLogger
+
+log = Log().getLogger()
+
+class array_list(object):
+
+	def __init__(self, array):
+		self.__arr = array
+
+	def __getitem__(self, key):
+		return self.__arr[key].get_val()
+
+	def __setitem__(self, key, value):
+		self.__arr[key].set_val(value)
+
+	def __len__(self):
+		return len(self.__arr)
+
+	def __repr__(self):
+		s = "["
+		for i in range(0, len(self.__arr)):
+			s += str(self.__arr[i].get_val())
+			if i < (len(self.__arr) - 1):
+				s += ", "
+			else:
+				s += "]"
+		return s
+
+class IStruct(object):
+	""" Abstract class for Structure """
+
+	def __init__(self):
+		self._instances = {}
+		def recursion_init(fields, instance = None):
+			for field in fields:
+				_name = field[0]
+				_class = field[1]
+				_sz = field[2]
+
+				if issubclass(_class, Struct):
+
+					inst = _class()
+					instance._instances[_name] = inst
+					setattr(instance, _name, inst)
+					recursion_init(inst._fields_, inst)
+
+				else:
+					if _sz == 1:
+						inst = _class()
+						instance._instances[_name] = inst
+						setattr(instance, _name, inst.get_val())
+					elif _sz > 1:
+
+						instance_list = []
+						for i in range(0, _sz):
+							inst = _class()
+							inst.set_array_size(_sz)
+							instance_list.append(inst)
+						array_il = array_list(instance_list)
+
+						instance._instances[_name] = instance_list
+						setattr(instance, _name, array_il)
+		recursion_init(self._fields_, self)
+		self._endian = None
+
+	@classmethod
+	def sizeof(self):
+		def recursion_size(fields):
+			size = 0
+			for field in fields:
+				if issubclass(field[1], Struct):
+					size += recursion_size(field[1]._fields_)
+				else:
+					size += field[1].get_size() * field[2]
+			return size
+		return recursion_size(self._fields_)
+
+	def __repr__(self):
+		string = "\nstructure\n"
+		string += "_________\n"
+
+		for item in self._fields_:
+			name = item[0]
+			val = getattr(self, name)
+			string += "%s : %s\n"%(name, str(val))
+		string += "_________\n"
+		return string
+
+	def __recursion_send(self, fields, instance, bstr = ""):
+		log.debug("send struct %s", instance)
+		for field in fields:
+			if instance._instances.has_key(field[0]):
+				inst = instance._instances[field[0]]
+			else:
+				raise Exception
+
+			if isinstance(inst, Struct):
+				bstr += self.__recursion_send(inst._fields_, inst, bstr)
+			else:
+				if type(inst) == list:
+					for i in range(0, inst[0].get_array_size()):
+						_type = self._endian + inst[i].get_type()
+						_val = inst[i].get_val()
+						log.debug("struct field, type, value %s %s %s", field, _type, _val)
+
+						bstr += struct.pack(_type, _val)
+				else:
+					_type = self._endian + inst.get_type()
+					_val = inst.get_val()
+					log.debug("struct field, type, value %s %s %s", field, _type, _val)
+
+					bstr += struct.pack(_type, _val)
+		return bstr
+
+	def send(self):
+		return self.__recursion_send(self._fields_, self)
+
+	def __recursion_recv(self, fields, instance, data, p = 0):
+		for field in fields:
+			if instance._instances.has_key(field[0]):
+				inst = instance._instances[field[0]]
+			else:
+				raise Exception
+
+			if isinstance(inst, Struct):
+				p += self.__recursion_recv(inst._fields_, inst, data, p)
+			else:
+				if type(inst) == list:
+					for i in range(0, inst[0].get_array_size()):
+						_type = self._endian + inst[i].get_type()
+						_val = data[p:p + inst[i].get_size()]
+						unpack_val = struct.unpack(_type, _val)[0]
+						inst[i].set_val(unpack_val)
+						p += inst[i].get_size()
+				else:
+					_type = self._endian + inst.get_type()
+					_val = data[p:p + inst.get_size()]
+					unpack_val = struct.unpack(_type, _val)[0]
+					inst.set_val(unpack_val)
+					p += inst.get_size()
+					setattr(instance, field[0], inst.get_val())
+		return p
+
+	def recv(self, data):
+		self.__recursion_recv(self._fields_, self, data)
+
+	def __setattr__(self, name, value):
+		if hasattr(self, "_instances"):
+			if self._instances.has_key(name):
+				e = self._instances[name]
+				if type(e) != list and not isinstance(e, Struct):
+					e.set_val(value)
+		self.__dict__[name] = value
+
+class pod_type(object):
+
+	def __init__(self):
+		self.__array = 0
+		self.__array_size = 0
+		self._val = 0
+
+	@classmethod
+	def get_size(self):
+		return self._size
+
+	@classmethod
+	def get_type(self):
+		return self._type
+
+	def get_val(self):
+		if isinstance(self, c_char):
+			return str(self._val)
+		else:
+			return long(self._val)
+
+	def set_val(self, data):
+		self._val = data
+
+	def set_array_size(self, size):
+		self.__array_size = size
+
+	def get_array_size(self):
+		return self.__array_size
+
+class c_char(pod_type):
+
+	_type = "c"
+	_size = 1
+
+class c_int8(pod_type):
+
+	_type = "b"
+	_size = 1
+
+class c_int16(pod_type):
+
+	_type = "h"
+	_size = 2
+
+class c_int32(pod_type):
+
+	_type = "l"
+	_size = 4
+
+class c_int64(pod_type):
+
+	_type = "q"
+	_size = 8
+
+class c_uint8(pod_type):
+
+	_type = "B"
+	_size = 1
+
+class c_uint16(pod_type):
+
+	_type = "H"
+	_size = 2
+
+class c_uint32(pod_type):
+
+	_type = "L"
+	_size = 4
+
+class c_uint64(pod_type):
+
+	_type = "Q"
+	_size = 8
+
+class LStruct(IStruct):
+
+	def __init__(self):
+		IStruct.__init__(self)
+		self._endian = "<"
+
+class BStruct(IStruct):
+
+	def __init__(self):
+		IStruct.__init__(self)
+		self._endian = ">"
+
+class Struct(LStruct, BStruct):
+
+	def __init__(self, little = True):
+		if little:
+			LStruct.__init__(self)
+			self.__little = 1
+		else:
+			BStruct.__init__(self)
+			self.__little = 0
+
+	def send(self):
+		if self.__little:
+			return super(Struct, self).send()
+		else:
+			return super(LStruct, self).send()
+
+	def recv(self, data):
+		if self.__little:
+			super(Struct, self).recv(data)
+		else:
+			super(LStruct, self).recv(data)
+
+
+class ident_t(Struct):
+	_fields_ = [
+		("magic", c_char, 4),
+		("major", c_char, 1),
+		("minor", c_char, 1),
+		("patch", c_char, 1),
+		("flags", c_char, 1),
+	]
+
+class string_array_header_t(Struct):
+	_fields_ = [
+		("id", ident_t, 1),
+		("count", c_uint32, 1),
+	]
+
+class flash_header_t(Struct):
+	FLASH_NAME_SIZE = 24
+	_fields_ = [
+		("id", ident_t, 1),
+		("toc_off", c_uint64, 1),
+		("toc_sz", c_uint32, 1),
+		("name", c_char, FLASH_NAME_SIZE),
+	]
+
+class flash_toc_entry_t(Struct):
+	PADDING_SIZE = 3
+	_fields_ = [
+		("full_name", c_uint32, 1),
+		("section_name", c_uint32, 1),
+		("section_device", c_uint32, 1),
+		("section_alignment", c_uint32, 1),
+		("section_sz", c_uint64, 1),
+		("section_off", c_uint64, 1),
+		("section_flags", c_uint32, 1),
+		("section_parent", c_int32, 1),
+		("section_id", c_int32, 1),
+		("file_name", c_uint32, 1),
+		("data_sz", c_uint64, 1),
+		("data_off", c_uint64, 1),
+		("data_crc", c_uint32, 1),
+		("section_fill", c_uint8, 1),
+		("padding", c_uint8, PADDING_SIZE),
+	]
+
+class flash_toc_t(Struct):
+	_fields_ = [
+		("str_off", c_uint64, 1),
+		("str_sz", c_uint32, 1),
+		("entry_sz", c_uint16, 1),
+		("entry_count", c_uint16, 1),
+		("flash_toc_entry", flash_toc_entry_t, 1),
+	]
+
+
+class uboot_header_script_t(BStruct):
+	_fields_ = [
+		("len", c_uint32, 1),
+		("padding", c_uint32, 1),
+	]
+
+class uboot_header_t(BStruct):
+	""" format from perl :
+
+	$body = pack ("Nxxxx", length $body) . $body;
+
+	$head = pack ("N", 0x27051956)		# [0,0] Magic Number
+		pack ("N", 0)			# [0,1] Header CRC (TBD)
+		pack ("N", time) 		# [0,2] Timestamp
+		pack ("N", length $body)	# [0,3] Length of body + 8
+		pack ("N", 0)			# [1,0] Load point
+		pack ("N", 0)			# [1,1] Entry point
+		pack ("N", crc32 ($body, 0))	# [1,2] Body CRC
+		pack ("C", 5)			# [1,3]0 OS (5, Linux)
+		pack ("C", 7)			# [1,3]1 Architecture (7, PPC)
+		pack ("C", 6)			# [1,3]2 Type (6, Script)
+		pack ("C", 0)			# [1,3]3 Compression (0, None)
+		pack ("a[32]", "Flashing via Ethernet Script");
+	"""
+	NM_SZ = 32
+	_fields_ = [
+		("magic", c_uint32, 1),
+		("crc_tbd", c_uint32, 1),
+		("timestamp", c_uint32, 1),
+		("length", c_uint32, 1),
+		("load_point", c_uint32, 1),
+		("entry_point", c_uint32, 1),
+		("crc_script", c_uint32, 1),
+		("os", c_uint8, 1),
+		("arch", c_uint8, 1),
+		("type", c_uint8, 1),
+		("compression", c_uint8, 1),
+		("name", c_char, NM_SZ),
+	]
+
+class Parser(object):
+	""" Class for parsing of flash image.
+	    Image have this format :
+
+	    flash_header(always in head of file)
+	    flash_header.toc_off -> flash_toc
+	    flash_toc
+
+	    first_entry = flash_toc.flash_toc_entry
+	    off = flash_header.toc_off + sizeof(flash_toc)
+	    for i in range(0, flash_toc.entry_count - 1):
+		entry = read(fd, sizeof(flash_toc_enty))
+		off += sizeof(flash_toc_entry)
+
+	    string_array_head(after all entries)
+	    for i in range(0, string_array_head.count):
+		sz_string = read(fd, STRING_SZ)
+		string = read(fd, sz_string)
+
+	"""
+
+	SECTION_FLAG_NOBITS = 0x1
+	SECTION_PROTECTED = 0x10
+	END_OF_FILE = "end-of-file"
+	STRING_SZ = 2
+	LE = 1
+	BE = 2
+	def __new__(cls, filep, offset):
+		if not os.path.exists(filep):
+			log.error("file doesn't exist : %s"%filep)
+			raise IOError
+		if not os.access(filep, os.R_OK):
+			log.error("not readable file, check your permissions : %s"%filep)
+			raise IOError
+		return super(Parser, cls).__new__(cls)
+
+	def __init__(self, filep, offset = None):
+		log.debug("-Constructor was called %s-"%(self))
+		self.__fd = os.open(filep, os.O_RDONLY)
+		self.__offset = 0
+		if offset:
+			self.__offset = offset
+			os.lseek(self.__fd, offset, os.SEEK_SET)
+		self.__header = None
+		self.__toc = None
+		self.__toc_entries = []
+		self.__string_entries = []
+		self.__endianess = self.LE
+		self.__img_name = ""
+
+	def __del__(self):
+		os.close(self.__fd)
+		if log:
+			log.debug("-Destructor was called %s-"%(self))
+
+	def __get_struct(self, _struct):
+		if  self.__endianess == self.LE:
+			return _struct()
+		else:
+			return _struct(little = False)
+
+	def get_offset(self):
+		return self.__offset
+
+	def parse_header(self):
+		""" parsing of flash header """
+		data = os.read(self.__fd, flash_header_t.sizeof())
+		self.__header = flash_header_t()
+		self.__header.recv(data)
+		if self.__header.id.flags == self.LE:
+			self.__endianess = self.LE
+		elif self.__header.id.flags == self.BE:
+			self.__endianess = self.BE
+		if not (self.__header.id.magic[0] == "F" and \
+		self.__header.id.magic[1] == "L" and \
+		self.__header.id.magic[2] == "S" and \
+		self.__header.id.magic[3] == "I"):
+			log.error("wrong magic for header")
+			return None
+		for char in self.__header.name:
+			self.__img_name += char
+		return self.__header
+
+	def get_img_name(self):
+		return self.__img_name
+
+	def parse_toc(self):
+		""" parsing of table of contents """
+		if self.__header:
+			off = self.__header.toc_off
+			sz = self.__header.toc_sz
+			os.lseek(self.__fd, off, os.SEEK_SET)
+			data = os.read(self.__fd, sz)
+			self.__toc = self.__get_struct(flash_toc_t)
+			self.__toc.recv(data)
+			return self.__toc
+		else:
+			log.error("flash header is not parsed")
+			return None
+
+	def parse_toc_entries(self):
+		""" parsing of toc entries """
+		if self.__toc:
+			entry_count = self.__toc.entry_count
+			self.__toc_entries.append(self.__toc.flash_toc_entry)
+			e = self.__toc.flash_toc_entry
+			off = self.__header.toc_off + flash_toc_t.sizeof()
+			sz = flash_toc_entry_t.sizeof()
+			""" first entry in struct """
+			for i in range(0, entry_count - 1):
+				os.lseek(self.__fd, off, os.SEEK_SET)
+				data = os.read(self.__fd, sz)
+				entry = self.__get_struct(flash_toc_entry_t)
+				entry.recv(data)
+				e = entry
+				self.__toc_entries.append(entry)
+				off += flash_toc_entry_t.sizeof()
+
+			data = os.read(self.__fd, string_array_header_t.sizeof())
+			sah = self.__get_struct(string_array_header_t)
+			sah.recv(data)
+			off += string_array_header_t.sizeof()
+			for i in range(0, sah.count):
+				""" <2byte==size><string><2byte==size><string> """
+				data = os.read(self.__fd, self.STRING_SZ)
+				off += self.STRING_SZ
+				length = struct.unpack('<H', data)[0]
+				data = os.read(self.__fd, length)
+				off += length
+				string =  struct.unpack("<%is"%(length), data)[0]
+				self.__string_entries.append(string)
+
+			for i in range(0, entry_count):
+				log.debug("%s"%(self.__toc_entries[i]))
+			log.debug("string_entries :\n %s"%(self.__string_entries))
+			self.__offset = off
+			return self.__toc_entries
+		else:
+			log.error("toc is not parsed")
+			return None
+
+	def get_entry(self, index):
+		if len(self.__toc_entries) == 0:
+			log.error("no any entries")
+			return None
+		try:
+			return self.__toc_entries[index]
+		except ValueError:
+			log.error("entry does not exist")
+			return None
+
+	def get_string_entries(self):
+		return self.__string_entries
+
+	def get_data(self, off, sz):
+		os.lseek(self.__fd, off, os.SEEK_SET)
+		data = os.read(self.__fd, sz)
+		return data
+
+	def get_length(self):
+		return len(self.__toc_entries)
+
+	def is_protected(self, name):
+		se = self.get_string_entries()
+		for i in range(0, self.get_length()):
+			e = self.get_entry(i)
+			if name.partition('\0')[0] in (se[e.section_name].partition('\0')[0], \
+					se[e.full_name].partition('\0')[0]):
+				if e.section_flags & self.SECTION_PROTECTED:
+					return True
+
+	def find_section(self, name):
+		se = self.get_string_entries()
+		for i in range(0, self.get_length()):
+			e = self.get_entry(i)
+			if name.partition('\0')[0] in (se[e.section_name].partition('\0')[0], \
+					se[e.full_name].partition('\0')[0]):
+				return i
+
+	def get_toplevel_sections(self):
+		sections = []
+		se = self.get_string_entries()
+		for i in range(0, self.get_length()):
+			e = self.get_entry(i)
+			if e.section_flags & self.SECTION_FLAG_NOBITS:
+				sections.append(se[e.full_name])
+		return sections
+
+	def is_image(self, name):
+		if self.__img_name.partition('\0')[0] == name:
+			return True
+		return False
+
+class CommandExecutor(object):
+	CLEAR_NVRAM = "nvr"
+	TOOL_RESET = "rst"
+	REBOOT = "boo"
+	SHUTDOWN = "svc"
+	UMOUNT = "umn"
+	INFO = "get"
+	MEMORY_TRANSFER = "mem"
+	ROUTE = "rte"
+	RCV_SZ = 256
+	MAGIC = 0x27051956
+	FLASH = "fl5"
+	RAWFLASH = "fla"
+
+	MODE = "sys"
+	MAINT_MODE = "maintenance"
+	NORM_MODE = "normal"
+	SELECT_TIME = 1
+	RECV_TIMEOUT = 800
+
+	""" class with simple protocol which working with eflashd """
+
+	def __new__(cls, host, port, flash):
+		cls.__parsers = []
+		if not flash:
+			return super(CommandExecutor, cls).__new__(cls)
+		offset = None
+		while 1:
+			p = Parser(flash, offset)
+			header = p.parse_header()
+			if not header:
+				log.error("header is not possible to parse")
+				raise Exception
+
+			name = p.get_img_name()
+			if p.END_OF_FILE in name:
+				break
+
+			if not p.parse_toc():
+				log.error("toc is not possible to parse")
+				raise Exception
+
+			if not p.parse_toc_entries():
+				log.error("toc_entries is not possible to parse")
+				raise Exception
+
+			cls.__parsers.append(p)
+			offset = p.get_offset()
+
+		log.debug("list of parsers : %s", str(cls.__parsers))
+
+		return super(CommandExecutor, cls).__new__(cls)
+
+	def __init__(self, host, port, flash):
+		log.debug("-Constructor was called %s-"%(self))
+		self.__host = host
+		self.__port = port
+		self.__mode = None
+		self.__socket = None
+
+	def get_partitions(self):
+		return self.__parsers
+
+	def __del__(self):
+		self.__parsers = None
+		if log:
+			log.debug("-Destructor was called %s-"%(self))
+		if not self.__socket:
+			if log:
+				log.error("socket doesn't exist")
+			return None
+		self.close()
+		self.__socket = None
+
+	def connect(self):
+		try:
+			self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			# enabled 'linger' mechanism and set timeout 15
+			self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER,\
+						struct.pack('ii', 1, 15))
+
+			log.warning("connecting to the host...")
+			self.__socket.connect((self.__host, self.__port))
+			log.warning("succesfully connected")
+			return True
+		except:
+			log.error("socket can't connect to the host : %s, \
+					port: %i"%(self.__host, self.__port))
+			return False
+
+	def __send(self, data):
+		if not self.connect():
+			log.error("can't send any info, not connected")
+			raise Exception
+
+		length = len(data)
+		lvl = log.getEffectiveLevel()
+		for chunk in range(1, length + 1):
+			try:
+				self.__socket.send(data[(chunk - 1):chunk])
+			except:
+				log.debug(fmt_except())
+				log.error("couldn't send data")
+
+			if lvl == logging.WARNING or lvl == logging.DEBUG:
+				percent = int((chunk/float(length)) * 100)
+				sys.stdout.write("\r[" + percent/10 * '#' + (10 - percent/10) * " " + ']')
+				sys.stdout.write(" %d%%" % percent)
+				sys.stdout.flush()
+
+		if lvl == logging.WARNING or lvl == logging.DEBUG:
+			sys.stdout.write("\n")
+
+	def __cmd_send(self, type):
+		rdata = self.__pack("%is"%(len(type)), type)
+		self.__send(rdata)
+
+	def close(self, timeout = RECV_TIMEOUT):
+		if not self.__socket:
+			log.error("socket doesn't exist")
+			return None
+		log.warning("closing the connection...")
+		try:
+			self.__socket.shutdown(socket.SHUT_WR)
+			log.warning("socket succesfully shutdown")
+		except:
+			log.warning("can't shutdown the socket")
+
+		try:
+			self.__recv(timeout)
+			log.warning("succesfully received")
+		except:
+			log.warning("recv problems")
+
+		try:
+			self.__socket.close()
+			log.warning("succesfully closed")
+		except:
+			log.warning("can't close the socket")
+
+	def wait(self, mode, timeout = 180):
+		_time = time.time()
+		while 1:
+			try:
+				__mode = self.get_mode()
+			except:
+				if (time.time() >= (_time + timeout)):
+					log.error("target is not responding, timeout")
+					break
+				time.sleep(1)
+				continue
+
+			if __mode == mode:
+				break
+
+			if (time.time() >= (_time + timeout)):
+				log.error("target is not responding, timeout")
+
+			time.sleep(1)
+
+	def __recv(self, timeout = 5):
+		time = timeout
+		data = ""
+		log.debug("receiving data...")
+		try:
+			while time > 0:
+				ready = select.select([ self.__socket ],
+								[], [],
+								self.SELECT_TIME)
+				if not ready[0]:
+					time -= self.SELECT_TIME
+					continue
+
+				d = self.__socket.recv(self.RCV_SZ)
+				if not d:
+					break
+				else:
+					data += d
+		except:
+			log.debug(fmt_except())
+			log.debug("__recv problems")
+
+		log.debug("server received data : %s", data)
+		return data
+
+	def unmount_fs(self):
+		log.warning("umount fs")
+		self.__cmd_send(self.UMOUNT)
+		self.close()
+
+	def __parse_info(self, data):
+
+		def long2ip(ip):
+			return socket.inet_ntoa(struct.pack("!L", ip))
+
+		def ip2long(ip):
+			return struct.unpack("!L", socket.inet_aton(ip))[0]
+
+		log.warning(data)
+		ip = {0 : {}, 1: {}}
+		pairs = data.split(",")
+		map = {}
+		for i in pairs:
+			if i:
+				pair = i.split("=")
+				map[pair[0]] = pair[1]
+
+		if map.has_key("ipaddr0"):
+			ip[0]["ipaddr"] = map["ipaddr0"]
+			ip[0]["netmask"] = map["netmask0"]
+			#ip | (netmask ^ 0xffffffff)
+			ip[0]["bcast"] = long2ip(ip2long(ip[0]["ipaddr"]) | \
+					(ip2long(ip[0]["netmask"]) ^ 0xffffffff))
+
+		if map.has_key("ipaddr1"):
+			ip[1]["ipaddr"] = map["ipaddr1"]
+			ip[1]["netmask"] = map["netmask1"]
+			#ip | (netmask ^ 0xffffffff)
+			ip[1]["bcast"] = long2ip(ip2long(ip[1]["ipaddr"]) | \
+					 (ip2long(ip[1]["netmask"]) ^ 0xffffffff))
+
+		if not (map.has_key("ipaddr0") or map.has_key("ipaddr1")):
+			log.error("network is not set correct")
+			raise Exception
+
+		log.warning(ip)
+		return ip
+
+	def __parse_route(self, data):
+		lines = data.splitlines()
+		route = None
+		for i in lines:
+			array = i.split(None, 5)
+			try:
+				flags = int(array[3])
+				ip = int(array[1], 16)
+				# second bit is G/gateway in flags
+				if flags & 2 == 2:
+					route = int(array[2], 16)
+					break
+			except:
+				continue
+
+			if ip == 0:
+				break
+
+		if not route:
+			log.error("did not find default route")
+			raise Exception
+
+		return socket.inet_ntoa(struct.pack("!L", route))
+
+	def __build_script(self, ip, route):
+		header = "echo\necho FSP-2 Flashing via Ethernet\necho\n"
+		if (ip[0].has_key("ipaddr")):
+			ip0 = "setenv ipaddr0 %s\\' \\'netmask0=%s bcast0=%s\n"\
+				%(ip[0]["ipaddr"], ip[0]["netmask"], ip[0]["bcast"])
+		else:
+			ip0 = ""
+
+		if (ip[1].has_key("ipaddr")):
+			ip1 = "setenv ipaddr1 %s\\' \\'netmask1=%s bcast1=%s\n"\
+				%(ip[1]["ipaddr"], ip[1]["netmask"], ip[1]["bcast"])
+		else:
+			ip1 = ""
+
+		rte = "setenv bootmode flash ${bootmode} fspgateway=%s\n"%(route)
+		text = "setenv set_series_bootargs setenv series_bootargs \n"
+		text += "setenv setmoduleparams setenv module_params \n"
+		text += "echo\n"
+		text += "echo\n"
+		text += "echo ----------------------------------------------\n"
+		text += "echo\n"
+		text += "echo\n"
+		text += "printenv\n"
+		text += "echo\n"
+		text += "echo\n"
+		text += "echo ----------------------------------------------\n"
+		text += "echo\n"
+		text += "echo\n"
+		text += "echo booting image\n"
+		script = header + ip0 + ip1 + rte + text
+		log.debug("uboot script : %s\n", script)
+		return script
+
+	def __build_image(self, script):
+		sh = uboot_header_script_t()
+		sh.len = len(script)
+		sh.padding = 0
+		tmpscript = sh.send()
+		tmpscript += script
+
+		uh = uboot_header_t()
+		uh.magic = self.MAGIC
+		uh.crc_tbd = 0
+		uh.timestamp = int(time.time())
+		uh.length = len(tmpscript)
+		uh.load_point = 0
+		uh.entry_point = 0
+		uh.crc_script = zlib.crc32(tmpscript, 0) & 0xffffffff
+
+		uh.os = 5 # OS (5, Linux)
+		uh.arch = 7 # Architecture (7, PPC)
+		uh.type = 6 # Type (6, Script)
+
+		uh.compression = 0
+		uh.name = "Flashing via Ethernet Script"
+		header = uh.send()
+		uh.crc_tbd = zlib.crc32(header, 0) & 0xffffffff
+		header = uh.send()
+
+		image = header + tmpscript
+		log.debug("len of script : %u, len of header : %u", len(tmpscript), len(header))
+		return image
+
+	def get_info(self):
+		log.warning("get info")
+		self.__cmd_send(self.INFO)
+		data = self.__recv()
+		rdata = self.__parse_info(data)
+		self.close()
+		return rdata
+
+	def get_route(self):
+		log.warning("get route")
+		self.__cmd_send(self.ROUTE)
+		data = self.__recv()
+		rdata = self.__parse_route(data)
+		self.close()
+		return rdata
+
+	def generate_image(self):
+		log.warning("generate image")
+		ip = self.get_info()
+		route = self.get_route()
+		script = self.__build_script(ip, route)
+		rdata = self.__build_image(script)
+		return rdata
+
+	def load_image(self, image):
+		log.warning("load image")
+		self.__cmd_send(self.MEMORY_TRANSFER)
+		self.__socket.send(image)
+		self.close()
+
+	def reboot(self):
+		log.warning("reboot")
+		self.__cmd_send(self.REBOOT)
+		self.close(5)
+
+	def tool_reset(self):
+		log.warning("tool reset")
+		self.__cmd_send(self.TOOL_RESET)
+		self.close(5)
+
+	def maint(self, force = False):
+		log.warning("starting maint mode...")
+		if self.get_mode() == self.MAINT_MODE:
+			log.error("already in maint mode")
+			return force
+		self.shutdown()
+		self.unmount_fs()
+		image = self.generate_image()
+		self.load_image(image)
+		self.reboot()
+		return True
+
+	def clear_nvram(self):
+		log.warning("clear nvram")
+		self.__cmd_send(self.CLEAR_NVRAM)
+		self.close()
+
+	def shutdown(self):
+		log.warning("shutdown")
+		self.__cmd_send(self.SHUTDOWN)
+		self.close()
+
+	def get_mode(self):
+		log.warning("get mode")
+		self.__cmd_send(self.MODE)
+		data = self.__recv()
+		if "on" in data:
+			self.__mode = self.MAINT_MODE
+		elif "off" in data:
+			self.__mode = self.NORM_MODE
+
+		self.close()
+		return self.__mode
+
+	def load_raw(self, info, force = False):
+		log.debug("load_raw: %s"%info)
+		LEN = 4096
+		file, dev = info.split(":")
+		try:
+			fd = os.open(file, os.O_RDONLY)
+		except OSError:
+			log.error("some network problem, try to do it local")
+			raise Exception
+
+		self.__cmd_send(self.RAWFLASH)
+		self.__socket.send(dev)
+		self.__socket.send('\0')
+		while True:
+			data = os.read(fd, LEN)
+			if not data:
+				break;
+			self.__socket.send(data)
+		self.close()
+		os.close(fd)
+
+	def __load_flash(self, section_id, force = False, partition = None):
+		"""
+			'Partition' for load_entry, __load_entry, __load_flash
+			same as 'Parser' instance.
+		"""
+		log.warning("Load entire flash...")
+
+		val = self.get_mode()
+		if val == self.NORM_MODE:
+			log.warning("can't write entry, already in 'normal' mode")
+			return None
+		else:
+			force = True
+
+		p = partition
+		length = p.get_length()
+		for ind in range(0, length):
+			s = p.get_entry(ind)
+			if s.section_parent == section_id:
+				self.__load_entry(ind, force, True, True, 0, p)
+
+	def load_entry(self, name, force = False):
+		for p in self.get_partitions():
+			index = p.find_section(name)
+			if index != None:
+				break
+		if index == None:
+			log.error("can't find entry [%s]"%name)
+			raise Exception
+		e = p.get_entry(index)
+		if e.section_flags & p.SECTION_FLAG_NOBITS:
+			self.__load_flash(index, force, p)
+		else:
+			self.__load_entry(index, force, partition = p)
+
+	def __load_entry(self, index, force = False, use_offset = False, \
+			override_device = False, override_entry_number = 0, \
+			partition = None):
+		if not force:
+			val = self.get_mode()
+			if val == self.NORM_MODE:
+				log.warning("can't write entry, already in 'normal' mode")
+				return None
+		p = partition
+		entry = p.get_entry(index)
+		se = p.get_string_entries() # string_entries
+
+		cmd = self.FLASH
+		len_cmd = len(cmd)
+		if override_device:
+			override_entry = p.get_entry(override_entry_number)
+			sd = se[override_entry.section_device]
+			len_sd = len(se[override_entry.section_device])
+		else:
+			sd = se[entry.section_device]
+			len_sd = len(se[entry.section_device])
+
+		if use_offset:
+			so = entry.section_off #uint64
+		else:
+			so = 0 #uint64
+		sz = entry.section_sz #uint64
+		crc = entry.data_crc #uint32
+		len_cmdsd = len_sd + len_cmd
+		cmd_sd = cmd + sd
+
+		log.warning("""load flash entry:%s %s...""" %(se[entry.full_name], sd))
+		compr_data = p.get_data(entry.data_off, entry.data_sz)
+		cmd_data = struct.pack("<%isQQL"%(len_cmdsd), cmd_sd, so, sz, crc)
+		log.debug("cmd data : <%isQQL, cmd_sd : %s, so : %i, sz : %i, crc : %i"\
+				%((len_cmdsd), cmd_sd, so, sz, crc))
+		self.__send(cmd_data)
+		self.__socket.send(compr_data)
+		self.close()
+
+	def __pack(self, format, data):
+		presuffix = "<"
+		curformat = presuffix + format
+		r = struct.pack(curformat, data)
+		return r
+
+if __name__ == "__main__":
+	port = DEFAULT_PORT
+	host = None
+	maint_mode = False
+	reboot = False
+	tool_reset = False
+	clear_nvram = False
+	shutdown = False
+	debug = False
+	mode = False
+	force = False
+	flash = None
+	imagelist = None
+	rawinfo = []
+	images = []
+	verbose = False
+	def _usage():
+		return """Usage: eflash --target <addr> [OPTIONS]\n""" + \
+			"""Try `eflash --help' for more information.\n"""
+
+	def _help():
+		return """Usage:\n""" + \
+			"""    eflash --target <addr> --flash <file> [--imagelist <imagelist>] [OPTIONS]\n""" + \
+			"""    eflash --target <addr> --imagelist <imagelist> [OPTIONS]\n""" + \
+			"""    eflash.pl --target <addr> [OPTIONS] [ACTION]\n""" + \
+			"""    eflash.pl [--help]\n\n""" + \
+			"""Arguments:\n""" + \
+			"""    -h, --help\n""" + \
+			"""        Print usage information and exit.\n""" + \
+			"""    -t, --target <addr>\n""" + \
+			"""        Controller's host name or IP address.\n""" + \
+			"""    -p, --port \n""" + \
+			"""        Port for target host, default 31337.\n""" + \
+			"""    -f, --flash <flash file>\n""" + \
+			"""        The flash image archive file to use (.flash).\n""" + \
+			"""    --maint_mode\n""" + \
+			"""        Using this option leaves the target FSP in maintenance mode.\n""" + \
+			"""    --force\n""" + \
+			"""        Force write when the target is already in maintenance mode.\n""" + \
+			"""    -l, --imagelist <imagelist>\n""" + \
+			"""        List of image specifications <spec>[,<spec>]... to be flashed\n""" + \
+			"""        where spec is <fullname, fullname, fullname, etc. > or \n""" + \
+			"""        <raw-image-file:target-device|image-name-from-flash-file>""" + \
+			"""    -v, --verbose\n""" + \
+			"""        Enable the output of additional program status messages.\n""" + \
+			"""    -d, --debug\n""" + \
+			"""        Enable debug output.\n\n""" + \
+			"""Actions:\n""" + \
+			"""    -m, --mode\n""" + \
+			"""        Determine the target's mode.\n""" + \
+			"""    -r, --reboot\n""" + \
+			"""    -T, --toolreset\n""" + \
+			"""        Signal the target to reboot, or to initiate a "toolreset"\n""" + \
+			"""\nExamples:\n""" + \
+			"""    Flash all images from the file sunray2_nand2G.flash:\n""" + \
+			"""        eflash -t 10.0.0.1 --flash sunray2_nand2G.flash\n""" + \
+			"""\n    Flash the rootfs0 and rootfs1 images from the file sunray2_nand2G.flash:\n""" + \
+			"""        eflash -t 10.0.0.1 --flash sunray2_nand2G.flash --imagelist rootfs0, rootfs1\n""" + \
+			"""\n    Flash the raw image sunray2_nand2G.mif to /dev/mmcblk0:\n""" + \
+			"""        eflash -t 10.0.0.1 --imagelist sunray2_nand2G.mif:/dev/mmcblk0\n""" + \
+			"""\n    Flash the rootfs0 image from the file sunray2_nand2G.flash\n""" + \
+			"""     and the raw image NOR:\n""" + \
+			"""        eflash -t 10.0.0.1 --flash sunray2_nand2G.flash \\\n""" + \
+			"""           --imagelist rootfs0, NOR\n""" + \
+			"""     and the raw image sunray2_nor64.mif to NOR:\n""" + \
+			"""        eflash -t 10.0.0.1 --flash sunray2_nand2G.flash \\\n""" + \
+			"""           --imagelist rootfs0, sunray2_nor64.mif:NOR\n""" + \
+			"""     and full image sunray2_nand2G.mif :\n""" + \
+			"""        eflash -t 10.0.0.1 --flash sunray2_nand2G.mif\n""" + \
+			"""         --imagelist sunray_nand2G:\n"""
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "p:t:f:crsdhvmTl:", \
+					["help", "target=", "port=",\
+					 "maint_mode", "reboot", "verbose",\
+					"toolreset", "clear_nvram", "shutdown",\
+					"debug", "force", "flash=",\
+					"imagelist=", "mode"])
+
+		if len(opts) == 0:
+			sys.stderr.write(_usage())
+			sys.exit(1)
+
+		for opt, arg in opts:
+			if opt == ("-h") or opt == ("--help") :
+				sys.stdout.write(_help())
+				sys.exit(1)
+			elif opt == ("-t") or opt == ("--target"):
+				host = str(arg)
+			elif opt == ("-p") or opt == ("--port"):
+				port = int(arg)
+			elif opt == ("--maint_mode"):
+				maint_mode = True
+			elif opt == ("-r") or opt == ("--reboot"):
+				reboot = True
+			elif opt == ("-T") or opt == ("--toolreset"):
+				tool_reset = True
+			elif opt == ("-c") or opt == ("--clear_nvram"):
+				clear_nvram = True
+			elif opt == ("-s") or opt == ("--shutdown"):
+				shutdown = True
+			elif opt == ("-d") or opt == ("--debug"):
+				debug = True
+			elif opt == ("-m") or opt == ("--mode"):
+				mode = True
+			elif opt == ("--force"):
+				force = True
+			elif opt == ("-f") or opt == ("--flash"):
+				flash = str(arg)
+			elif opt == ("-l") or opt == ("--imagelist"):
+				imagelist = str(arg)
+			elif opt == ("-v") or opt == ("--verbose"):
+				verbose = True
+
+	except getopt.GetoptError, e:
+		log.error("some problem of parsing options")
+		sys.exit(1)
+
+	if verbose:
+		log.setLevel(logging.WARNING)
+	if debug:
+		log.setLevel(logging.DEBUG)
+	log.debug("opts : %s, args : %s"%(opts, args))
+
+	try:
+		ce = CommandExecutor(host, port, flash)
+	except:
+		log.error("can't create 'CE' instance")
+		sys.exit(1)
+
+	if (maint_mode or flash) and (shutdown or reboot or tool_reset):
+		log.error("not possible to use --reboot/--shutdown/--tool_reset\
+ with --maint_mode/--flash")
+		del ce
+		sys.exit(1)
+
+	if shutdown:
+		ce.shutdown()
+		del ce
+		sys.exit(0)
+
+	if reboot:
+		ce.reboot()
+		del ce
+		sys.exit(0)
+
+	if tool_reset:
+		ce.tool_reset()
+		del ce
+		sys.exit(0)
+
+	if mode:
+		print ce.get_mode()
+		del ce
+		sys.exit(0)
+
+	if not imagelist and flash:
+		for p in ce.get_partitions():
+			sections = p.get_toplevel_sections()
+			log.debug("extend sections : %s"%sections)
+			images.extend(sections)
+	elif imagelist:
+		for el in imagelist.split(","):
+			val = el.split(":")
+			if len(val) == 1:
+				name = ""
+				sections = val
+			else:
+				name = val[0]
+				sections = [val[1]]
+			facc = os.access(name, os.R_OK)
+			startlen = len(images)
+			# if name is file then it's old format nor
+			if facc:
+				log.debug("add NOR %s"%name)
+				rawinfo.append(el)
+			else:
+				# else try to find sections which was passed to eflash
+				for section in sections[0].split(","):
+					for p in ce.get_partitions():
+						iexst = (p.find_section(section) != None)
+						if not iexst:
+							continue
+
+						if p.is_protected(section):
+							log.error("element[%s] is \
+protected, aborted, use entire flash load"%el)
+							del ce
+							sys.exit(1)
+
+						log.debug("add section %s"%section)
+						images.append(section)
+						break
+
+			# if nothing in sections then try to find on img names
+			length = len(images) - startlen
+			if not length:
+				for p in ce.get_partitions():
+					if p.is_image(name):
+						sections = p.get_toplevel_sections()
+						log.debug("extend sections %s"%sections)
+						images.extend(sections)
+
+
+			# if still nothing return error
+			length = len(images) - startlen
+			if not (length or facc):
+				log.error("element [%s] is not found"%el)
+				del ce
+				sys.exit(1)
+	else:
+		log.error("flash file or imagelist isn't found or incorrect")
+		del ce
+		sys.exit(1)
+
+	if rawinfo or images:
+		if not ce.maint(force):
+			del ce
+			sys.exit(1)
+		ce.wait(ce.MAINT_MODE)
+		for raw in rawinfo:
+			ce.load_raw(raw, force)
+		for img in images:
+			ce.load_entry(img, force)
+		if clear_nvram:
+			ce.clear_nvram()
+		if not maint_mode:
+			ce.tool_reset()
+		del ce
+		sys.exit(0)
+

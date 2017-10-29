@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<devices>
+    <default>
+        <manufacturerName> NXP / Philips Semiconductors </manufacturerName>
+        <maxBitrate> 400 </maxBitrate>
+        <writeTime> 28000 </writeTime>
+        <addressWidth> 1 </addressWidth>
+        <baseDeviceAddress> 0x50 </baseDeviceAddress>
+        <deviceAlgorithm> I2C EEPROM </deviceAlgorithm>
+    </default>
+
+    <device version="1.0">
+        <deviceName> PCA24S08 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCA24S08 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 1024 </capacity>
+        <writeSize> 16 </writeSize>
+        <writeTime> 5000 </writeTime>
+        <baseDeviceAddress> 0x54 </baseDeviceAddress>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCA8581 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCA8581 128 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 128 </capacity>
+        <writeSize> 8 </writeSize>
+        <writeTime> 6000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCA8581C </deviceName>
+        <deviceDescription>
+            NXP / Philips PCA8581C 128 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 128 </capacity>
+        <writeSize> 8 </writeSize>
+        <writeTime> 6000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF85102C-2 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF85102C-2 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <writeSize> 8 </writeSize>
+        <maxBitrate> 100 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF85103C-2 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF85103C-2 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <writeSize> 8 </writeSize>
+        <maxBitrate> 100 </maxBitrate>
+        <baseDeviceAddress> 0x10 </baseDeviceAddress>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF85116-3 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF85116-3 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <writeSize> 32 </writeSize>
+        <writeTime> 10000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF8582C-2 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF8582C-2 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <writeSize> 8 </writeSize>
+        <maxBitrate> 100 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF8594C-2 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF8594C-2 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <writeSize> 8 </writeSize>
+        <maxBitrate> 100 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> PCF8598C-2 </deviceName>
+        <deviceDescription>
+            NXP / Philips PCF8598C-2 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 1024 </capacity>
+        <writeSize> 8 </writeSize>
+        <maxBitrate> 100 </maxBitrate>
+    </device>
+
+</devices>

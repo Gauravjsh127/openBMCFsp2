@@ -1,0 +1,43 @@
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<h2>Aardvark Control Center</h2>
+
+<h4>I2C Bitrate Command</h4>
+
+<p align=right><a href="help.html"><img src="back-icon.png" width="15" height="15" border="0"></a>
+
+<pre>
+&lt;i2c_bitrate khz="<i>khz</i>"/&gt;
+</pre>
+
+<p>Set the I2C bitrate in kilohertz.
+
+<p><b>Parameters</b>
+
+<dl>
+    <dt><b>khz</b></dt>
+    <dd>the requested bitrate in khz
+    </dd>
+</dl>
+
+<p><b>Details</b>
+
+<p>The default power-on bitrate is 100khz
+
+<p>Only certain discrete bitrates are supported by the Aardvark I2C
+master interface. As such, this actual bitrate set will be less than
+or equal to the requested bitrate unless the requested value is less
+than 32 kHz, in which case the Aardvark device will default to 32 kHz.
+
+<p>The actual bitrate is returned in the Transaction Log.
+
+<p>Please see the Aardvark I2C/SPI Embedded Systems Interface
+Datasheet for more information.
+
+<p align=right><a href="#top"><img src="top-icon.png" width="15" height="15" border="0"></a>
+
+</body>
+</html>

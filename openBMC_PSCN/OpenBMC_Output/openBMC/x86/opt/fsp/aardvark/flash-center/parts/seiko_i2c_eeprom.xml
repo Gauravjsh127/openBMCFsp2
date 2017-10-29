@@ -1,0 +1,92 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Seiko Instruments </manufacturerName>
+        <deviceAlgorithm> I2C EEPROM </deviceAlgorithm>
+        <maxBitrate> 400 </maxBitrate>
+        <writeTime> 4000 </writeTime>
+        <baseDeviceAddress> 0x50 </baseDeviceAddress>
+    </default>
+
+    <device version="1.0">
+        <deviceName> S-24CS01A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS01A 128 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS02A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS02A 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS04A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS04A 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS08A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS08A 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS16A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS16A 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS64A </deviceName>
+        <deviceDescription>
+            Seiko S-24CS64A 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <writeTime> 6000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS02BPPHL </deviceName>
+        <deviceDescription>
+            Seiko S-24CS02BPPHL 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> S-24CS04BPHAL </deviceName>
+        <deviceDescription>
+            Seiko S-24CS04BPHAL 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+</devices>

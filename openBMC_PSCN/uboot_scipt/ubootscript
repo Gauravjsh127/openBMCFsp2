@@ -1,0 +1,120 @@
+# FSP-2 ubootscript
+echo "------ Initiating complete FSP2 network boot ------"
+setenv bootvarsize 0x10000
+
+# bootargs with all pdd data and fls md5 sum - parameter list has to be in escaped quotes for allowing that many parameters
+
+setenv ram0_md5_version c2acdbb7f20a3346e09ce60c594cbbe2
+
+setenv ram0_build_version IMAGE_VERSION:/zfw_build/zfsp/3/D32E_20170427.1206/build_fsp2/images/sunray2_nor_network,Thu-27-April-10:08:30-UTC
+
+setenv bootargs \"console=ttyS0,115200 root=/dev/ram0 rw ramdisk_size=34816 init=/sbin/init ethaddr=${ethaddr} eth1addr=${eth1addr} ram0_serverip=${serverip} mem=${mem} ltt_size=3145728 log_buf_len=32768 rr_timeslice_ms=4 crashkernel=64M@300M slram=bootvars,${mem},+${bootvarsize}\"
+
+# Defining new tftp_maxloadaddr = position of this ubootscript
+setenv tftp_maxloadaddr
+setenv tftp_maxloadaddr $scriptaddr
+# As we aren't in flash anymore, we can increase the speed of transfers as well
+# as the risk of transfer failures by increasing the tftp blocksize
+setenv tftp_block_size 16200
+
+# Setting tftp_timeout again as older U-Boot version might not have set it
+setenv tftp_timeout
+setenv tftp_timeout 1
+
+# Use ztftpsvrd instead of standard tftpd.
+setenv tftp_server_port  33333
+
+setenv kernelloadaddr 0x04000000
+setenv devicetreeloadaddr 0x04400000
+setenv fdt_high 0x03ff0000
+setenv rootfsloadaddr 0x04500000
+setenv initrd_high 0x20000000
+# adding commands to both ubootscript and bootenv_network for having them applied immediatelly
+
+# Collecting FFDC data for Core Watchdogs without an mcore
+#ffdcdata snd
+
+# Downloading kernel
+# kernel download is tried 3 times before the FSP is resetted
+# $counter stores the retries: s=start, x=failure
+rc=1
+cnt=s
+while itest $rc -ne 0 ; do
+    echo "downloading bbqefsp2_vmlinux.img at $kernelloadaddr"
+    tftp $kernelloadaddr bbqefsp2_vmlinux.img
+    rc=$?
+    if itest $rc -ne 0 ; then
+        echo "tftp of bbqefsp2_vmlinux.img failed: $rc"
+        # U-Boot shell is unable to count - but it can concatenate strings
+        # So we extend the string on every try for implementing a counter
+        cnt=$(cnt)x
+        if test "$cnt" = "sxxx" ; then
+	    # maximum retry limit exceeded - resetting FSP
+            run failurescript
+        fi
+        # putting the FSP to sleep for stalling high network load situations
+        echo "sleeping"
+        sleep 5
+   fi
+
+done
+
+
+# Downloading dtb 
+# initrd download is tried 3 times before the FSP is resetted
+# $counter stores the retries: s=start, x=failure
+rc=1
+cnt=s
+while itest $rc -ne 0 ; do
+    echo "downloading bbqefsp2_dtb.img at $devicetreeloadaddr"
+    tftp $devicetreeloadaddr bbqefsp2_dtb.img
+    rc=$?
+    if itest $rc -ne 0 ; then
+        echo "tftp of bbqefsp2_dtb.img failed: $rc"
+        # U-Boot shell is unable to count - but it can concatenate strings
+        # So we extend the string on every try for implementing a counter
+        cnt=$(cnt)x
+        if test "$cnt" = "sxxx" ; then
+	    # maximum retry limit exceeded - resetting FSP
+            run failurescript
+        fi
+        # putting the FSP to sleep for stalling high network load situations
+        echo "sleeping"
+        sleep 5
+   fi
+done
+# Downloading initrd
+# initrd download is tried 3 times before the FSP is resetted
+# $counter stores the retries: s=start, x=failure
+rc=1
+cnt=s
+while itest $rc -ne 0 ; do
+    echo "downloading bbqefsp2_rootfs.img at $rootfsloadaddr"
+    tftp $rootfsloadaddr bbqefsp2_rootfs.img
+    rc=$?
+    if itest $rc -ne 0 ; then
+        echo "tftp of bbqefsp2_rootfs.img failed: $rc"
+        # U-Boot shell is unable to count - but it can concatenate strings
+        # So we extend the string on every try for implementing a counter
+        cnt=$(cnt)x
+        if test "$cnt" = "sxxx" ; then
+	    # maximum retry limit exceeded - resetting FSP
+            run failurescript
+        fi
+        # putting the FSP to sleep for stalling high network load situations
+        echo "sleeping"
+        sleep 5
+   fi
+done
+
+
+echo NOW BOOTING USING bootm kernel=$kernelloadaddr rootfs=$rootfsloadaddr devicetree=$devicetreeloadaddr
+setenv ram0_serverip ${serverip}
+env export -s ${bootvarsize} -t 0x2D600000 # ${mem} as hex value
+bootprogress set 2 # set bootprogress to OS_START indicating SPL has completed
+bootm $kernelloadaddr  $rootfsloadaddr $devicetreeloadaddr
+rc=$?
+if itest $rc -ne 0 ; then
+    echo "bootm failed: $rc"
+    run failurescript
+fi

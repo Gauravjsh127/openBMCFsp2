@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> STMicro </manufacturerName>
+        <maxBitrate> 33000 </maxBitrate>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <addressWidth>3</addressWidth>
+        <readDummyBytes>1</readDummyBytes>
+        <writeSize>256</writeSize>
+        <eraseSize>256</eraseSize>
+        <writeTime>1200</writeTime>
+        <eraseTime>10000</eraseTime>
+        <readInstruction>0x0b</readInstruction>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <eraseInstruction>0xdb</eraseInstruction>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0xfc</deviceConnectedMask>
+    </default>
+
+    <device version="1.0">
+        <deviceName>M45PE10</deviceName>
+        <deviceDescription>
+            STMicro M45PE10 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>128*1024</capacity>
+        <expectedDeviceId>\x20\x40\x11</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M45PE20</deviceName>
+        <deviceDescription>
+            STMicro M45PE20 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>256*1024</capacity>
+        <expectedDeviceId>\x20\x40\x12</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M45PE40</deviceName>
+        <deviceDescription>
+            STMicro M45PE40 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>512*1024</capacity>
+        <expectedDeviceId>\x20\x40\x13</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M45PE80</deviceName>
+        <deviceDescription>
+           STMicro M45PE80 1 Megabyte SPI Flash
+        </deviceDescription>
+        <capacity>1024*1024</capacity>
+        <expectedDeviceId>\x20\x40\x14</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M45PE16</deviceName>
+        <deviceDescription>
+            STMicro M45PE16 2 Megabyte SPI Flash
+        </deviceDescription>
+        <capacity>2*1024*1024</capacity>
+        <maxBitrate>50*1000</maxBitrate>
+        <writeTime>800</writeTime>
+        <expectedDeviceId>\x20\x40\x15</expectedDeviceId>
+    </device>
+
+</devices>

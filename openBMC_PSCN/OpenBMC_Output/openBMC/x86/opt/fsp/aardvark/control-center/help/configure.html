@@ -1,0 +1,87 @@
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+
+<h2>Aardvark Control Center</h2>
+
+<h4>Configure Command</h4>
+
+<p align="right"><a href="help.html"><img src="back-icon.png" width="15" height="15" border="0"></a>
+
+<pre>
+&lt;configure i2c="<i>i2c</i>" 
+           spi="<i>spi</i>"
+           gpio="<i>gpio</i>" 
+           tpower="<i>tpower</i>"
+           pullups="<i>pullups</i>"/&gt;
+</pre>
+
+<p>Activate/Deactivate individual sub-systems and features
+
+<p><b>Parameters</b>
+
+<dl>
+    <dt><b>i2c</b></dt>
+    <dd>Enable I2C</dd>
+
+    <dt><b>spi</b></dt>
+    <dd>Enable SPI</dd>
+
+    <dt><b>gpio</b></dt>
+    <dd>Enable GPIO</dd>
+
+    <dt><b>tpower</b></dt>
+    <dd>Enable Target Power on pins 4 and 6</dd>
+
+    <dt><b>pullups</b></dt>
+    <dd>Enable pullup resistors on the I2C lines: SCL and SDA</dd>
+</dl>
+
+<p><b>Details</b>
+
+<p>It is not possible to activate I2C, SPI and GPIO all at the same
+time.  The possible combinations are:
+
+<p align=center><table border="1" cellpadding="3" cellspacing="0">
+    <tr>
+        <td align=center><b>I2C</b></td>
+        <td align=center><b>SPI</b></td>
+        <td align=center><b>GPIO</b></td>
+        <td align=center><b>Configuration</b></td>
+    </tr>
+    <tr>
+        <td align=center>1</td>
+        <td align=center>1</td>
+        <td align=center>0</td>
+        <td align=center>I2C and SPI enabled</td>
+    </tr>
+    <tr>
+        <td align=center>1</td>
+        <td align=center>0</td>
+        <td align=center>1</td>
+        <td align=center>I2C enabled and SPI pins used as GPIO</td>
+    </tr>
+    <tr>
+        <td align=center>0</td>
+        <td align=center>1</td>
+        <td align=center>1</td>
+        <td align=center>SPI enabled and I2C pins used as GPIO</td>
+    </tr>
+    <tr>
+        <td align=center>0</td>
+        <td align=center>0</td>
+        <td align=center>1</td>
+        <td align=center>I2C and SPI pins used as GPIO</td>
+    </tr>
+</table>
+
+<p>Please see the Aardvark I2C/SPI Embedded Systems Interface
+Datasheet for more information about supplying target power and I2C
+pullup resistors.
+
+<p align=right><a href="#top"><img src="top-icon.png" width="15" height="15" border="0"></a>
+
+</body>
+</html>

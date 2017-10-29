@@ -1,0 +1,6 @@
+<aardvark>
+    <configure i2c="1" spi="1" gpio="0" tpower="1" pullups="1"/>
+    <i2c_bitrate khz="100"/>
+    <i2c_write addr="0x50" count="1" radix="16" nostop="1">00</i2c_write>
+    <i2c_read addr="0x50" count="256"/>
+</aardvark>

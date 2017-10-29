@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Atmel </manufacturerName>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <maxBitrate>20000</maxBitrate>
+        <eraseBeforeWrite>false</eraseBeforeWrite>
+        <!-- Buffer 1 to Main Memory Page w/ Built-in Erase -->
+        <writeInstruction>0x83</writeInstruction>
+        <!-- Buffer 1 Write -->
+        <writeBufferInstruction>0x84</writeBufferInstruction>
+        <addressWidth>3</addressWidth>
+        <readDummyBytes>4</readDummyBytes>
+        <readInstruction>0xe8</readInstruction>
+        <hasEraseAll>false</hasEraseAll>
+        <eraseInstruction>0x50</eraseInstruction>
+        <deviceBusyBit>0x80</deviceBusyBit>
+        <readStatusRegisterInstruction>0xd7</readStatusRegisterInstruction>
+        <writeStatusRegisterInstruction>0</writeStatusRegisterInstruction>
+        <busyBitPolarity>true</busyBitPolarity>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <writeEnableBits>0</writeEnableBits>
+        <writeEnableInstruction>0</writeEnableInstruction>
+        <blockProtectBits>0x2</blockProtectBits>
+        <deviceConnectedMask>0x3d</deviceConnectedMask>
+    </default>
+
+    <device version="1.0">
+        <deviceName>AT45DB011B</deviceName>
+        <deviceDescription>
+             Atmel AT45DB011B 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>512 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>10000</writeTime>
+        <eraseSize>2112</eraseSize>
+        <eraseTime>7000</eraseTime>
+        <deviceConnectedBits>0x0c</deviceConnectedBits>
+        <deviceConnectedMask>0x3c</deviceConnectedMask>
+        <blockProtectBits>0x00</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB021B</deviceName>
+        <deviceDescription>
+             Atmel AT45DB021B 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>1024 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>20000</writeTime>
+        <eraseSize>2112</eraseSize>
+        <eraseTime>12000</eraseTime>
+        <deviceConnectedBits>0x14</deviceConnectedBits>
+        <deviceConnectedMask>0x3c</deviceConnectedMask>
+        <blockProtectBits>0x00</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB041B</deviceName>
+        <deviceDescription>
+             Atmel AT45DB041B 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>2048 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>20000</writeTime>
+        <eraseSize>2112</eraseSize>
+        <eraseTime>12000</eraseTime>
+        <deviceConnectedBits>0x1c</deviceConnectedBits>
+        <deviceConnectedMask>0x3c</deviceConnectedMask>
+        <blockProtectBits>0x00</blockProtectBits>
+    </device>
+
+    <!-- There are two devices for each 'D' device below.
+       - One corresponds to the native page size, which is a multiple of 264,
+       - and the other to the power-of-two pagesize which is a multiple
+       - of 256.
+      -->
+    <device version="1.0">
+        <deviceName>AT45DB041D/264</deviceName>
+        <deviceDescription>
+             Atmel AT45DB041D 512 Kilobyte SPI Flash, 264 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>2048 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>14000</writeTime>
+        <eraseSize>2112</eraseSize>
+        <eraseTime>30000</eraseTime>
+        <expectedDeviceId>\x1f\x24\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x1c</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB041D/256</deviceName>
+        <deviceDescription>
+             Atmel AT45DB041D 512 Kilobyte SPI Flash, 256 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>2048 * 256</capacity>
+        <writeSize>256</writeSize>
+        <writeTime>14000</writeTime>
+        <eraseSize>2048</eraseSize>
+        <eraseTime>30000</eraseTime>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\x1f\x24\x00\x00</expectedDeviceId>
+        <!-- deviceConnectedBits includes the page size bit indicating 256
+             byte pages -->
+        <deviceConnectedBits>0x1d</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB081B</deviceName>
+        <deviceDescription>
+             Atmel AT45DB081B 1 Megabyte SPI Flash
+        </deviceDescription>
+        <capacity>4096 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>20000</writeTime>
+        <eraseSize>8 * 264</eraseSize>
+        <eraseTime>12000</eraseTime>
+        <deviceConnectedBits>0x24</deviceConnectedBits>
+        <deviceConnectedMask>0x3c</deviceConnectedMask>
+        <blockProtectBits>0x00</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB081D/264</deviceName>
+        <deviceDescription>
+             Atmel AT45DB081D 1 Megabyte SPI Flash, 264 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>4096 * 264</capacity>
+        <writeSize>264</writeSize>
+        <writeTime>14000</writeTime>
+        <eraseSize>8 * 264</eraseSize>
+        <eraseTime>30000</eraseTime>
+        <expectedDeviceId>\x1f\x25\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x24</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB081D/256</deviceName>
+        <deviceDescription>
+             Atmel AT45DB081D 1 Megabyte SPI Flash, 256 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>4096 * 256</capacity>
+        <writeSize>256</writeSize>
+        <writeTime>14000</writeTime>
+        <eraseSize>8 * 256</eraseSize>
+        <eraseTime>30000</eraseTime>
+        <expectedDeviceId>\x1f\x25\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x25</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB161D/528</deviceName>
+        <deviceDescription>
+             Atmel AT45DB161D 2 Megabyte SPI Flash, 528 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>4096 * 528</capacity>
+        <writeSize>528</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 528</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x26\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x2c</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB161D/512</deviceName>
+        <deviceDescription>
+             Atmel AT45DB161D 2 Megabyte SPI Flash, 512 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>4096 * 512</capacity>
+        <writeSize>512</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 512</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x26\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x2d</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB321C</deviceName>
+        <deviceDescription>
+             Atmel AT45DB321C 4 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40000</maxBitrate>
+        <capacity>8192 * 528</capacity>
+        <writeSize>528</writeSize>
+        <writeTime>16000</writeTime>
+        <eraseSize>8 * 528</eraseSize>
+        <eraseTime>20000</eraseTime>
+        <expectedDeviceId>\x1f\x27\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x34</deviceConnectedBits>
+        <deviceConnectedMask>0x3c</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB321D/528</deviceName>
+        <deviceDescription>
+             Atmel AT45DB321D 4 Megabyte SPI Flash, 528 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>8192 * 528</capacity>
+        <writeSize>528</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 528</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x27\x01\x00</expectedDeviceId>
+        <deviceConnectedBits>0x34</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB321D/512</deviceName>
+        <deviceDescription>
+             Atmel AT45DB321D 4 Megabyte SPI Flash, 512 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>8192 * 512</capacity>
+        <writeSize>512</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 512</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x27\x01\x00</expectedDeviceId>
+        <deviceConnectedBits>0x35</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB642D/1056</deviceName>
+        <deviceDescription>
+             Atmel AT45DB642D 8 Megabyte SPI Flash, 1056 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>8192 * 1056</capacity>
+        <writeSize>1056</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 1056</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x28\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x3c</deviceConnectedBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>AT45DB642D/1024</deviceName>
+        <deviceDescription>
+             Atmel AT45DB642D 8 Megabyte SPI Flash, 1024 byte pages
+        </deviceDescription>
+        <maxBitrate>66000</maxBitrate>
+        <capacity>8192 * 1024</capacity>
+        <writeSize>512</writeSize>
+        <writeTime>17000</writeTime>
+        <eraseSize>8 * 1024</eraseSize>
+        <eraseTime>45000</eraseTime>
+        <expectedDeviceId>\x1f\x28\x00\x00</expectedDeviceId>
+        <deviceConnectedBits>0x3d</deviceConnectedBits>
+    </device>
+
+</devices>

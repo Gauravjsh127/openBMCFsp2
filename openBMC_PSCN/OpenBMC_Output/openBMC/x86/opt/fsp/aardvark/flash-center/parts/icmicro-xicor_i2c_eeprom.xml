@@ -1,0 +1,240 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> IC Microsystems / Xicor </manufacturerName>
+        <deviceAlgorithm> I2C EEPROM </deviceAlgorithm>
+        <maxBitrate> 400 </maxBitrate>
+        <writeTime> 5000 </writeTime>
+        <baseDeviceAddress> 0x50 </baseDeviceAddress>
+        <addressWidth> 2 </addressWidth>
+    </default>
+
+    <device version="1.0">
+        <deviceName> X24C01 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C01 128 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24C01A </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C01A 128 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24C02 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C02 256 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24C04 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C04 512 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24C08 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C08 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24C16 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24C16 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24012 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24012 128 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24022 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24022 256 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24026 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24026 256 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 4 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24042 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24042 512 Byte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24128 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24128 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 16*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24164 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24164 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24165 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24165 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24256 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24256 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 32*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24257 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24257 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 32*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24320 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24320 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 4*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24325 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24325 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 4*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24640 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24640 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> X24641 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24641 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 400 </maxBitrate>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <!-- device has write protection -->
+    <device version="1.0">
+        <deviceName> X24645 </deviceName>
+        <deviceDescription>
+            Xicor / ICmic X24645 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 100 </maxBitrate>
+        <capacity> 8*1024 </capacity>
+        <addressWidth> 2 </addressWidth>
+        <writeSize> 32 </writeSize>
+        <baseDeviceAddress> 0x40 </baseDeviceAddress>
+    </device>
+
+</devices>

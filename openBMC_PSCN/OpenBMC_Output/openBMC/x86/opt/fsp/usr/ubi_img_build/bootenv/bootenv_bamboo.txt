@@ -1,0 +1,12 @@
+baudrate=57600
+ipaddr=192.168.1.44
+serverip=192.168.1.2
+bootdelay=3
+mem=48M
+pcs_size=0x00400000
+netboot=root=/dev/nfs ip=192.168.1.44:192.168.1.2::255.255.255.0:sunray:eth0:off nfsroot=192.168.1.2:/tftpboot/192.168.1.44 rw
+bootargs=console=ttyS0,57600 ethaddr=$(ethaddr) eth1addr=$(eth1addr) $(netboot) mem=$(mem) slram=tmp,$(tmp_addr),+$(tmp_size),pcs,$(mem),+$(pcs_size) ubi.mtd=content,448,512
+setupcmd=prascript; setupenv set
+netcmd=ubiload $os_vol 0; bootx $fileaddr
+#netcmd=tftp 0 vmlinux_tftp-nfs.bin; bootx $fileaddr
+bootcmd=run setupcmd; run netcmd; reset

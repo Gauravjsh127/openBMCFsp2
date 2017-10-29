@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Microchip Technology </manufacturerName>
+        <writeTime> 5000 </writeTime>
+        <deviceAlgorithm> SPI EEPROM </deviceAlgorithm>
+        <addressWidth> 2 </addressWidth>
+        <blockProtectBits> 0xC </blockProtectBits>
+        <maxBitrate> 10*1000 </maxBitrate>
+    </default>
+
+    <device version="1.0">
+        <deviceName> 25AA010A </deviceName>
+        <deviceDescription>
+            Microchip 24AA010A 128 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC010A </deviceName>
+        <deviceDescription>
+            Microchip 24LC010A 128 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA020A </deviceName>
+        <deviceDescription>
+            Microchip 25AA020A 256 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 256 </capacity>
+        <addressWidth>  1 </addressWidth>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC020A </deviceName>
+        <deviceDescription>
+            Microchip 25LC020A 256 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA040 </deviceName>
+        <deviceDescription>
+            Microchip 25AA040 512 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+        <addressWidth> 1 </addressWidth>
+        <capacity> 512 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC040 </deviceName>
+        <deviceDescription>
+            Microchip 25LC040 512 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+        <addressWidth> 1 </addressWidth>
+        <capacity> 512 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25C040 </deviceName>
+        <deviceDescription>
+            Microchip 25C040 512 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 3*1000 </maxBitrate>
+        <addressWidth> 1 </addressWidth>
+        <capacity> 512 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA040A </deviceName>
+        <deviceDescription>
+            Microchip 25AA040A 512 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC040A </deviceName>
+        <deviceDescription>
+            Microchip 25LC040A 512 Byte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA160 </deviceName>
+        <deviceDescription>
+            Microchip 25AA160 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC160 </deviceName>
+        <deviceDescription>
+            Microchip 25LC160 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25C160 </deviceName>
+        <deviceDescription>
+            Microchip 25C160 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <maxBitrate> 3*1000 </maxBitrate>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA160A </deviceName>
+        <deviceDescription>
+            Microchip 25AA160A 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC160A </deviceName>
+        <deviceDescription>
+            Microchip 25LC160A 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA160B </deviceName>
+        <deviceDescription>
+            Microchip 25AA160B 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC160B </deviceName>
+        <deviceDescription>
+            Microchip 25LC160B 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 2*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA320 </deviceName>
+        <deviceDescription>
+            Microchip 25AA320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+        <capacity> 4*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC320 </deviceName>
+        <deviceDescription>
+            Microchip 25LC320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 2*1000 </maxBitrate>
+        <capacity> 4*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25C320 </deviceName>
+        <deviceDescription>
+            Microchip 25C320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <maxBitrate> 3*1000 </maxBitrate>
+        <capacity> 4*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA320A </deviceName>
+        <deviceDescription>
+            Microchip 25AA320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 4*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC320A </deviceName>
+        <deviceDescription>
+            Microchip 25LC320 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 4*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA640 </deviceName>
+        <deviceDescription>
+            Microchip 25AA640 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 8*1024 </capacity>
+        <maxBitrate> 1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC640 </deviceName>
+        <deviceDescription>
+            Microchip 25LC640 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 8*1024 </capacity>
+        <maxBitrate> 3*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA080A </deviceName>
+        <deviceDescription>
+            Microchip 25AA080A 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC080A </deviceName>
+        <deviceDescription>
+            Microchip 25LC080A 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 16 </writeSize>
+        <capacity> 1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA080B </deviceName>
+        <deviceDescription>
+            Microchip 25AA080B 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC080B </deviceName>
+        <deviceDescription>
+            Microchip 25LC080B 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 32 </writeSize>
+        <capacity> 1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA256 </deviceName>
+        <deviceDescription>
+            Microchip 25AA256 32 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 64 </writeSize>
+        <capacity> 32*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC256 </deviceName>
+        <deviceDescription>
+            Microchip 25LC256 32 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 64 </writeSize>
+        <capacity> 32*1024 </capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25AA1024 </deviceName>
+        <deviceDescription>
+            Microchip 25AA1024 128 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 256 </writeSize>
+        <writeTime> 6000 </writeTime>
+        <capacity> 128*1024 </capacity>
+        <addressWidth> 3 </addressWidth>
+        <maxBitrate> 20*1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 25LC1024 </deviceName>
+        <deviceDescription>
+            Microchip 25LC1024 128 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <writeSize> 256 </writeSize>
+        <writeTime> 6000 </writeTime>
+        <capacity> 128*1024 </capacity>
+        <addressWidth> 3 </addressWidth>
+        <maxBitrate> 20*1000 </maxBitrate>
+    </device>
+
+</devices>

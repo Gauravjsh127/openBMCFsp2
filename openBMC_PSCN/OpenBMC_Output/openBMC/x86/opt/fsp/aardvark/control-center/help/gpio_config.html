@@ -1,0 +1,88 @@
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<h2>Aardvark Control Center</h2>
+
+<h4>GPIO Configure Command</h4>
+
+<p align=right><a href="help.html"><img src="back-icon.png" width="15" height="15" border="0"></a>
+
+<pre>
+&lt;gpio_config direction="<i>direction</i>" 
+             pullups="<i>pullups</i>"/&gt;
+</pre>
+
+<p>Configure the GPIO interface.
+
+<p><b>Parameters</b>
+
+<dl>
+    <dt><b>direction</b></dt>
+    <dd>each bit corresponds to the physical line as defined below. 
+    If a line's bit is 0, the line is configured as an
+input. Otherwise it will be an output.
+    </dd>
+    <dt><b>pullups</b></dt>
+    <dd>each bit corresponds to the physical line as defined below. 
+    If a line's bit is 1, the line's pullup is active
+whenever the line is configured as an input. Otherwise the pullup
+will be deactivated.
+    </dd>
+</dl>
+
+<p><b>Details</b>
+
+<p>The following table maps the named lines on the
+Aardvark I2C/SPI output cable to bit positions in the <b>direction</b> and
+<b>pullups</b> masks. All
+GPIO API functions will index these lines through a single 8-bit
+masked value. Thus, each bit position in the mask can be referred
+back its corresponding line through the mapping described below.
+
+<p><table border=0 cellpadding=2 cellspacing=0>
+    <tr valign="bottom">
+        <td align=center><b>Pin #</b></td>
+        <td align=center><b>Bit Value</b></td>
+        <td align=center><b>Description</b></td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 1</td>
+        <td align="center">0x01</td>
+        <td align="center">I2C SCL line</td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 3</td>
+        <td align="center">0x02</td>
+        <td align="center">I2C SDA line</td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 5</td>
+        <td align="center">0x04</td>
+        <td align="center">SPI MISO line</td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 7</td>
+        <td align="center">0x08</td>
+        <td align="center">SPI SCLK line</td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 8</td>
+        <td align="center">0x10</td>
+        <td align="center">SPI MOSI line</td>
+    </tr>
+    <tr valign="top">
+        <td align="center">Pin 9</td>
+        <td align="center">0x20</td>
+        <td align="center">SPI SS line</td>
+    </tr>
+</table>
+    
+<p>Please see the Aardvark I2C/SPI Embedded Systems Interface
+Datasheet for more information.
+
+<p align=right><a href="#top"><img src="top-icon.png" width="15" height="15" border="0"></a>
+
+</body>
+</html>

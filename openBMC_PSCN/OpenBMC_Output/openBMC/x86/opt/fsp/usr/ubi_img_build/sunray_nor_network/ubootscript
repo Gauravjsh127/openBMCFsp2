@@ -1,0 +1,6 @@
+setenv bootargs console=ttyS0,57600 root=/dev/ram0 rw ramdisk_size=34816 init=/usr/bin/fspinit ethaddr=$ethaddr eth1addr=$eth1addr card_type=$card_type card_hardwarelevel=$card_hardwarelevel ipaddr=$ipaddr serverip=$serverip $stdbootargs $mtdsettings mem=$mem slram=tmp,$tmp_addr,+$tmp_size
+
+tftp 0 evmlinux.bin
+tftp 300000 initrd.gz
+bootx 0 $fileaddr $filesize
+

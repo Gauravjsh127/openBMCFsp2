@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> STMicro </manufacturerName>
+        <deviceAlgorithm>I2C EEPROM</deviceAlgorithm>
+        <maxBitrate>400</maxBitrate>
+        <addressWidth>1</addressWidth>
+        <writeSize>16</writeSize>
+        <writeTime>5000</writeTime>
+        <baseDeviceAddress>0x50</baseDeviceAddress>
+    </default>
+
+    <device version="1.0">
+        <deviceName>M24C01-R</deviceName>
+        <deviceDescription>
+            STMicro M24C01-R 128 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>128</capacity>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C01-W</deviceName>
+        <deviceDescription>
+            STMicro M24C01-W 128 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>128</capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C02-R</deviceName>
+        <deviceDescription>
+            STMicro M24C02-R 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>256</capacity>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C02-W</deviceName>
+        <deviceDescription>
+            STMicro M24C02-W 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>256</capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C04-R</deviceName>
+        <deviceDescription>
+            STMicro M24C04-R 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>512</capacity>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C04-W</deviceName>
+        <deviceDescription>
+            STMicro M24C04-W 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity>512</capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C08-R</deviceName>
+        <deviceDescription>
+            STMicro M24C08-R 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>1024</capacity>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C08-W</deviceName>
+        <deviceDescription>
+            STMicro M24C08-W 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>1024</capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C16-R</deviceName>
+        <deviceDescription>
+            STMicro M24C16-R 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>2*1024</capacity>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C16-W</deviceName>
+        <deviceDescription>
+            STMicro M24C16-W 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>2*1024</capacity>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C32-R</deviceName>
+        <deviceDescription>
+            STMicro M24C32-R 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>4*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>32</writeSize>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C32-W</deviceName>
+        <deviceDescription>
+            STMicro M24C32-W 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>4*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>32</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C64-R</deviceName>
+        <deviceDescription>
+            STMicro M24C64-R 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>8*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>32</writeSize>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24C64-W</deviceName>
+        <deviceDescription>
+            STMicro M24C64-W 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>8*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>32</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24128-BR</deviceName>
+        <deviceDescription>
+            STMicro M24128-BR 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>16*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>64</writeSize>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24128-BW</deviceName>
+        <deviceDescription>
+            STMicro M24128-BW 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>16*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>64</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24256-BR</deviceName>
+        <deviceDescription>
+            STMicro M24256-BR 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>32*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>64</writeSize>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24256-BW</deviceName>
+        <deviceDescription>
+            STMicro M24256-BW 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>32*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>64</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24512-R</deviceName>
+        <deviceDescription>
+            STMicro M24512-R 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>64*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>128</writeSize>
+        <writeTime>10000</writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24512-W</deviceName>
+        <deviceDescription>
+            STMicro M24512-W 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>64*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>128</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M24M01-R</deviceName>
+        <deviceDescription>
+            STMicro M24M01-R 128 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>128*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>256</writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M34D64-W</deviceName>
+        <deviceDescription>
+            STMicro M34D64-W 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity>8*1024</capacity>
+        <addressWidth>2</addressWidth>
+        <writeSize>32</writeSize>
+    </device>
+
+</devices>

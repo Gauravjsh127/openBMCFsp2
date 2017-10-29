@@ -1,0 +1,10 @@
+baudrate=57600
+bootdelay=1
+pcs_size=0x00400000
+core_size=0x00400000
+initramfs_vol=0xa
+initramfs_addr=0x2000000
+bootargs=console=ttyS0,57600 ethaddr=$(ethaddr) eth1addr=$(eth1addr) ipaddr0=$(ipaddr0) ipaddr1=$(ipaddr1) mem=$(mem) slram=tmp,$(tmp_addr),+$(tmp_size),pcscore,$(core_addr),+$(core_size),pcs,$(pcs_addr),+$(pcs_size) rw log_buf_len=32768 usbclocked=$(usbclocked) ubi.mtd=content,1984 rootfs_name=mtd:$(rootfs_name) rootfs_type=jffs2 crashkernel=32M
+setupcmd=bootwd off maskon; prascript; setupenv set
+startcmd=ubiload $initramfs_vol $initramfs_addr; if ubiload $os_vol 0; then bootm 0 $initramfs_addr; else echo Image corrupted!!; fi
+bootcmd=run setupcmd; run startcmd; reset

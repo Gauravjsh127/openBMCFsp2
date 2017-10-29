@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Intel </manufacturerName>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <maxBitrate>68*1000</maxBitrate>
+        <addressWidth>3</addressWidth>
+        <writeSize>256</writeSize>
+        <writeTime>1400</writeTime>
+        <readDummyBytes>1</readDummyBytes>
+        <readInstruction>0x0b</readInstruction>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <eraseInstruction>0xd8</eraseInstruction>
+        <eraseSize>64*1024</eraseSize>
+        <eraseTime>700000</eraseTime>
+        <hasEraseAll>true</hasEraseAll>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+    </default>
+
+    <device version="1.0">
+        <deviceName>S33 16-Mbit</deviceName>
+        <deviceDescription>
+            Intel S33 2 Megabyte SPI Flash
+            </deviceDescription>
+        <capacity>2*1024*1024</capacity>
+        <expectedDeviceId>\x89\x89\x11</expectedDeviceId>
+        <eraseAllTime>22400000</eraseAllTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>S33 32-Mbit</deviceName>
+        <deviceDescription>
+            Intel S33 4 Megabyte SPI Flash
+            </deviceDescription>
+        <capacity>4*1024*1024</capacity>
+        <expectedDeviceId>\x89\x89\x12</expectedDeviceId>
+        <eraseAllTime>44800000</eraseAllTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName>S33 64-Mbit</deviceName>
+        <deviceDescription>
+            Intel S33 8 Megabyte SPI Flash
+            </deviceDescription>
+        <capacity>8*1024*1024</capacity>
+        <expectedDeviceId>\x89\x89\x13</expectedDeviceId>
+        <eraseAllTime>89600000</eraseAllTime>
+    </device>
+
+</devices>

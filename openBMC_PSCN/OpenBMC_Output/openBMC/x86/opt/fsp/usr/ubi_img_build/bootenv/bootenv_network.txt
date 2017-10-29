@@ -1,0 +1,11 @@
+baudrate=57600
+ipaddr=192.168.1.44
+serverip=192.168.1.2
+bootdelay=3
+mem=92M
+pcs_size=0x00400000
+netboot=root=/dev/nfs ip=192.168.1.44:192.168.1.2::255.255.255.0:sunray:eth0:off nfsroot=192.168.1.2:/tftpboot/192.168.1.44 rw
+bootargs=console=ttyS0,57600 ethaddr=$(ethaddr) eth1addr=$(eth1addr) $(netboot) mem=$(mem) slram=tmp,$(tmp_addr),+$(tmp_size),pcs,$(mem),+$(pcs_size) log_buf_len=32768 usbclocked=$(usbclocked)
+setupcmd=bootwd off maskon; prascript; setupenv set
+netcmd=tftp 0 vmlinux.bin; bootx $fileaddr
+bootcmd=run setupcmd; run netcmd; reset

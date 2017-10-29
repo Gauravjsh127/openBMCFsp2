@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Renesas Technology </manufacturerName>
+        <deviceAlgorithm> SPI eeprom </deviceAlgorithm>
+        <maxBitrate>5000</maxBitrate>
+        <writeTime>5000</writeTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+    </default>
+
+    <device version="1.0">
+        <deviceName>HN58X2502I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2502I 256 Byte SPI EEPROM
+        </deviceDescription>
+        <capacity>256</capacity>
+        <writeSize>16</writeSize>
+        <deviceConnectedBits>0xf0</deviceConnectedBits>
+        <deviceConnectedMask>0xf0</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X2504I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2508I 512 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>512</capacity>
+        <writeSize>32</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0xf0</deviceConnectedBits>
+        <deviceConnectedMask>0xf0</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X2508I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2508I 1 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>1024</capacity>
+        <writeSize>32</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X2516I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2516I 2 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>2*1024</capacity>
+        <writeSize>32</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X2532I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2532I 4 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>4*1024</capacity>
+        <writeSize>32</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X2564I</deviceName>
+        <deviceDescription>
+            Renesas HN58X2564I 8 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>8*1024</capacity>
+        <writeSize>32</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X25128I</deviceName>
+        <deviceDescription>
+            Renesas HN58X25128I 16 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>16*1024</capacity>
+        <writeSize>64</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X25256I</deviceName>
+        <deviceDescription>
+            Renesas HN58X25256I 32 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>32*1024</capacity>
+        <writeSize>64</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+    <device version="1.0">
+        <deviceName>HN58X25512I</deviceName>
+        <deviceDescription>
+            Renesas HN58X25512I 64 Kilobyte SPI EEPROM
+        </deviceDescription>
+        <capacity>64*1024</capacity>
+        <writeSize>128</writeSize>
+        <addressWidth>2</addressWidth>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0x70</deviceConnectedMask>
+    </device>
+
+</devices>

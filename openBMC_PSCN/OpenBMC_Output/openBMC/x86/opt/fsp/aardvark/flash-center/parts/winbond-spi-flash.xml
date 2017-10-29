@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Winbond / NexFlash </manufacturerName>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <addressWidth>3</addressWidth>
+        <readDummyBytes>1</readDummyBytes>
+        <writeSize>256</writeSize>
+        <hasEraseAll>true</hasEraseAll>
+        <readInstruction>0x0b</readInstruction>
+        <eraseInstruction>0xd8</eraseInstruction>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+    </default>
+
+    <device version="1.0">
+        <deviceName>W25P10 / NX25P10</deviceName>
+        <deviceDescription>
+            Winbond W25P10 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>128*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>2000</writeTime>
+        <eraseTime>700000</eraseTime>
+        <eraseAllTime>3000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25P20 / NX25P20</deviceName>
+        <deviceDescription>
+            Winbond W25P20 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>256*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>2000</writeTime>
+        <eraseTime>700000</eraseTime>
+        <eraseAllTime>3000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25P40 / NX25P40</deviceName>
+        <deviceDescription>
+            Winbond W25P40 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>512*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>2000</writeTime>
+        <eraseTime>700000</eraseTime>
+        <eraseAllTime>5000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25P80 / NX25P80</deviceName>
+        <deviceDescription>
+            Winbond W25P80 1 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>50*1000</maxBitrate>
+        <capacity>1024*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>17000</writeStatusRegisterTime>
+        <writeTime>3500</writeTime>
+        <eraseTime>600000</eraseTime>
+        <eraseAllTime>7000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x20\x14</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25P16 / NX25P16</deviceName>
+        <deviceDescription>
+            Winbond W25P16 2 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>50*1000</maxBitrate>
+        <capacity>2*1024*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>17000</writeStatusRegisterTime>
+        <writeTime>3500</writeTime>
+        <eraseTime>600000</eraseTime>
+        <eraseAllTime>12000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x20\x15</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25P32 / NX25P32</deviceName>
+        <deviceDescription>
+            Winbond W25P32 4 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>50*1000</maxBitrate>
+        <capacity>4*1024*1024</capacity>
+        <eraseSize>64*1024</eraseSize>
+        <writeStatusRegisterTime>17000</writeStatusRegisterTime>
+        <writeTime>3500</writeTime>
+        <eraseTime>600000</eraseTime>
+        <eraseAllTime>25000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x20\x16</expectedDeviceId>
+    </device>
+
+
+    <device version="1.0">
+        <deviceName>W25X10</deviceName>
+        <deviceDescription>
+            Winbond W25X10 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>128*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>3000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x11</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X20</deviceName>
+        <deviceDescription>
+            Winbond W25X20 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>256*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>3000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x12</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X40</deviceName>
+        <deviceDescription>
+            Winbond W25X40 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>512*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>5000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x13</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X80</deviceName>
+        <deviceDescription>
+            Winbond W25X80 1 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>10000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x14</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X16</deviceName>
+        <deviceDescription>
+            Winbond W25X16 2 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>2*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1600</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>25000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x15</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X32</deviceName>
+        <deviceDescription>
+            Winbond W25X32 4 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>4*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1600</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>40000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x16</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X64</deviceName>
+        <deviceDescription>
+            Winbond W25X32 8 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>75*1000</maxBitrate>
+        <capacity>8*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1600</writeTime>
+        <eraseTime>150000</eraseTime>
+        <eraseAllTime>40000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x17</expectedDeviceId>
+    </device>
+
+<!--      UNSUPPORTED VARIABLE SECTOR ERASE SIZES
+    <device version="1.0">
+        <deviceName>W25B40 / NX25B40</deviceName>
+        <deviceDescription>
+            Winbond W25B40 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>512*1024</capacity>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>2000</writeTime>
+        <eraseTime>120000</eraseTime>
+        <eraseAllTime>5500000</eraseAllTime>
+    </device>
+-->
+
+    <device version="1.0">
+        <deviceName>W25Q16</deviceName>
+        <deviceDescription>
+            Winbond W25Q16 2 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>80*1000</maxBitrate>
+        <capacity>2*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>120000</eraseTime>
+        <eraseAllTime>25000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x40\x15</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25Q32</deviceName>
+        <deviceDescription>
+            Winbond W25Q32 4 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>80*1000</maxBitrate>
+        <capacity>4*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>120000</eraseTime>
+        <eraseAllTime>50000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x40\x16</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25Q80</deviceName>
+        <deviceDescription>
+            Winbond W25Q16 1 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>80*1000</maxBitrate>
+        <capacity>1*1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>10000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>120000</eraseTime>
+        <eraseAllTime>12000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x40\x14</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X10L</deviceName>
+        <deviceDescription>
+            Winbond W25X10L 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>128*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>5000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>170000</eraseTime>
+        <eraseAllTime>4000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x11</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X20L</deviceName>
+        <deviceDescription>
+            Winbond W25X20L 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>256*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>5000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>170000</eraseTime>
+        <eraseAllTime>4000000</eraseAllTime>
+        <blockProtectBits>0x0c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x12</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X40L</deviceName>
+        <deviceDescription>
+            Winbond W25X40L 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>512*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>5000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>170000</eraseTime>
+        <eraseAllTime>6000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x13</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>W25X80L</deviceName>
+        <deviceDescription>
+            Winbond W25X80L 1 Megabyte SPI Flash
+        </deviceDescription>
+        <maxBitrate>40*1000</maxBitrate>
+        <capacity>1024*1024</capacity>
+        <eraseInstruction>0x20</eraseInstruction>
+        <eraseSize>4*1024</eraseSize>
+        <writeStatusRegisterTime>5000</writeStatusRegisterTime>
+        <writeTime>1500</writeTime>
+        <eraseTime>170000</eraseTime>
+        <eraseAllTime>12000000</eraseAllTime>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <expectedDeviceId>\xef\x30\x14</expectedDeviceId>
+    </device>
+
+</devices>

@@ -1,0 +1,320 @@
+#!/bin/bash
+
+# Script to generate a nor flash image for sunray2
+# Author: Mike Kobler <mkobler@us.ibm.com>
+#   Adapted from a script by Shaun Wetzstein
+
+set -o nounset
+set -o errexit
+
+FPART="fpart"
+FCP="fcp"
+
+MB=$((1*1024*1024))
+KB=$((1*1024))
+BOOT_SIZE=$((4*$MB))
+LINUX_SIZE=$((27*$MB))
+BOOTENV_SIZE=$((960*$KB))
+BANKS=2
+
+# default values
+IMAGE="nor"
+SIZE="64MiB"
+BLOCK="64KiB"
+PAD="0xFF"
+TYPE="bb"
+V=0
+
+IPL_BIN="ipl.bin"
+SPL_BIN="u-boot.bin"
+BOOTENV_BIN=( "default.crc" "series.crc" "card.crc" )
+KERNEL_BIN="kernel.bin"
+INITRAMFS_BIN="initramfs.bin"
+DTB_BIN="dtb.uImage"
+
+# List of image types supported
+TYPES="bb fips pscn"
+
+function setup_boot_partitions()
+{
+	local part=$1
+	local opts="-A -t $IMAGE -p $part -v"
+
+	for bank in {0..1}
+	do
+		local name="bank$bank"
+		local base=$((${bank}*${BOOT_SIZE}))
+
+		${FPART} $opts -g 1 -n $name -l
+		${FPART} $opts -g 0 -s 1MiB -o $(($base+0*$MB)) -n $name/ipl -a $PAD 
+		${FPART} $opts -g 0 -s 1MiB -o $(($base+1*$MB)) -n $name/spl -a $PAD
+		if [[ "$TYPE" != "pscn" ]]; then
+			${FPART} $opts -g 1 -s 1MiB -o $(($base+2*$MB)) -n $name/stage -a $PAD
+		fi
+
+		name+="/bootenv"
+		base=$(($base+3*$MB))
+
+		${FPART} $opts -g 0 -n $name -l
+		${FPART} $opts -g 2 -s $BLOCK -o $(($base+0*$KB))  -n $name/default -a $PAD
+		${FPART} $opts -g 2 -s $BLOCK -o $(($base+64*$KB))  -n $name/series -a $PAD
+		${FPART} $opts -g 3 -s $BLOCK -o $(($base+128*$KB)) -n $name/card   -a $PAD
+	done
+}
+
+function setup_linux_partitions()
+{
+	local part=$1
+	local opts="-A -t $IMAGE -p $part -v"
+
+	for bank in {0..1}
+	do
+		local name="linux$bank"
+		local base=$(($BANKS*$BOOT_SIZE+$bank*$LINUX_SIZE))
+
+		${FPART} $opts -g 1 -n $name -l
+		${FPART} $opts -g 0 -s  6MiB -o $(($base+0*$MB))  -n $name/kernel    -a $PAD
+		${FPART} $opts -g 0 -s 20MiB -o $(($base+6*$MB))  -n $name/initramfs -a $PAD
+		${FPART} $opts -g 0 -s  1MiB -o $(($base+26*$MB)) -n $name/dtb       -a $PAD
+	done
+}
+
+function setup_dump_partitions()
+{
+	local part=$1
+	local opts="-A -t $IMAGE -p $part -v"
+	local base=$(($BANKS*$BOOT_SIZE+$BANKS*$LINUX_SIZE))
+
+	local name="dump"
+	${FPART} $opts -g 1 -n $name -l
+	for dump in {0..1}
+	do
+		${FPART} $opts -g 1 -s 1MiB -o $(($base+$dump*$MB)) -n "$name/$dump" -a $PAD
+	done
+}
+
+# This function will setup the partition table in the specified image/offset
+function setup_partitions()
+{
+	local part=$1
+
+	${FPART} -C -t $IMAGE -p $part -s $SIZE -b $BLOCK
+
+	setup_boot_partitions $part
+
+	if [[ "$TYPE" != "pscn" ]]; then
+		setup_linux_partitions $part
+		setup_dump_partitions $part
+	fi
+}
+
+function setup_boot_userdata()
+{
+	local part=$1
+	local opts="-t $IMAGE -p $part -v"
+
+	# user[0] = partition type (values taken from apps/ffs/src/ffs-fsp.h)
+	for bank in {0..1}
+	do
+		local name="bank$bank"
+
+		${FPART} $opts -U 0 --value $(($bank+0)) -n $name/ipl
+		${FPART} $opts -U 0 --value $(($bank+2)) -n $name/spl
+
+		name+="/bootenv"
+
+		${FPART} $opts -U 0 --value $(($bank+4))  -n $name/default -f
+		${FPART} $opts -U 0 --value $(($bank+12)) -n $name/series
+		${FPART} $opts -U 0 --value $(($bank+14)) -n $name/card -f
+	done
+
+	# user[1] = actual size
+	for bank in {0..1}
+	do
+		local name="bank$bank"
+
+		local size
+		size=$(stat -L -c %s $IPL_BIN)
+		${FPART} $opts -U 1 --value $size -n $name/ipl
+
+		size=$(stat -L -c %s $SPL_BIN)
+		${FPART} $opts -U 1 --value $size -n $name/spl
+
+		name+="/bootenv"
+		for b in ${BOOTENV_BIN[@]}
+		do
+			size=$(stat -L -c %s $b)
+			${FPART} $opts -U 1 --value $size -n $name/${b%.crc} -f
+		done
+	done
+
+	# user[2] = crc32 (spl only)
+	for bank in {0..1}
+	do
+		local name="bank$bank"
+
+		crc=$(crc32 $SPL_BIN)
+		${FPART} $opts -U 2 --value $crc -n $name/spl
+	done
+}
+
+function setup_linux_userdata()
+{
+	local part=$1
+	local opts="-t $IMAGE -p $part -v"
+
+	# user[0] = partition type (values taken from apps/ffs/src/ffs-fsp.h)
+	for bank in {0..1}
+	do
+		local name="linux$bank"
+
+		${FPART} -U 0 $opts --value $(($bank+6))  -n $name/kernel
+		${FPART} -U 0 $opts --value $(($bank+8))  -n $name/initramfs
+		${FPART} -U 0 $opts --value $(($bank+10)) -n $name/dtb
+	done
+
+	# user[1] = actual size
+	for bank in {0..1}
+	do
+		local name="linux$bank"
+
+		size=$(stat -L -c %s $KERNEL_BIN)
+		${FPART} -U 1 $opts --value $size -n $name/kernel -v
+		size=$(stat -L -c %s $INITRAMFS_BIN)
+
+		${FPART} -U 1 $opts --value $size -n $name/initramfs -v
+		size=$(stat -L -c %s $DTB_BIN)
+		${FPART} -U 1 $opts --value $size -n $name/dtb -v
+	done
+}
+
+# This function will setup the the user data in specified image/partition table
+function setup_user_data()
+{
+	local part=$1
+
+	setup_boot_userdata $part
+
+	if [[ "$TYPE" != "pscn" ]]; then
+		setup_linux_userdata $part
+	fi
+}
+
+function inject_boot_images()
+{
+	local part=$1
+	local opts="-o $part -W -v"
+
+	for bank in {0..1}
+	do
+		local name="bank$bank"
+
+		${FCP} $IPL_BIN $IMAGE:$name/ipl $opts
+		${FCP} $SPL_BIN $IMAGE:$name/spl $opts
+
+		name+="/bootenv"
+		for b in ${BOOTENV_BIN[@]}
+		do
+			${FCP} $b $IMAGE:$name/${b%.crc} $opts -p
+		done
+	done
+}
+
+function inject_linux_images()
+{
+	local part=$1
+	local opts="-o $part -W -v"
+
+	for bank in {0..1}
+	do
+		local name="linux$bank"
+
+		${FCP} $KERNEL_BIN $IMAGE:$name/kernel $opts
+		${FCP} $INITRAMFS_BIN $IMAGE:$name/initramfs $opts
+		${FCP} $DTB_BIN $IMAGE:$name/dtb $opts
+	done
+}
+
+# This function injects the images into the appropriate partitions
+function hot_image_injection()
+{
+	local part=$1
+
+	inject_boot_images $part
+
+	if [[ "$TYPE" != "pscn" ]]; then
+		inject_linux_images $part
+	fi
+}
+
+usage()
+{
+	cat <<-EOM
+Usage: $(basename $0) [OPTIONS]
+
+OPTIONS
+  -b, --block   Size of block (default: $BLOCK)
+  -bs           Size of boot segment (default: $BOOT_SIZE)
+  -e, --ecc     Use ipl image injected with ECC bytes
+  -i, --image   Name of image to create (default: $IMAGE)
+  -s, --size    Size of flash image (default: $SIZE)
+  -t, --type    Type of image to build (default: $TYPE)
+                  Valid option: $TYPES
+
+  -h,--help    This help output
+  -v,--verbose Enable verbose/debug output
+EOM
+}
+
+check_params()
+{
+	local valid=0
+
+	for t in $TYPES; do
+		[ "$t" = "$TYPE" ] && { valid=1; break; }
+	done
+
+	[ $valid -eq 0 ] && { echo "Invalid type: $t"; return 1; }
+
+	return 0
+}
+
+# Main part of script starts here
+while [ $# -gt 0 ]; do
+	case $1 in
+		-b | --block )
+			shift; BLOCK="$1"; shift;;
+		-bs | --boot_segment )
+			shift; BOOT_SIZE=$1; shift;;
+		-e | --ecc )
+			shift; IPL_BIN+=".ecc";;
+		-i | --image )
+			shift; IMAGE=$1; shift;;
+		-s | --size)
+			shift; SIZE="$1"; shift;;
+		-t | --type)
+			shift; TYPE="$1"; shift;;
+
+		-h )
+			usage; exit 0;;
+		-v )
+			V=1; set -x; shift;;
+		* )
+			echo "Unrecognized option: $1\n"; exit 1;;
+	esac
+done
+
+check_params || { exit 1; }
+
+# Set default size to 8M for PSCN images
+[[ "$TYPE" == "pscn" ]] && { SIZE=8M; }
+
+for bank in {0..1}
+do
+	# partition tables are last 64Kb of each boot bank
+	part=$(($bank*$BOOT_SIZE+$BOOT_SIZE-64*$KB))
+
+	setup_partitions $part
+	setup_user_data $part
+	hot_image_injection $part
+done

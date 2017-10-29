@@ -1,0 +1,68 @@
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<h2>Aardvark Control Center</h2>
+
+<h4>I2C Read Command</h4>
+
+<p align=right><a href="help.html"><img src="back-icon.png" width="15" height="15" border="0"></a>
+
+<pre>
+&lt;i2c_read addr="<i>addr</i>" 
+          count="<i>count</i>"
+          nostop="<i>nostop</i>" 
+          ten_bit_addr="<i>ten_bit_addr</i>"
+          combined_fmt="<i>combined_fmt</i>"/&gt;
+</pre>
+
+<p>Read a stream of bytes from the I2C slave device.
+
+<p><b>Parameters</b>
+
+<dl>
+    <dt><b>addr</b></dt>
+    <dd>The slave from which to read.  The slave address can be
+specified in decimal or hexadecimal notation.
+    </dd>
+    <dt><b>count</b></dt>
+    <dd>The number of bytes to write (maximum 65535).
+    </dd>
+    <dt><b>nostop</b></dt>
+    <dd>Request that no stop condition is issued on the I2C bus
+after the transaction completes.
+    </dd>
+    <dt><b>ten_bit_addr</b></dt>
+    <dd>Request that the provided address is treated as a 10-bit
+address.
+    </dd>
+    <dt><b>combined_fmt</b></dt>
+    <dd>Request that the Philips combined format is followed during
+a I2C read operation.  This only has an effect when used in
+conjunction with 10-bit addressing.
+    </dd>
+</dl>
+
+<p><b>Details</b>
+
+<p>For ordinary 7-bit addressing, the lower 7 bits of the addr
+should correspond to the slave address. The topmost bits are
+ignored. The Aardvark I2C subsystem will assemble the address along
+with the R/W bit after grabbing the bus. For 10- bit addressing, the
+lower 10 bits of addr should correspond to the slave address. The
+Aardvark adapter will then assemble the address into the proper
+format as described in the Philips specification, namely by first
+issuing an write transaction on the bus to specify the 10-bit slave
+and then a read transaction to read the requested number of bytes.
+The initial write transaction can be skipped if the  Combined Format
+feature is requested in conjunction with the 10-bit addressing
+functionality.
+
+<p>Please see the Aardvark I2C/SPI Embedded Systems Interface
+Datasheet for more information.
+
+<p align=right><a href="#top"><img src="top-icon.png" width="15" height="15" border="0"></a>
+
+</body>
+</html>

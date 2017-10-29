@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> STMicro </manufacturerName>
+        <deviceAlgorithm>SPI flash</deviceAlgorithm>
+        <maxBitrate>33000</maxBitrate>
+        <addressWidth>3</addressWidth>
+        <readDummyBytes>1</readDummyBytes>
+        <writeSize>256</writeSize>
+        <eraseSize>256</eraseSize>
+        <writeTime>1200</writeTime>
+        <eraseTime>10000</eraseTime>
+        <readInstruction>0x0b</readInstruction>
+        <readDeviceIdInstruction>0x9f</readDeviceIdInstruction>
+        <eraseInstruction>0xdb</eraseInstruction>
+        <deviceConnectedBits>0x00</deviceConnectedBits>
+        <deviceConnectedMask>0xfc</deviceConnectedMask>
+    </default>
+
+    <device version="1.0">
+        <deviceName>M25PE10</deviceName>
+        <deviceDescription>
+            STMicro M25PE10 128 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>128*1024</capacity>
+        <expectedDeviceId>\x20\x80\x11</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M25PE20</deviceName>
+        <deviceDescription>
+            STMicro M25PE20 256 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>256*1024</capacity>
+        <expectedDeviceId>\x20\x80\x12</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M25PE40</deviceName>
+        <deviceDescription>
+            STMicro M25PE40 512 Kilobyte SPI Flash
+        </deviceDescription>
+        <capacity>512*1024</capacity>
+        <expectedDeviceId>\x20\x80\x13</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M25PE80</deviceName>
+        <deviceDescription>
+            STMicro M25PE80 1 Megabyte SPI Flash
+        </deviceDescription>
+        <capacity>1024*1024</capacity>
+        <maxBitrate>50000</maxBitrate>
+        <hasEraseAll>true</hasEraseAll>
+        <writeTime>1350</writeTime>
+        <eraseAllTime>10*1000000</eraseAllTime>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+        <expectedDeviceId>\x20\x80\x14</expectedDeviceId>
+    </device>
+
+    <device version="1.0">
+        <deviceName>M25PE16</deviceName>
+        <deviceDescription>
+            STMicro M25PE16 2 Megabyte SPI Flash
+        </deviceDescription>
+        <capacity>2*1024*1024</capacity>
+        <maxBitrate>50*1000</maxBitrate>
+        <blockProtectBits>0x1c</blockProtectBits>
+        <hasEraseAll>true</hasEraseAll>
+        <writeTime>800</writeTime>
+        <eraseAllTime>17*1000000</eraseAllTime>
+        <eraseAllInstruction>0xc7</eraseAllInstruction>
+        <expectedDeviceId>\x20\x80\x15</expectedDeviceId>
+        <deviceConnectedMask>0x60</deviceConnectedMask>
+    </device>
+
+</devices>

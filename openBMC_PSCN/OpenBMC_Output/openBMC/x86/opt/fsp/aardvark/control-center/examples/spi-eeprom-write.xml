@@ -1,0 +1,772 @@
+<aardvark>
+    <configure i2c="1" spi="1" gpio="0" tpower="1" pullups="0"/>
+    <spi_bitrate khz="1000"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 00 00</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 01 01</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 02 02</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 03 03</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 04 04</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 05 05</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 06 06</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 07 07</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 08 08</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 09 09</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0A 0A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0B 0B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0C 0C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0D 0D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0E 0E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 0F 0F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 10 10</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 11 11</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 12 12</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 13 13</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 14 14</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 15 15</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 16 16</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 17 17</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 18 18</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 19 19</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1A 1A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1B 1B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1C 1C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1D 1D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1E 1E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 1F 1F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 20 20</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 21 21</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 22 22</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 23 23</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 24 24</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 25 25</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 26 26</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 27 27</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 28 28</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 29 29</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2A 2A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2B 2B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2C 2C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2D 2D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2E 2E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 2F 2F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 30 30</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 31 31</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 32 32</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 33 33</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 34 34</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 35 35</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 36 36</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 37 37</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 38 38</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 39 39</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3A 3A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3B 3B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3C 3C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3D 3D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3E 3E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 3F 3F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 40 40</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 41 41</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 42 42</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 43 43</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 44 44</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 45 45</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 46 46</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 47 47</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 48 48</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 49 49</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4A 4A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4B 4B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4C 4C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4D 4D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4E 4E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 4F 4F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 50 50</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 51 51</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 52 52</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 53 53</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 54 54</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 55 55</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 56 56</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 57 57</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 58 58</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 59 59</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5A 5A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5B 5B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5C 5C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5D 5D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5E 5E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 5F 5F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 60 60</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 61 61</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 62 62</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 63 63</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 64 64</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 65 65</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 66 66</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 67 67</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 68 68</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 69 69</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6A 6A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6B 6B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6C 6C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6D 6D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6E 6E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 6F 6F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 70 70</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 71 71</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 72 72</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 73 73</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 74 74</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 75 75</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 76 76</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 77 77</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 78 78</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 79 79</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7A 7A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7B 7B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7C 7C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7D 7D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7E 7E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 7F 7F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 80 80</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 81 81</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 82 82</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 83 83</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 84 84</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 85 85</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 86 86</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 87 87</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 88 88</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 89 89</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8A 8A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8B 8B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8C 8C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8D 8D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8E 8E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 8F 8F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 90 90</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 91 91</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 92 92</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 93 93</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 94 94</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 95 95</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 96 96</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 97 97</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 98 98</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 99 99</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9A 9A</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9B 9B</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9C 9C</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9D 9D</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9E 9E</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 9F 9F</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A0 A0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A1 A1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A2 A2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A3 A3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A4 A4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A5 A5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A6 A6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A7 A7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A8 A8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 A9 A9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AA AA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AB AB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AC AC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AD AD</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AE AE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 AF AF</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B0 B0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B1 B1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B2 B2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B3 B3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B4 B4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B5 B5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B6 B6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B7 B7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B8 B8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 B9 B9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BA BA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BB BB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BC BC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BD BD</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BE BE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 BF BF</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C0 C0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C1 C1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C2 C2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C3 C3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C4 C4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C5 C5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C6 C6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C7 C7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C8 C8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 C9 C9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CA CA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CB CB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CC CC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CD CD</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CE CE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 CF CF</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D0 D0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D1 D1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D2 D2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D3 D3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D4 D4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D5 D5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D6 D6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D7 D7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D8 D8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 D9 D9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DA DA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DB DB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DC DC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DD DD</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DE DE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 DF DF</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E0 E0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E1 E1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E2 E2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E3 E3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E4 E4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E5 E5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E6 E6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E7 E7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E8 E8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 E9 E9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 EA EA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 EB EB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 EC EC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 ED ED</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 EE EE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 EF EF</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F0 F0</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F1 F1</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F2 F2</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F3 F3</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F4 F4</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F5 F5</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F6 F6</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F7 F7</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F8 F8</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 F9 F9</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FA FA</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FB FB</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FC FC</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FD FD</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FE FE</spi_write>
+    <sleep ms="10"/>
+    <spi_write count="1" radix="16">06</spi_write>
+    <spi_write count="4" radix="16">02 00 FF FF</spi_write>
+    <sleep ms="10"/>
+</aardvark>

@@ -1,0 +1,14 @@
+clone command
+ git clone https://github.com/Gauravjsh127/openBMCFsp2
+ cd openBMCFsp2/
+ . openbmc-env      (this will also clone the ibm internal)
+ cd meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+ git checkout  d58b54c2c0e89a9c5e841dd6028aea080260703d    (only for the moment until fixed)
+ 
+ 
+ 
+setup fakeroot 
+cd openBMCFsp2/openBMC_PSCN
+look at README.md --> ## To setup Fake root ##  --> on link then 1. Set up the fakeroot environment
+--> download from Daisy
+

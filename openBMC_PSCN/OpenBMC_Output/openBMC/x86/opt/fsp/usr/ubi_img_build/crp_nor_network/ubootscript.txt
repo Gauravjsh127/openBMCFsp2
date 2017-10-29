@@ -1,0 +1,86 @@
+# FSP0 ubootscript
+echo "------ Initiating complete FSP0 network boot ------"
+
+# bootargs with all pdd data, parameter list has to be in escaped quotes
+# for allowing that many parameters
+setenv bootargs \"console=ttyS2,57600 root=/dev/ram0 rw ramdisk_size=20480 \
+                  init=/sbin/init ethaddr=${ethaddr} eth1addr=${eth1addr}  \
+                  eth0=${eth0} eth1=${eth1} card_type=${card_type}         \
+                  card_hardwarelevel=${card_hardwarelevel}                 \
+                  card_serialnumber=${card_serialnumber} mem=${memhex}     \
+                  ram0_serverip=${serverip} mcore=${mcore} mcoretop=${mcoretop} \
+                  log_buf_len=32768 flash_size=${flash_size}\"
+
+# Defining new tftp_maxloadaddr = position of this ubootscript
+setenv tftp_maxloadaddr
+setenv tftp_maxloadaddr $scriptaddr
+# As we aren't in flash anymore, we can increase the speed of transfers as well
+# as the risk of transfer failures by increasing the tftp blocksize
+setenv tftp_block_size 16200
+
+# Setting tftp_timeout again as older U-Boot version might not have set it
+setenv tftp_timeout
+setenv tftp_timeout 1
+
+# Collecting FFDC data for Core Watchdogs without an mcore
+ffdcdata snd
+
+# Downloading kernel
+# kernel download is tried 3 times before the FSP is resetted
+# $counter stores the retries: s=start, x=failure
+rc=1
+cnt=s
+while itest $rc -ne 0 ; do
+    echo "downloading vmlinux.bin"
+    tftp 0 crp/vmlinux.bin
+    rc=$?
+    if itest $rc -ne 0 ; then
+        echo "tftp of vmlinux.bin failed: $rc"
+        # U-Boot shell is unable to count - but it can concatenate strings
+        # So we extend the string on every try for implementing a counter
+        cnt=${cnt}x
+        if test "$cnt" = "sxxx" ; then
+	    # maximum retry limit exceeded - resetting FSP
+            run failurescript
+        fi
+        # putting the FSP to sleep for stalling high network load situations
+        echo "sleeping"
+        sleep 5
+   fi
+done
+
+# Downloading initrd
+# initrd download is tried 3 times before the FSP is resetted
+# $counter stores the retries: s=start, x=failure
+rc=1
+cnt=s
+while itest $rc -ne 0 ; do
+    echo "downloading initrd.gz"
+    tftp $mcoretop crp/initrd.gz
+    rc=$?
+    if itest $rc -ne 0 ; then
+        echo "tftp of initrd.gz failed: $rc"
+        # U-Boot shell is unable to count - but it can concatenate strings
+        # So we extend the string on every try for implementing a counter
+        cnt=${cnt}x
+        if test "$cnt" = "sxxx" ; then
+	    # maximum retry limit exceeded - resetting FSP
+            run failurescript
+        fi
+        # putting the FSP to sleep for stalling high network load situations
+        echo "sleeping"
+        sleep 5
+   fi
+done
+
+echo "bootx..."
+bootx 0 $fileaddr $filesize
+rc=$?
+if itest $rc -ne 0 ; then
+    echo "bootx failed: $rc"
+    run failurescript
+fi
+
+echo "bootx exited, a failure happened, resetting"
+sleep 1
+reset

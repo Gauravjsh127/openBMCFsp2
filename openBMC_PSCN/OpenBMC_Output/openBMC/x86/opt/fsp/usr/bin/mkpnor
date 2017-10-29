@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Script to generate a pnor flash image for sunray2
+# Author: Nathan Miller <nathanm2@us.ibm.com>
+#   Adapted from the 'mknor' script by Mike Kobler.
+
+set -o nounset
+set -o errexit
+
+FPART="fpart"
+
+# default values
+IMAGE="pnor"
+OFFSETS="0"
+TOTAL_SIZE="8MiB"
+BLOCK="4KiB"
+TYPE="bb"
+V=0
+
+# List of image types supported
+TYPES="bb"
+
+# This function will setup the partition table in the specified image/offset
+function setup_partition()
+{
+	local file=$1
+	local off=$2
+	local global_ops="--add --target $file --partition-offset $off --flags 0x0"
+
+	${FPART} --create --target $file --partition-offset $off --size $TOTAL_SIZE --block $BLOCK
+	${FPART} $global_ops -s 4KiB  -o 4KiB  -n p1 --pad 0x11
+	${FPART} $global_ops -s 8KiB  -o 8KiB  -n p2 --pad 0x22
+	${FPART} $global_ops -s 12KiB -o 16KiB -n p3 --pad 0x33
+	${FPART} $global_ops -s 8KiB  -o 28KiB -n p4 --pad 0x44
+
+	return 0
+}
+
+
+usage()
+{
+	cat <<-EOM
+Usage: $(basename $0) [OPTIONS]
+
+OPTIONS
+	-b,--block   Size of block (default: $BLOCK)
+	-i,--image   Name of image to create (default: $IMAGE)
+	-o,--offset  Offset of partition tables to update (default: $OFFSETS)
+	-s,--size    Size of flash image (default: $SIZE)
+	-t,--type    Type of image to build (default: $TYPE)
+	                Valid option: $TYPES
+
+	-h,--help    This help output
+	-v,--verbose Enable verbose/debug output
+EOM
+}
+
+check_params()
+{
+	local valid=0
+
+	for t in $TYPES; do
+		[ "$t" = "$TYPE" ] && { valid=1; break; }
+	done
+
+	[ $valid -eq 0 ] && { echo "Invalid type: $t"; return 1; }
+
+	return 0
+}
+
+# Main part of script starts here
+while [ $# -gt 0 ]; do
+	case $1 in
+		-b | --block )
+			shift; BLOCK="$1"; shift;;
+		-i | --image )
+			shift; IMAGE=$1; shift;;
+		-o |--offset )
+			shift; OFFSETS="$OFFSETS $1"; shift;;
+		-s | --size)
+			shift; SIZE="$1"; shift;;
+		-t | --type)
+			shift; TYPE="$1"; shift;;
+
+		-h )
+			usage; exit 0;;
+		-v )
+			V=1; set -x; shift;;
+		* )
+			echo "Unrecognized option: $1\n"; exit 1;;
+	esac
+done
+
+check_params || { exit 1; }
+
+for o in $OFFSETS; do
+	setup_partition $IMAGE $o
+	[ $V -eq 1 ] && ${FPART} --list $IMAGE --partition-offset $o
+done
+
+exit 0

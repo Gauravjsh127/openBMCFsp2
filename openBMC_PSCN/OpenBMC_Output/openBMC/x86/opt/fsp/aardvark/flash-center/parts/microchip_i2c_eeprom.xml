@@ -1,0 +1,520 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<devices>
+    <default version="1.0">
+        <manufacturerName> Microchip Technology </manufacturerName>
+        <deviceAlgorithm> I2C EEPROM </deviceAlgorithm>
+        <maxBitrate> 400 </maxBitrate>
+        <writeTime> 5000 </writeTime>
+        <baseDeviceAddress> 0x50 </baseDeviceAddress>
+        <addressWidth> 2 </addressWidth>
+    </default>
+
+    <device version="1.0">
+        <deviceName> 24AA00 </deviceName>
+        <deviceDescription>
+            Microchip 24AA00 8 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 4000 </writeTime>
+        <writeSize> 1 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC00 </deviceName>
+        <deviceDescription>
+            Microchip 24LC00 8 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 4000 </writeTime>
+        <writeSize> 1 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24C00 </deviceName>
+        <deviceDescription>
+            Microchip 24C00 8 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 4000 </writeTime>
+        <writeSize> 1 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA01 </deviceName>
+        <deviceDescription>
+            Microchip 24AA01 128 byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA014 </deviceName>
+        <deviceDescription>
+            Microchip 24C014 128 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC014 </deviceName>
+        <deviceDescription>
+            Microchip 24C014 128 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC01B </deviceName>
+        <deviceDescription>
+            Microchip 24LC01B
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24C01C </deviceName>
+        <deviceDescription>
+            Microchip 24C01C 128 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 1000 </writeTime>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC21A </deviceName>
+        <deviceDescription>
+            Microchip 24LC21A 128 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 10000 </writeTime>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LCS21A </deviceName>
+        <deviceDescription>
+            Microchip 24LCS21A 128 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 128 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 10000 </writeTime>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA04 </deviceName>
+        <deviceDescription>
+            Microchip 24AA04 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC04B </deviceName>
+        <deviceDescription>
+            Microchip 24LC04B 512 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 512 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24C02C </deviceName>
+        <deviceDescription>
+            Microchip 24C02C 256 Byte I2C EEPROM\
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeTime> 1000 </writeTime>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA02 </deviceName>
+        <deviceDescription>
+            Microchip 24AA02 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC02B </deviceName>
+        <deviceDescription>
+            Microchip 24LC02B 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC02SC </deviceName>
+        <deviceDescription>
+            Microchip 24LC02SC 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC22A </deviceName>
+        <deviceDescription>
+            Microchip 24LC22A 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 22 </writeSize>
+        <writeTime> 10000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LCS22A </deviceName>
+        <deviceDescription>
+            Microchip 24LCS22A 256 Byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 8 </writeSize>
+        <writeTime> 10000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA08 </deviceName>
+        <deviceDescription>
+            Microchip 24AA08 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 4*256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC08B </deviceName>
+        <deviceDescription>
+            Microchip 24LC08B 1 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 4*256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA16 </deviceName>
+        <deviceDescription>
+            Microchip 24AA16 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC16B </deviceName>
+        <deviceDescription>
+            Microchip 24LC16B 2 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA32A </deviceName>
+        <deviceDescription>
+            Microchip 24AA32A 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 4*1024 </capacity>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC32A </deviceName>
+        <deviceDescription>
+            Microchip 24LC32A 4 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 4*1024 </capacity>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA64 </deviceName>
+        <deviceDescription>
+            Microchip 24AA64 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC64 </deviceName>
+        <deviceDescription>
+            Microchip 24FC64 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <maxBitrate> 1000 </maxBitrate>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC64 </deviceName>
+        <deviceDescription>
+            Microchip 24LC64 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 32 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA65 </deviceName>
+        <deviceDescription>
+            Microchip 24AA65 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24C65 </deviceName>
+        <deviceDescription>
+            Microchip 24C65 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC65 </deviceName>
+        <deviceDescription>
+            Microchip 24LC65 8 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 8*1024 </capacity>
+        <writeSize> 8 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA128 </deviceName>
+        <deviceDescription>
+            Microchip 24AA128 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC128 </deviceName>
+        <deviceDescription>
+            Microchip 24LC128 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC128 </deviceName>
+        <deviceDescription>
+            Microchip 24FC128 16 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 16*1024 </capacity>
+        <writeSize> 64 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA164 </deviceName>
+        <deviceDescription>
+            Microchip 24AA164 2 Kilobyte I2C EEPROM (Obsolete)
+        </deviceDescription>
+        <capacity> 2*1024 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+        <writeTime> 2000 </writeTime>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA256 </deviceName>
+        <deviceDescription>
+            Microchip 24AA256 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 32*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC256 </deviceName>
+        <deviceDescription>
+            Microchip 24LC256 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 32*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC256 </deviceName>
+        <deviceDescription>
+            Microchip 24FC256 32 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 32*1024 </capacity>
+    <writeSize> 64 </writeSize>
+    <maxBitrate> 1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA512 </deviceName>
+        <deviceDescription>
+            Microchip 24AA512 64 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 128 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA512SC </deviceName>
+        <deviceDescription>
+            Microchip 24AA512SC 64 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 128 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC512 </deviceName>
+        <deviceDescription>
+            Microchip 24LC512 64 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 128 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC512 </deviceName>
+        <deviceDescription>
+            Microchip 24FC512 64 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 128 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA1025 </deviceName>
+        <deviceDescription>
+            Microchip 24AA1025 128 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 128*1024 </capacity>
+        <writeSize> 128 </writeSize>
+        <pageShift> 2 </pageShift>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC1025 </deviceName>
+        <deviceDescription>
+            Microchip 24LC1025 128 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 128*1024 </capacity>
+        <writeSize> 128 </writeSize>
+        <writeTime> 3000 </writeTime>
+        <pageShift> 2 </pageShift>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC1025 </deviceName>
+        <deviceDescription>
+            Microchip 24FC1025 128 Kilobyte EEPROM
+        </deviceDescription>
+        <capacity> 128*1024 </capacity>
+        <writeSize> 128 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+        <writeTime> 3000 </writeTime>
+        <pageShift> 2 </pageShift>
+    </device>
+
+
+    <device version="1.0">
+        <deviceName> 24AA024 </deviceName>
+        <deviceDescription>
+            Microchip 24AA024 256 byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC024 </deviceName>
+        <deviceDescription>
+            Microchip 24LC024 256 byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA025 </deviceName>
+        <deviceDescription>
+            Microchip 24AA025 256 byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC025 </deviceName>
+        <deviceDescription>
+            Microchip 24LC025 256 byte I2C EEPROM
+        </deviceDescription>
+        <capacity> 256 </capacity>
+        <addressWidth> 1 </addressWidth>
+        <writeSize> 16 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24AA515 </deviceName>
+        <deviceDescription>
+            Microchip 24AA515 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24LC515 </deviceName>
+        <deviceDescription>
+            Microchip 24LC515 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 64 </writeSize>
+    </device>
+
+    <device version="1.0">
+        <deviceName> 24FC515 </deviceName>
+        <deviceDescription>
+            Microchip 24FC515 64 Kilobyte I2C EEPROM
+        </deviceDescription>
+        <capacity> 64*1024 </capacity>
+        <writeSize> 64 </writeSize>
+        <maxBitrate> 1000 </maxBitrate>
+    </device>
+
+</devices>
