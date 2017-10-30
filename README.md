@@ -1,133 +1,96 @@
-# OpenBMC #
+# OpenBMCFsp2 #
 
-[![Build Status](https://openpower.xyz/buildStatus/icon?job=openbmc-build)](https://openpower.xyz/job/openbmc-build/)
+Proof of concept : Experimental build for adding FSP2 chipset support in openBMC
 
-The OpenBMC project can be described as a Linux distribution for embedded
-devices that have a BMC; typically, but not limited to, things like servers,
-top of rack switches or RAID appliances. The OpenBMC stack uses technologies
-such as Yocto, Open-Embedded, Systemd and DBus to allow easy customization
-for your server platform.
+## Building ##
 
+OpenBMCFSP2 uses Yocto/Open-Embedded for a build system, which supports an
+out-of-tree build.  It is recommended that you create an empty directory
+somewhere to hold the build.  This directory will get big.
 
-## Setting up your OpenBMC project ##
+On Ubuntu 164.04 the following packages are required to build the default target
 
-### 1) Prerequisite ###
-- Ubuntu 14.04
+    sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat mkimage
 
-```
-sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat
-```
+## Build steps ##
 
-- Fedora 23
+  - ./git clone git@github.com:Gauravjsh127/openBMCFsp2.git
 
-```
-sudo dnf install -y git patch diffstat texinfo chrpath SDL-devel bitbake
-sudo dnf groupinstall "C Development Tools and Libraries"
-```
-### 2) Download the source ###
-```
-git clone git@github.com:openbmc/openbmc.git
-cd openbmc
-```
+  - ./cd openBMCFsp2
+    
+  - ./source openbmc-env  (Setup script)
+    
+  - Build the kernel :     ./bitbake linux-yocto-fsp2 
 
-### 3) Target your hardware ###
-Any build requires an environment variable known as `TEMPLATECONF` to be set
-to a hardware target.  OpenBMC has placed all known hardware targets in a
-standard directory structure `meta-openbmc-machines/meta-openpower/[company]/[target]`.
-You can see all of the known targets with `find meta-openbmc-machines -type d -name conf`.
-Choose the hardware target and then move to the next step. Additional examples
-can be found in the [OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
+  - Build the example recipies :    ./bitbake hello or bitbake rootfsexample
 
-Machine | TEMPLATECONF
---------|---------
-Palmetto | ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf```
-Barreleye | ```meta-openbmc-machines/meta-openpower/meta-rackspace/meta-barreleye/conf```
-Zaius| ```meta-openbmc-machines/meta-openpower/meta-ingrasys/meta-zaius/conf```
-Witherspoon| ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-witherspoon/conf```
+  - Clean command :    bitbake -c clean core-image-minimal
+  	
+  - Build the bare minimum rootfile system and the linux image :    bitbake core-image-minimal
 
+## Notes ##
 
-As an example target Palmetto
-```
-export TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf
-```
+ - The distribution used is poky and not phosphorous. 
+ - OpenBMC kernel used for FSP2 is 4.10.
 
-### 3) Build ###
+## OpenBMC kernel ##
 
-```
-. openbmc-env
-bitbake obmc-phosphor-image
-```
+ - Kernel Image uImage is created inside directory tmp/work/fsp2-poky-linux/linux-yocto-fsp2/4.10+gitAUTOINC+d5adbfcd5f-r0/image/boot
+ - rename the zImage-4.10.0-rc7-yocto-standard-custom to bbqefsp2_vmlinux.img
+ - scp to the SE /console/power
 
-Additional details can be found in the [docs](https://github.com/openbmc/docs)
-repository.
+## FSP2 Device Tree ##
 
-## Build Validation and Testing ##
-Commits submitted by members of the OpenBMC Github community are compiled and
-tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
-through two levels of testing.  At the repository level the makefile `make
-check` directive is run.  At the system level, the commit is built into a
-firmware image and run with a arm-softmmu QEMU model against a barrage of
-[CI tests](https://openpower.xyz/job/openbmc-test-qemu-ci/).
+ - Device tree is created inside the directory tmp/deploy/images/fsp2/ with the name zImage-fsp2.dtb
+ - rename the zImage-fsp2.dtb to bbqefsp2_dtb.img
+ - scp to the SE /console/power
+ 
+## Root File system ##
 
-Commits submitted by non-members do not automatically proceed through CI
-testing. After visual inspection of the commit, a CI run can be manually
-performed by the reviewer.
+ - Rootfile system is created inside the directory tmp/deploy/images/fsp2/ with the name core-image-minimal-fsp2.cpio.gz 
+ - To generate its uImage you need to use mkimage tool 
+ - Mkimage command :  mkimage -A ppc -O linux -T ramdisk -C none -a 0x01400000 -d core-image-minimal-fsp2.cpio.gz rootfsimg.img
+ - rename the rootfsimg.img to bbqefsp2_rootfs.img
+ - scp to the SE /console/power
+ 
+## Uboot Image ##
 
-Automated testing against the QEMU model along with supported systems are
-performed.  The OpenBMC project uses the
-[Robot Framework](http://robotframework.org/) for all automation.  Our
-complete test repository can be found
-[here](https://github.com/openbmc/openbmc-test-automation).
+ - Its added inside openBMC_PSCN folder with the name bbqefsp2_uboot.img
+ - scp to the SE /console/power   
+ 
+        
+## FLD drivers and ADALs##
 
-## Submitting Patches ##
-Support of additional hardware and software packages is always welcome.
-Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/contributing.md)
-when making a submission.  It is expected that contributions contain test
-cases.
+ - The Drivers and ADAL code is IBM internal and not hosted in public Github repository.
+   
+ - To access it you need to create account in https://github.ibm.com/.
+  
+ - For IBM employess : login Credentials are your IBM intranet ID and password. For cloning any project you need to add your ssh keys to the IBM github account(https://github.ibm.com/).
 
-## Bug Reporting ##
-[Issues](https://github.com/openbmc/openbmc/issues) are managed on
-Github.  It is recommended you search through the issues before opening
-a new one.
+ - The meta-fsp2-ibm-internal layer is automatically integrated in the openBMCFsp2 project inside the /meta-openbmc-bsp/meta-ibm layer when you run the setupscript ie openbmc-env
 
-## Features of OpenBMC ##
+ - Build the FLD drivers recipies :    ./bitbake fsptrace
 
-**Feature List**
-* REST Management
-* IPMI
-* SSH based SOL
-* Power and Cooling Management
-* Event Logs
-* Zeroconf discoverable
-* Sensors
-* Inventory
-* LED Management
-* Host Watchdog
-* Simulation
+## New Recipie ##
 
-**Features In Progress**
-* Code Update Support for multiple BMC/BIOS images
-* POWER On Chip Controller (OCC) Support
-* Full IPMI 2.0 Compliance with DCMI
-* Verified Boot
-* HTML5 Java Script Web User Interface
-* BMC RAS
+- Create a new recipie inside the new layer. Command : yocto-layer create mylayer
+         
+- Add  the new layer in bb file inside build directory.
 
-**Features Requested but need help**
-* OpenCompute Redfish Compliance
-* OpenBMC performance monitoring
-* cgroup user management and policies
-* Remote KVM
-* Remote USB
-* OpenStack Ironic Integration
-* QEMU enhancements
+- build the recipie   
+
+    Command : ./bitbake recipiename
+    
+- Check where the build recipie is created.
+  
+   ./cd build/temp/work/...
+   
+   
+   
+    
+     
 
 
-## Finding out more ##
-Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
-repository
 
-## Contact ##
-- Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
-- IRC: #openbmc on freenode.net
-- Riot: [#openbmc:matrix.org](https://riot.im/app/#/room/#openbmc:matrix.org)
+
+

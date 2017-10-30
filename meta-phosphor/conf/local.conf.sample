@@ -165,8 +165,7 @@ IMAGE_INSTALL_append = " kernel-modules "
 
 EXTRA_IMAGE_FEATURES += "tools-debug"
 
-IMAGE_INSTALL_append +=" gdb gdbserver libatomic "
-
+IMAGE_INSTALL_append +=" gdb gdbserver libatomic procps "
 
 IMAGE_INSTALL_append += "trace-collect "
 
