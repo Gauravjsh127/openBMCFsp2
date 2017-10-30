@@ -40,7 +40,7 @@ LINUX_VERSION_EXTENSION_append = "-custom"
 # tag: v4.10-rc7 ba5c00e0627e4d735b36e0353744c6c3c4690454
 ###   https://github.com/fr0st61te/linux
 
-SRCREV_machine="4d3d83ac3df9b2d7d6e69fd5028975ec84312f0e"
+SRCREV_machine="e4eaca0332d5178a8dcb1d30f3f5b6c370a7132a"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
