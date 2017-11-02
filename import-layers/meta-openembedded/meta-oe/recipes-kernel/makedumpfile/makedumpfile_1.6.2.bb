@@ -12,7 +12,7 @@ RDEPENDS_${PN}-tools = "perl ${PN}"
 
 # arm would compile but has never been tested upstream.  mips would not compile.
 #
-COMPATIBLE_HOST = "(x86_64|i.86|powerpc).*-linux"
+COMPATIBLE_HOST = "(x86_64|i.86|powerpc|arm).*-linux"
 
 PACKAGES =+ "${PN}-tools"
 FILES_${PN}-tools = "${bindir}/*.pl"
@@ -24,8 +24,8 @@ SRC_URI = "\
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 LICENSE = "GPLv2.0"
 
-SRC_URI[md5sum] = "041c5c6de2c3066600e4ca646c2397d6"
-SRC_URI[sha256sum] = "e3147abc52df2ceac1e9affef45bf37e2f2e1d9979bc94a761ee11e4044072ac"
+SRC_URI[md5sum] = "72be5bf973eed898c5127e3abc466583"
+SRC_URI[sha256sum] = "ee3d21cb4032a60bd2c802d1d8b21b9f399710e1574f8de8ead5ab50cd821a6d"
 
 SECTION = "base"
 
