@@ -37,25 +37,24 @@ Generating the cross-toolchain via BitBake within an existing build directory in
 	- cd scsn/
              
     - Update the openBMC project path in the cmake/fsp2_compiler.template file inside the PSCN project ( VARIABLE : openBMCprojectpath ).
-      ie Update these lines: openBMCprojectpath=/home/gaurav/code/github/26th_july/openBMCFsp2
+      ie Update these lines: openBMCprojectpath=/home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22
     
-    - Update the openBMC project path in the cmake/fsp2_toolchain file inside the PSCN project for C, C++ and STRIP.
-      ie Update these lines:
-      C++   : set(PSCN_COMPILER " tracepp_zseries /home/gaurav/code/github/26th_july/openBMCFsp2/build/tmp/sysroots/x86_64-linux/usr/bin/powerpc-poky-linux/powerpc-poky-linux-g++ --sysroot=$SDKTARGETSYSROOT -lpthread -lresolv ")
-      C     : set(PSCN_COMPILER " tracepp_zseries /home/gaurav/code/github/26th_july/openBMCFsp2/build/tmp/sysroots/x86_64-linux/usr/bin/powerpc-poky-linux/powerpc-poky-linux-gcc --sysroot=$SDKTARGETSYSROOT -lpthread -lresolv ")
-      STRIP : set(CMAKE_STRIP /home/gaurav/code/github/26th_july/openBMCFsp2/build/tmp/sysroots/x86_64-linux/usr/bin/powerpc-poky-linux/powerpc-poky-linux-strip  CACHE PATH "Path to a program" FORCE)
-    
+    - Update the openBMC project path in the cmake/fsp2_toolchain file inside the PSCN project
+		 i.e. set(openBMC /home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22)
+
     - Update the  PSCN project path inside the /cmake/Modules/SetupFldLinks.cmake file inside the PSCN project. 
       ie Update these lines:
-      COMMAND ln -T -s -f -v /home/gaurav/BB/openBMC_pscn/scsn/OpenBMC_Output/openBMC ${PSCN_BINARY_DIR}/openBMC WORKING_DIRECTORY ${PSCN_BINARY_DIR}
-  
-    - Copy the openBMC output files and libraries generated via openBMC(bitbake -k core-image-minimal command) for the ppc and x86 architecture inside the /openBMC_Output folder inside the PSCN project.
-      Note : Copy the ffs libraries from the package and not from rootfs to the openBMC_output 
+      COMMAND ln -T -s -f -v /home/xxpetri/code/openBMC/PSCN/scsn/OpenBMC_Output/openBMC ${PSCN_BINARY_DIR}/openBMC WORKING_DIRECTORY ${PSCN_BINARY_DIR}
       
-      For example :
-      OpenBMC file/libaries location : /home/gaurav/code/github/26th_july/openBMCFsp2/build/tmp/work/fsp2-poky-linux/core-image-minimal/1.0-r0/rootfs
-      Copy to :
-      PSCN project location          : /home/gaurav/BB/openBMC_pscn/scsn/OpenBMC_Output/openBMC/ppc
+    - link to rootfs for x85 and ppc
+		ppc point to your openBMC rootfs
+			cd scsn/OpenBMC_Output/openBMC
+			ln -fs /home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22/build/tmp/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs/ ppc
+		x86s point to AFS - do a klog to get it 
+
+
+		update buildrootfs (in scsn/cmake)
+		my $openBMCprojectpath="/home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22/";
   
     - Build the PSCN code : ./buildctl.cm fsp2
 
