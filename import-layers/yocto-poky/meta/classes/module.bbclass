@@ -21,7 +21,7 @@ module_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
 	oe_runmake KERNEL_PATH=${STAGING_KERNEL_DIR}   \
 		   KERNEL_VERSION=${KERNEL_VERSION}    \
-		   CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
+		   CC=" perl ${THISDIR}/../include/pre_processor/tracepp ${KERNEL_CC} " LD="${KERNEL_LD}" \
 		   AR="${KERNEL_AR}" \
 	           O=${STAGING_KERNEL_BUILDDIR} \
 		   KBUILD_EXTRA_SYMBOLS="${KBUILD_EXTRA_SYMBOLS}" \
