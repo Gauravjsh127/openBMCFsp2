@@ -1,0 +1,17 @@
+diff --git a/fs/coredump.c b/fs/coredump.c
+index ae6b056..6387f4b 100644
+--- a/fs/coredump.c
++++ b/fs/coredump.c
+@@ -774,6 +774,12 @@ void do_coredump(const siginfo_t *siginfo)
+ fail_creds:
+ 	put_cred(cred);
+ fail:
++#ifdef CONFIG_FSP2
++	if (!core_dumped) {
++		show_regs(cprm.regs);
++		panic("coredump failed");
++	}
++#endif
+ 	return;
+ }
+ 
