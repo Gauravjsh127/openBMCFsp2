@@ -46,7 +46,7 @@ set -xeo pipefail
 target=${target:-qemu}
 distro=${distro:-ubuntu}
 imgtag=${imgtag:-latest}
-obmcdir=${obmcdir:-/tmp/openbmc}
+obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}}
 rnd=${RANDOM}${RANDOM}
 WORKSPACE=${WORKSPACE:-${HOME}/${rnd}}
@@ -59,6 +59,9 @@ PROXY=""
 # Determine the architecture
 ARCH=$(uname -m)
 
+
+#echo ${target}
+#echo ${obmcdir}
 # Determine the prefix of the Dockerfile's base image
 case ${ARCH} in
   "ppc64le")
