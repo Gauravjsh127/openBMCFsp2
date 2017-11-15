@@ -161,7 +161,8 @@ if [[ "${distro}" == fedora ]];then
       which \
       uboot-tools\
       libxerces-c-dev \
-      expect
+      expect\
+      cmake
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   USER ${USER}
@@ -200,7 +201,8 @@ elif [[ "${distro}" == ubuntu ]]; then
       wget \
       u-boot-tools \
       libxerces-c-dev \
-      expect
+      expect \
+      cmake
   # Set the locale
   RUN locale-gen en_US.UTF-8
   ENV LANG en_US.UTF-8
