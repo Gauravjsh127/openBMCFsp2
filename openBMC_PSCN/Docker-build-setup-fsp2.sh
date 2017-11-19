@@ -262,16 +262,16 @@ fi
 # Source our build env
 ${BITBAKE_CMD}
 # Custom BitBake config settings
-#cat >> conf/local.conf << EOF_CONF
-#BB_NUMBER_THREADS = "$(nproc)"
-#PARALLEL_MAKE = "-j$(nproc)"
-#INHERIT += "rm_work"
-#BB_GENERATE_MIRROR_TARBALLS = "1"
-#DL_DIR="${sscdir}/bitbake_downloads"
-#SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
-#USER_CLASSES += "buildstats"
+cat >> conf/local.conf << EOF_CONF
+BB_NUMBER_THREADS = "$(nproc)"
+PARALLEL_MAKE = "-j$(nproc)"
+INHERIT += "rm_work"
+BB_GENERATE_MIRROR_TARBALLS = "1"
+DL_DIR="${sscdir}/bitbake_downloads"
+SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
+USER_CLASSES += "buildstats"
 #INHERIT_remove = "uninative"
-#EOF_CONF
+EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
 echo "Generate the core-image-minimal"
@@ -279,6 +279,13 @@ bitbake core-image-minimal
 # To generate the SDK for the core-image-minimal if BITBAKE_OPTS passed as -c populate_sdk
 echo "Generate the SDK for the core-image-minimal"
 bitbake core-image-minimal -c populate_sdk
+## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
+cd tmp/deploy/images/fsp2
+mkdir rootfs
+cp core-image-minimal-fsp2.cpio.gz rootfs/
+cd rootfs
+gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
+cd ../../../../../
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 #cp -R ${obmcdir}/build/tmp/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs ${WORKSPACE}/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs
