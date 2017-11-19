@@ -70,10 +70,10 @@
       		COMMAND ln -T -s -f -v /home/xxpetri/code/openBMC/PSCN/scsn/OpenBMC_Output/openBMC ${PSCN_BINARY_DIR}/openBMC WORKING_DIRECTORY ${PSCN_BINARY_DIR}
       
   - Update sym links to rootfs for x86 and ppc inside scsn/OpenBMC_Output/openBMC
-	For ppc:
+	-	For ppc:
 		ln -fs /home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22/build/tmp/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs/ ppc
 	
-	For x86s point to AFS - do a klog to get it and use ln .fs command to point to it
+	-	For x86s point to AFS - do a klog to get it and use ln -fs command to point sym link  to it
 
   - Build the PSCN code : ./buildctl.cm fsp2
  
