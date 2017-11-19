@@ -16,7 +16,7 @@
 		openbmc/ubuntu       latest-fsp2-x86_64              	99b63e49b013      19 hours ago    751.4 MB
 		ubuntu             	 latest                          	dd6f76d9cc        12 days ago     122 MB
 
-   - Now checkout the latest PSCN code( branch /team/openbmc)
+   - checkout PSCN code branching to team/openBMC (use the /openBMC_PSCN/gitclone_pscn_openbmc.sh script)
 
    - Change the image name inside dockerbuild-imagename file to openbmc/ubuntu:latest-fsp2-x86_64-2328916236   
 
@@ -52,24 +52,21 @@
   
   - Build the SDK :    bitbake core-image-minimal -c populate_sdk 
    	 
-
-	## Using openBMC SDK to build PSCN code ##
-   
-	- checkout PSCN code branching to team/openBMC (use the /openBMC_PSCN/gitclone_pscn_openbmc.sh script)
+  - checkout PSCN code branching to team/openBMC (use the /openBMC_PSCN/gitclone_pscn_openbmc.sh script)
 	
-	- cd scsn/
+  - cd scsn/
              
-    - Update the openBMC project path in the cmake/fsp2_compiler.template file inside the PSCN project ( VARIABLE : openBMCprojectpath ).
+  - Update the openBMC project path in the cmake/fsp2_compiler.template file inside the PSCN project ( VARIABLE : openBMCprojectpath ).
       ie Update these lines: openBMCprojectpath=/home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22
     
-    - Update the openBMC project path in the cmake/fsp2_toolchain file inside the PSCN project
+  - Update the openBMC project path in the cmake/fsp2_toolchain file inside the PSCN project
 		 i.e. set(openBMC /home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22)
 
-    - Update the  PSCN project path inside the /cmake/Modules/SetupFldLinks.cmake file inside the PSCN project. 
+  - Update the  PSCN project path inside the /cmake/Modules/SetupFldLinks.cmake file inside the PSCN project. 
       ie Update these lines:
       COMMAND ln -T -s -f -v /home/xxpetri/code/openBMC/PSCN/scsn/OpenBMC_Output/openBMC ${PSCN_BINARY_DIR}/openBMC WORKING_DIRECTORY ${PSCN_BINARY_DIR}
       
-    - link to rootfs for x85 and ppc
+  - link to rootfs for x85 and ppc
 		ppc point to your openBMC rootfs
 			cd scsn/OpenBMC_Output/openBMC
 			ln -fs /home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22/build/tmp/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs/ ppc
@@ -78,19 +75,16 @@
 		update buildrootfs (in scsn/cmake)
 		my $openBMCprojectpath="/home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22/";
   
-    - Build the PSCN code : ./buildctl.cm fsp2
-
-
-	## To Start PSCN application ##
-    
-   - Switch to the PSCN output directory ie cd ../build_fsp2
+  - Build the PSCN code : ./buildctl.cm fsp2
+ 
+  - Switch to the PSCN output directory ie cd ../build_fsp2
    
-   - scp the ram0 and ram1 tar files to SE /console/power directory
+  - scp the ram0 and ram1 tar files to SE /console/power directory
   	 For example :  scp bbqefsp2_ram1.tar images/bbqefsp2_ram0.tar hmcmanager@9.152.171.108:/console/power
   		 
-   - run the setup application on SE i.e. /console/power/bbqmcffilesetup.se
+  - run the setup application on SE i.e. /console/power/bbqmcffilesetup.se
    
-   - Reboot the FSPs.
+  - Reboot the FSPs.
   
    
 
