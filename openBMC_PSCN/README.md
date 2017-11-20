@@ -21,9 +21,10 @@
 
    - Change the image name inside dockerbuild-imagename file to openbmc/ubuntu:latest-fsp2-x86_64-2328916236   
 
-   - Now run the docker script to build the PSCN code.[Two steps]
-         ./dockerbuild fsp 
-         ./dockerbuild fsp:package_rpm 
+   - Now run the docker script to build the PSCN code.[3 steps]
+  		-	./dockerbuild fsp 
+		-	./dockerbuild fsp:package_rpm
+		-	./dockerbuild fsp:package_ffdc 
 
    - Switch to the PSCN output directory ie cd build/build_fsp2
    - scp the ram0 ,ram1, bbqgtrc.bin and ffdc tar files to SE directory(preferable to a temporary directory and use fix command to poy them inside /console/power). 
