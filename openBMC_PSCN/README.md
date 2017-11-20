@@ -10,7 +10,7 @@
    - Install docker in your local system
   
   - Run the script :  openBMC_PSCN/Docker-build-setup-fsp2.sh.
-     This script execution will take appox 1 hour and will generate 3 images in your local system.for iterative build it will take approx 20-25 minutes but for any iterative changes to be  merge push them in github first.
+     This script execution will take appox 1 hour and will generate 3 images in your local system.For an iterative build it will take approx 20-25 minutes but for any iterative changes to be  merge in build push them in github/github.ibm.com first.
      		          
 	  	REPOSITORY        	TAG                     IMAGE ID          CREATED          SIZE
 		openbmc/ubuntu  latest-fsp2-x86_64-2328916236   9a4fd8484028      14 hours ago    4 GB       (used by PSCN)
@@ -27,7 +27,8 @@
 		-	./dockerbuild fsp:package_ffdc 
 
    - Switch to the PSCN output directory ie cd build/build_fsp2
-   - scp the ram0 ,ram1, bbqgtrc.bin and ffdc tar files to SE directory(preferable to a temporary directory and use fix command to poy them inside /console/power). 
+   
+   - scp the ram0 ,ram1, bbqgtrc.bin and ffdc tar files to SE directory(preferable to a temporary directory and use fix command to copy them inside /console/power). 
   	 
 	For example : scp bbqefsp2_ram1.tar images/bbqefsp2_ram0.tar bbqgtrc.bin bbqefsp2_ffdc.tgz hmcmanager@9.152.150.97:/home/hmcmanager/tmp
   		 
@@ -42,20 +43,19 @@
   Make sure your system has libxerces-c-dev,cmake and rpm packages installed.
 
   - Populate the code : ./git clone git@github.com:Gauravjsh127/openBMCFsp2.git
-
-  - ./cd openBMCFsp2
+	  -	 ./cd openBMCFsp2
     
-  - Run setup script.
-      ./source openbmc-env 
+  - Run setup script. 
+ 	 -	./source openbmc-env 
 
   - Build kernel images ie vmlinux,dtb,rootfs and uboot.
         bitbake core-image-minimal 
   
-  - Build the SDK :    bitbake core-image-minimal -c populate_sdk 
+  - Build the SDK 
+  	-	bitbake core-image-minimal -c populate_sdk 
    	 
   - checkout PSCN code branching to team/openBMC (use the /openBMC_PSCN/gitclone_pscn_openbmc.sh script)
-	
-  - cd scsn/
+	-	cd scsn/
              
   - Update the openBMC project path in the cmake/fsp2_compiler.template file inside the PSCN project ( VARIABLE : openBMCprojectpath ).
       ie Update these lines: openBMCprojectpath=/home/xxpetri/code/openBMC/openBMCFsp2/openBMCFsp22
@@ -76,11 +76,13 @@
 	
 	-	For x86s point to AFS - do a klog to get it and use ln -fs command to point sym link  to it
 
-  - Build the PSCN code : ./buildctl.cm fsp2
+  - Build the PSCN code 
+  	-	./buildctl.cm fsp2
  
-  - Switch to the PSCN output directory ie cd ../build_fsp2
+  - Switch to the PSCN output directory.
+  	-	cd ../build_fsp2
    
-   - scp the ram0 ,ram1, bbqgtrc.bin and ffdc tar files to SE directory(preferable to a temporary directory and use fix command to poy them inside /console/power). 
+   - scp the ram0 ,ram1, bbqgtrc.bin and ffdc tar files to SE directory(preferable to a temporary directory and use fix command to copy them inside /console/power). 
   	 
 	For example : scp bbqefsp2_ram1.tar images/bbqefsp2_ram0.tar bbqgtrc.bin bbqefsp2_ffdc.tgz hmcmanager@9.152.150.97:/home/hmcmanager/tmp
   		 
