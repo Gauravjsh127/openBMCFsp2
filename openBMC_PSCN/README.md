@@ -86,7 +86,8 @@
   	 
 	For example : scp bbqefsp2_ram1.tar images/bbqefsp2_ram0.tar bbqgtrc.bin bbqefsp2_ffdc.tgz hmcmanager@9.152.150.97:/home/hmcmanager/tmp
   		 
-  - run the setup application on SE i.e. /console/power/bbqmcffilesetup.se
+  - run the setup application on SE 
+  	-	/console/power/bbqmcffilesetup.se
    
   - Reboot the FSPs.
   
