@@ -1,6 +1,6 @@
 # OpenBMCFsp2 #
 
- To Build PSCN application build via openBMC ADT there are two ways:
+ To Build PSCN application via openBMC there are two ways:
    - Using Docker - No dependency on host system  
    - Using Host system
    
