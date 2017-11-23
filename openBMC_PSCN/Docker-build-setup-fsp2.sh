@@ -8,8 +8,8 @@
 # Variables used for Jenkins build job matrix:
 #  target       = barreleye|palmetto|witherspoon|firestone|garrison|evb-ast2500
 #                 zaius|romulus|qemu|fsp2
-#  distro       = fedora|ubuntu
-#  imgtag       = Varies by distro. latest|16.04|14.04|trusty|xenial; 23|24|25
+#  distro       = fedora|ubuntu|boesedev
+#  imgtag       = Varies by distro. latest|16.04|14.04|trusty|xenial; 23|24|25;8.1.6
 #  obmcext      = Path of the OpenBMC repo directory used in creating a copy
 #                 inside the container that is not mounted to external storage
 #                 default directory location "${WORKSPACE}/openbmc"
@@ -44,8 +44,8 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-fsp2}
-distro=${distro:-ubuntu}
-imgtag=${imgtag:-latest}
+distro=${distro:-boesedev}
+imgtag=${imgtag:-8.1.6}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}}
 rnd=${RANDOM}${RANDOM}
@@ -127,7 +127,6 @@ if [[ "${distro}" == fedora ]];then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"proxy=${http_proxy}\" >> /etc/dnf/dnf.conf"
   fi
-
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE}${distro}:${imgtag}
   ${PROXY}
@@ -172,13 +171,12 @@ if [[ "${distro}" == fedora ]];then
   RUN /bin/bash
 EOF
 )
-
 elif [[ "${distro}" == ubuntu ]]; then
 
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
-
+	
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE}${distro}:${imgtag}
   ${PROXY}
@@ -218,6 +216,26 @@ elif [[ "${distro}" == ubuntu ]]; then
   ENV HOME ${HOME}
   RUN /bin/bash
 EOF
+)
+elif [[ "${distro}" == boesedev ]]; then
+  if [[ -n "${http_proxy}" ]]; then
+    PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
+  fi
+  DOCKER_BASE="fwdocker.boeblingen.de.ibm.com:5000/"
+  Dockerfile=$(cat << EOF
+  FROM ${DOCKER_BASE}${distro}:${imgtag}
+  ${PROXY}
+  ENV LANG en_US.UTF-8
+  ENV LANGUAGE en_US:en
+  ENV LC_ALL en_US.UTF-8
+  RUN yum install -y --nogpgcheck  texinfo chrpath texi2html
+  RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
+  RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
+  USER ${USER}
+  ENV HOME ${HOME}
+  RUN /bin/bash
+EOF
+ 
 )
 fi
 
@@ -315,6 +333,7 @@ if [[ "${launch}" == "" ]]; then
   if [[ ! -z ${ppbimg} ]]; then
     # Run the Docker container, execute the build.sh script
     docker run \
+    --entrypoint=/bin/bash \
     --cap-add=sys_admin \
     --net=host \
     -e WORKSPACE=${WORKSPACE} \
@@ -331,6 +350,7 @@ if [[ "${launch}" == "" ]]; then
   else
     # Run the Docker container, execute the build.sh script
     docker run \
+    --entrypoint=/bin/bash \
     --cap-add=sys_admin \
     --net=host \
     --rm=true \
