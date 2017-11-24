@@ -55,7 +55,10 @@ launch=${launch:-}
 http_proxy=${http_proxy:-}
 ppbimg=${ppbimg:-1}
 PROXY=""
+CurrentDate=$(date +%F_%H.%M.%S)
 
+DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+ 
 # Determine the architecture
 ARCH=$(uname -m)
 
@@ -221,9 +224,8 @@ elif [[ "${distro}" == boesedev ]]; then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
-  DOCKER_BASE="fwdocker.boeblingen.de.ibm.com:5000/"
   Dockerfile=$(cat << EOF
-  FROM ${DOCKER_BASE}${distro}:${imgtag}
+  FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
   ${PROXY}
   ENV LANG en_US.UTF-8
   ENV LANGUAGE en_US:en
@@ -314,9 +316,13 @@ chmod a+x ${WORKSPACE}/build.sh
 # Determine if the build container will be launched with Docker or Kubernetes
 if [[ "${launch}" == "" ]]; then
 
+if [[ "${distro}" == boesedev ]]; then
+  # Give the Docker image a name based on the distro,tag,arch,and target
+  imgname=${imgname:-${DOCKER_BASE_BOE}/${distro}-${imgtag}:"openBMC_1_dev"}
+else
   # Give the Docker image a name based on the distro,tag,arch,and target
   imgname=${imgname:-openbmc/${distro}:${imgtag}-${target}-${ARCH}}
-
+fi
   # Build the Docker image
   docker build -t ${imgname} - <<< "${Dockerfile}"
 
@@ -343,10 +349,9 @@ if [[ "${launch}" == "" ]]; then
     ${mountsscdir} \
     -t ${imgname} \
     ${WORKSPACE}/build.sh
-
     cnt_id=$(docker ps -lq)
-    docker commit ${cnt_id} ${imgname}-${rnd}
-    echo "Docker image has created ${imgname}-${rnd}"
+    docker commit ${cnt_id} ${imgname}-${CurrentDate}
+    echo "Docker image has created ${imgname}-${CurrentDate}"
   else
     # Run the Docker container, execute the build.sh script
     docker run \
