@@ -58,7 +58,8 @@ PROXY=""
 CurrentDate=$(date +%F_%H.%M.%S)
 
 DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
- 
+DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
+openBMCVersion="1"
 # Determine the architecture
 ARCH=$(uname -m)
 
@@ -318,7 +319,7 @@ if [[ "${launch}" == "" ]]; then
 
 if [[ "${distro}" == boesedev ]]; then
   # Give the Docker image a name based on the distro,tag,arch,and target
-  imgname=${imgname:-${DOCKER_BASE_BOE}/${distro}-${imgtag}:"openBMC_1_dev"}
+  imgname=${imgname:-${DOCKER_BASE_PSCN}/${distro}-${imgtag}:"openBMC_${openBMCVersion}_dev"}
 else
   # Give the Docker image a name based on the distro,tag,arch,and target
   imgname=${imgname:-openbmc/${distro}:${imgtag}-${target}-${ARCH}}
