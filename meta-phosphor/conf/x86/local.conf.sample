@@ -19,25 +19,25 @@ INHERIT += "extrausers"
 
 ## Pscn and FLD Libraries AND BINARIES ######
 
-IMAGE_INSTALL_append += "fpart "
+IMAGE_INSTALL_append += "fpart-x86 "
 
-IMAGE_INSTALL_append += "fcp "
+IMAGE_INSTALL_append += "fcp-x86 "
 
 IMAGE_INSTALL_append += "aeea aeea-dev "
 
 IMAGE_INSTALL_append += "fld-libs fld-libs-dev "
 
-IMAGE_INSTALL_append += "dbgx dbgx-dev "
+IMAGE_INSTALL_append += "dbgx-x86 dbgx-x86-dev "
 
-IMAGE_INSTALL_append += "clib clib-dev "
+IMAGE_INSTALL_append += "clib-x86 clib-x86-dev "
 
-IMAGE_INSTALL_append += "ffs ffs-dev "
+IMAGE_INSTALL_append += "ffs-x86 ffs-x86-dev "
 
-IMAGE_INSTALL_append += "spinor spinor-dev "
+IMAGE_INSTALL_append += "spinor-x86 spinor-x86-dev "
 
-IMAGE_INSTALL_append += "ffsfs "
+IMAGE_INSTALL_append += "ffsfs-x86 "
 
-IMAGE_INSTALL_append += "bootenvfld "
+IMAGE_INSTALL_append += "bootenvfld-x86 "
 
 IMAGE_INSTALL_append += "fsp-trace "
 

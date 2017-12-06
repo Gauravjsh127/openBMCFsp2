@@ -116,8 +116,8 @@ case ${target} in
     ;;
   fsp2)
     BITBAKE_CMD=""
-    BITBAKE_CMD_PPC="source openbmc-PPC-env"
-    BITBAKE_CMD_X86="source openbmc-X86-env"
+    BITBAKE_CMD_PPC="source openbmc-ppc-env"
+    BITBAKE_CMD_X86="source openbmc-x86-env"
     ;;
   qemu)
     BITBAKE_CMD="source openbmc-env"
@@ -283,6 +283,10 @@ EOF_GIT
 EOF_SVN
 fi
 
+
+#### Delete Any previous machine conf settings ####### 
+rm -rf build/conf
+
 #### Build the fsp2 PPC target  ####### 
 ${BITBAKE_CMD_PPC}
 # Custom BitBake config settings
@@ -305,17 +309,11 @@ echo "Generate the SDK for the core-image-minimal"
 bitbake core-image-minimal -c populate_sdk
 
 cd ../
-#### Delete the PPC conf settings ####### 
+#### Delete Any previous machine conf settings ####### 
 rm -rf build/conf
-
-#### Delete the PPC conf settings ####### 
-cd ../
-rm -rf build/conf
-
 
 #### Build the PSCN x86 target  ####### 
 ${BITBAKE_CMD_X86}
-${BITBAKE_CMD_PPC}
 # Custom BitBake config settings
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"

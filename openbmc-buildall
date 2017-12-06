@@ -5,9 +5,9 @@ rm -rf build/conf
 #### Build the fsp2 PPC target  ####### 
 source openbmc-ppc-env
 
-bitbake -k core-image-minimal
+bitbake core-image-minimal
 
-bitbake -k core-image-minimal -c populate_sdk
+bitbake core-image-minimal -c populate_sdk
 
 #### Delete the previous machine conf settings ####### 
 cd ../
@@ -18,7 +18,7 @@ rm -rf build/conf
 
 source openbmc-x86-env
 
-bitbake -k core-image-minimal-initramfs
+bitbake core-image-minimal-x86
 
 
 
