@@ -11,12 +11,12 @@ if [ -f $OBMCROOT/customrc ]; then
     . $OBMCROOT/customrc
 fi
 
+echo $OBMCROOT
 
-echo "### Merge meta-fsp2-drivers layers in openBMCFSP2 ###"
+echo "### Merge meta-fsp2-drivers layers in openBMCFSP2 for X86 ###"
 . $OBMCROOT/openBMC_PSCN/clone-meta-fsp2-drivers
 
 
-
-echo "### Initializing OE build env ###"
-. $OBMCROOT/oe-init-build-env
+echo "### Initializing OE build env for X86 ###"
+TEMPLATECONF=meta-phosphor/conf/x86 source $OBMCROOT/oe-init-build-env
 

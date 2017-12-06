@@ -1,0 +1,27 @@
+
+#### Delete the previous machine conf settings ####### 
+rm -rf build/conf
+
+#### Build the fsp2 PPC target  ####### 
+source openbmc-ppc-env
+
+bitbake -k core-image-minimal
+
+bitbake -k core-image-minimal -c populate_sdk
+
+#### Delete the previous machine conf settings ####### 
+cd ../
+rm -rf build/conf
+
+
+#### Build the PSCN x86 target  ####### 
+
+source openbmc-x86-env
+
+bitbake -k core-image-minimal-initramfs
+
+
+
+
+
+

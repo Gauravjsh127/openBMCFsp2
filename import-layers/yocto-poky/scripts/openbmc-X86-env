@@ -1,0 +1,22 @@
+if [ -n "$BASH_SOURCE" ]; then
+   OBMCROOT="`dirname $BASH_SOURCE`"
+elif [ -n "$ZSH_NAME" ]; then
+   OBMCROOT="`dirname $0`"
+else
+   OBMCROOT="`pwd`"
+fi
+
+if [ -f $OBMCROOT/customrc ]; then
+    echo "### Sourcing customrc ###"
+    . $OBMCROOT/customrc
+fi
+
+
+echo "### Merge meta-fsp2-drivers layers in openBMCFSP2 ###"
+. $OBMCROOT/openBMC_PSCN/clone-meta-fsp2-drivers
+
+
+
+echo "### Initializing OE build env ###"
+TEMPLATECONF=meta-phosphor/conf/x86 source $OBMCROOT/oe-init-build-env
+

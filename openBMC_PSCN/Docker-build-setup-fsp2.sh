@@ -115,7 +115,9 @@ case ${target} in
     BITBAKE_CMD="TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-romulus/conf source oe-init-build-env"
     ;;
   fsp2)
-    BITBAKE_CMD="TEMPLATECONF=meta-phosphor/conf source openbmc-env"
+    BITBAKE_CMD=""
+    BITBAKE_CMD_PPC="source openbmc-PPC-env"
+    BITBAKE_CMD_X86="source openbmc-X86-env"
     ;;
   qemu)
     BITBAKE_CMD="source openbmc-env"
@@ -280,8 +282,9 @@ EOF_GIT
   http-proxy-port = ${PROXY_PORT}
 EOF_SVN
 fi
-# Source our build env
-${BITBAKE_CMD}
+
+#### Build the fsp2 PPC target  ####### 
+${BITBAKE_CMD_PPC}
 # Custom BitBake config settings
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"
@@ -300,6 +303,36 @@ bitbake core-image-minimal
 # To generate the SDK for the core-image-minimal if BITBAKE_OPTS passed as -c populate_sdk
 echo "Generate the SDK for the core-image-minimal"
 bitbake core-image-minimal -c populate_sdk
+
+cd ../
+#### Delete the PPC conf settings ####### 
+rm -rf build/conf
+
+#### Delete the PPC conf settings ####### 
+cd ../
+rm -rf build/conf
+
+
+#### Build the PSCN x86 target  ####### 
+${BITBAKE_CMD_X86}
+${BITBAKE_CMD_PPC}
+# Custom BitBake config settings
+cat >> conf/local.conf << EOF_CONF
+BB_NUMBER_THREADS = "$(nproc)"
+PARALLEL_MAKE = "-j$(nproc)"
+INHERIT += "rm_work"
+BB_GENERATE_MIRROR_TARBALLS = "1"
+DL_DIR="${sscdir}/bitbake_downloads"
+SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
+USER_CLASSES += "buildstats"
+#INHERIT_remove = "uninative"
+EOF_CONF
+# Kick off a build
+# To generate the core-image-minimal
+echo "Generate the core-image-minimal"
+bitbake core-image-minimal 
+
+
 ## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
 cd tmp/deploy/images/fsp2
 mkdir rootfs
