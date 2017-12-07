@@ -17,7 +17,12 @@ BB_DISKMON_DIRS = "\
 CONF_VERSION = "1"
 INHERIT += "extrausers"
 
-## Pscn and FLD Libraries AND BINARIES ######
+
+################ ADALS ############################################
+
+IMAGE_INSTALL_append +="fsptrace-adal-x86 fsptrace-adal-x86-staticdev fsptrace-adal-x86-dev "
+
+################ Pscn and FLD Libraries AND BINARIES ##############
 
 IMAGE_INSTALL_append += "fpart-x86 "
 
@@ -39,7 +44,7 @@ IMAGE_INSTALL_append += "ffsfs-x86 "
 
 IMAGE_INSTALL_append += "bootenvfld-x86 "
 
-IMAGE_INSTALL_append += "fsp-trace "
+IMAGE_INSTALL_append += "fsp-trace-x86 "
 
 IMAGE_INSTALL_append += "tiny-kmsglogd "
 

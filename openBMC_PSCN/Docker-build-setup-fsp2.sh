@@ -326,21 +326,10 @@ USER_CLASSES += "buildstats"
 #INHERIT_remove = "uninative"
 EOF_CONF
 # Kick off a build
-# To generate the core-image-minimal
-echo "Generate the core-image-minimal"
-bitbake core-image-minimal 
+# To generate the core-image-minimal-x86
+echo "Generate the core-image-minimal-x86"
+bitbake core-image-minimal-x86 
 
-
-## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
-cd tmp/deploy/images/fsp2
-mkdir rootfs
-cp core-image-minimal-fsp2.cpio.gz rootfs/
-cd rootfs
-gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
-cd ../../../../../
-# Copy images out of internal obmcdir into workspace directory
-cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
-#cp -R ${obmcdir}/build/tmp/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs ${WORKSPACE}/work/fsp2-openbmc-linux/core-image-minimal/1.0-r0/rootfs
 EOF_SCRIPT
 
 chmod a+x ${WORKSPACE}/build.sh

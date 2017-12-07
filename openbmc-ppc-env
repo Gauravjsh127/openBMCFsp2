@@ -1,3 +1,6 @@
+#### Delete the previous machine conf settings ####### 
+rm -rf build/conf
+
 if [ -n "$BASH_SOURCE" ]; then
    OBMCROOT="`dirname $BASH_SOURCE`"
 elif [ -n "$ZSH_NAME" ]; then
@@ -11,12 +14,8 @@ if [ -f $OBMCROOT/customrc ]; then
     . $OBMCROOT/customrc
 fi
 
-echo $OBMCROOT
-
 echo "### Merge meta-fsp2-drivers layers in openBMCFSP2 for PPC ###"
 . $OBMCROOT/openBMC_PSCN/clone-meta-fsp2-drivers
-
-
 
 echo "### Initializing OE build env for PPC ###"
 TEMPLATECONF=meta-phosphor/conf/ppc source $OBMCROOT/oe-init-build-env
