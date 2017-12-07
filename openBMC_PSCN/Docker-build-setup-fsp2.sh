@@ -330,6 +330,30 @@ EOF_CONF
 echo "Generate the core-image-minimal-x86"
 bitbake core-image-minimal-x86 
 
+
+
+
+
+## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
+cd tmp/deploy/images/fsp2
+mkdir rootfs
+cp core-image-minimal-fsp2.cpio.gz rootfs/
+cd rootfs
+gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
+cd ../../../../../
+# Copy images out of internal obmcdir into workspace directory
+cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
+
+## Extract core-image-minimal-x86-pscnX86.cpio.gz files inside tmp/deploy/images/pscnX86 folder inside build directory
+cd tmp/deploy/images/pscnX86
+mkdir rootfs
+cp core-image-minimal-x86-pscnX86.cpio.gz rootfs/
+cd rootfs
+gzip -cd core-image-minimal-x86-pscnX86.cpio.gz | cpio -idmv
+cd ../../../../../
+# Copy images out of internal obmcdir into workspace directory
+cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
+
 EOF_SCRIPT
 
 chmod a+x ${WORKSPACE}/build.sh
