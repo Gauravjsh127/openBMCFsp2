@@ -46,9 +46,9 @@ IMAGE_INSTALL_append += "bootenvfld-x86 "
 
 IMAGE_INSTALL_append += "fsp-trace-x86 "
 
-IMAGE_INSTALL_append += "tiny-kmsglogd "
+IMAGE_INSTALL_append += "tiny-kmsglogd-x86 "
 
-IMAGE_INSTALL_append += "tiny-syslogd "
+IMAGE_INSTALL_append += "tiny-syslogd-x86 "
 
 IMAGE_INSTALL_append += "zeromq zeromq-dev "
 
