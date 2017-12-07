@@ -1,9 +1,0 @@
-baudrate=57600
-bootdelay=3
-mem=43M
-pcs_size=0x00200000
-core_size=0x00400000
-bootargs=console=ttyS2,57600 ethaddr=$(ethaddr) eth1addr=$(eth1addr) eth0=$(eth0) eth1=$(eth1) flash_size=$(flash_size) mem=$(mem) slram=tmp,$(tmp_addr),+$(tmp_size),pcscore,$(core_addr),+$(core_size),pcs,$(pcs_addr),+$(pcs_size) rootfstype=jffs2 rw root=mtd:$(rootfs_name) log_buf_len=32768 card_type=$(card_type) flash_size=$(flash_size)
-setupcmd=prascript; setupenv set
-startcmd=if ubiload $os_vol 0; then bootx 0; else echo Image corrupted!!; fi
-bootcmd=run setupcmd; run startcmd; reset

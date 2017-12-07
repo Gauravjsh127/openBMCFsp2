@@ -1,5 +1,0 @@
-a=b
-c=d
-ddr_refclk=83
-ddr_type=4
-ddr_rlo=1

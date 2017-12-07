@@ -1,0 +1,98 @@
+MACHINE ??= "fsp2"
+DISTRO ?= "openbmc-phosphor"
+PACKAGE_CLASSES ?= "package_rpm"
+SANITY_TESTED_DISTROS_append ?= " *"
+EXTRA_IMAGE_FEATURES = "debug-tweaks"
+USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+PATCHRESOLVE = "noop"
+BB_DISKMON_DIRS = "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    ABORT,${TMPDIR},100M,1K \
+    ABORT,${DL_DIR},100M,1K \
+    ABORT,${SSTATE_DIR},100M,1K \
+    ABORT,/tmp,10M,1K"
+CONF_VERSION = "1"
+INHERIT += "extrausers"
+
+################ openBMC packages ############################################
+
+IMAGE_INSTALL_append += "fuse fuse-dev "
+
+IMAGE_INSTALL_append += "libtirpc libtirpc-dev "
+
+IMAGE_INSTALL_append += "rpcbind rpcbind-dev "
+
+IMAGE_INSTALL_append = " kernel-modules "
+
+EXTRA_IMAGE_FEATURES += "tools-debug"
+
+IMAGE_INSTALL_append +=" gdb gdbserver libatomic procps "
+
+IMAGE_INSTALL_append += "trace-collect "
+
+IMAGE_INSTALL_append += "sqlite3 "
+
+IMAGE_INSTALL_append += "zeromq zeromq-dev "
+
+IMAGE_INSTALL_append += "libstdc++ "
+
+IMAGE_INSTALL_append += " kmod rpm "
+
+IMAGE_INSTALL_append += " makedumpfile makedumpfile-dev "
+
+IMAGE_INSTALL_append += " openldap openldap-dev lua acl   "
+
+#IMAGE_INSTALL_append += " gnutils "
+
+#IMAGE_INSTALL_append += " glibc "
+
+IMAGE_INSTALL_append += " libidn gmp nettle libcap "
+
+IMAGE_INSTALL_append += " libgpg-error libgcrypt  "
+
+IMAGE_INSTALL_append += " libpam pam-plugin-succeed-if pam-plugin-access "
+
+##libpam check this package image
+
+IMAGE_INSTALL_append += "net-snmp net-snmp-dev "
+
+IMAGE_INSTALL_append += "registry "
+
+IMAGE_INSTALL_append += "openssh openssh-dev "
+
+IMAGE_INSTALL_append += "glibc glibc-dev "
+
+IMAGE_INSTALL_append += "util-linux util-linux-dev "
+
+IMAGE_INSTALL_append += "tcpdump tcpdump-dev "
+
+IMAGE_INSTALL_append += "pciutils pciutils-dev "
+
+IMAGE_INSTALL_append += "net-tools net-tools-dev "
+
+IMAGE_INSTALL_append += "krb5 krb5-dev "
+
+IMAGE_INSTALL_append += "xz xz-dev "
+
+IMAGE_INSTALL_append += "lua lua-dev "
+
+IMAGE_INSTALL_append += "libbz2 "
+
+IMAGE_INSTALL_append += "elfutils elfutils-dev "
+
+IMAGE_INSTALL_append += "libcap-ng libcap-ng-dev "
+
+IMAGE_INSTALL_append += "libxml2 liburcu "
+
+IMAGE_INSTALL_append += "audit "
+
+IMAGE_INSTALL_append += "ifenslave ethtool kexec-tools "
+
+IMAGE_INSTALL_append += "udev "
+
+IMAGE_INSTALL_append += "trace-cmd "
+
+
