@@ -52,9 +52,3 @@ IMAGE_INSTALL_append += "tiny-syslogd-x86 "
 
 IMAGE_INSTALL_append += "zeromq zeromq-dev "
 
-
-################openBMC packages ##############
-
-IMAGE_INSTALL_append += "u-boot-mkimage "
-
-

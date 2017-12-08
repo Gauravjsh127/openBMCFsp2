@@ -15,7 +15,7 @@ if [ -f $OBMCROOT/customrc ]; then
 fi
 
 echo "### Merge meta-fsp2-drivers layers in openBMCFSP2 for PPC ###"
-. $OBMCROOT/openBMC_PSCN/clone-meta-fsp2-drivers
+. $OBMCROOT/openBMC_PSCN/clone-meta-fsp2-drivers.sh
 
 echo "### Initializing OE build env for PPC ###"
 TEMPLATECONF=meta-phosphor/conf/ppc source $OBMCROOT/oe-init-build-env
