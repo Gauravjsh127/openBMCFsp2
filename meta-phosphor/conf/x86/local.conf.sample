@@ -24,6 +24,8 @@ PARALLEL_MAKE = '-j 4'
 
 IMAGE_INSTALL_append +="fsptrace-adal-x86 fsptrace-adal-x86-staticdev fsptrace-adal-x86-dev "
 
+IMAGE_INSTALL_append += "additional-rootfs-x86 "
+
 ################ Pscn and FLD Libraries AND BINARIES ##############
 
 IMAGE_INSTALL_append += "fpart-x86 "
