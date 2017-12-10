@@ -1,4 +1,4 @@
-MACHINE ??= "pscnX86"
+MACHINE ??= "pscnx86"
 DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
