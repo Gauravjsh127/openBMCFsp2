@@ -347,6 +347,8 @@ mkdir rootfs
 cp core-image-minimal-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-pscnx86.cpio.gz | cpio -idmv
+rm -rf l* b* d* e* m* p* s* t* v* usr/lib*
+ 
 cd ../../../../../
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
