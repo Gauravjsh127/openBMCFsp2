@@ -15,7 +15,7 @@ rm -rf build/conf
 #### Build the PSCN x86 target  ####### 
 
 source openbmc-x86-env
-bitbake core-image-minimal-x86
+bitbake core-image-minimal
 
 
 
