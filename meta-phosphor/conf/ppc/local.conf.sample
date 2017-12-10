@@ -17,6 +17,10 @@ BB_DISKMON_DIRS = "\
 CONF_VERSION = "1"
 INHERIT += "extrausers"
 
+
+BB_NUMBER_THREADS = '4'
+PARALLEL_MAKE = '-j 4'
+
 ################ kernel ############################################
 IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
 

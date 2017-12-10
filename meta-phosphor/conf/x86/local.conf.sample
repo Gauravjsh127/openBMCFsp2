@@ -17,6 +17,8 @@ BB_DISKMON_DIRS = "\
 CONF_VERSION = "1"
 INHERIT += "extrausers"
 
+BB_NUMBER_THREADS = '4'
+PARALLEL_MAKE = '-j 4'
 
 ################ ADALS ############################################
 

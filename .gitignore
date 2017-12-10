@@ -4,3 +4,4 @@ customrc
 .repo/
 .project
 meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal*/*
+meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
