@@ -6,7 +6,7 @@
 # This tune is recommended for the Intel Core 2 CPU family, including Conroe,
 # Merom and beyond, as well as the first Atom CPUs, Diamondville, and beyond.
 #
-DEFAULTTUNE ?= "core2-32"
+DEFAULTTUNE ?= "core2-64"
 
 # Set x86 target arch to i686, so that glibc enables SSE optimised memcpy, etc.
 X86ARCH32 ?= "i686"
