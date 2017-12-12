@@ -20,6 +20,8 @@ INHERIT += "extrausers"
 BB_NUMBER_THREADS = '4'
 PARALLEL_MAKE = '-j 4'
 
+BASELIB="lib64"
+
 ################ ADALS ############################################
 
 IMAGE_INSTALL_append +="fsptrace-adal-x86 fsptrace-adal-x86-staticdev fsptrace-adal-x86-dev "

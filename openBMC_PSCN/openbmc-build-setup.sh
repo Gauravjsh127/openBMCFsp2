@@ -327,9 +327,11 @@ USER_CLASSES += "buildstats"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
-echo "Generate the core-image-minimal"
-bitbake core-image-minimal 
-
+echo "Generate the x86 application"
+bitbake fcp-x86 
+bitbake fpart-x86 
+bitbake bootenvfld-x86
+bitbake ffsfs-x86
 
 ## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
 cd tmp/deploy/images/fsp2
@@ -341,15 +343,19 @@ cd ../../../../../
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 
-## Extract core-image-minimal-pscnx86.cpio.gz files inside tmp/deploy/images/pscnX86 folder inside build directory
-cd tmp/deploy/images/pscnx86
-mkdir rootfs
-cp core-image-minimal-pscnx86.cpio.gz rootfs/
-cd rootfs
-gzip -cd core-image-minimal-pscnx86.cpio.gz | cpio -idmv
+  # ## Extract core-image-minimal-pscnx86.cpio.gz files inside tmp/deploy/images/pscnX86 folder inside build directory
+  # cd tmp/deploy/images/pscnx86
+  # mkdir rootfs
+  #cp core-image-minimal-pscnx86.cpio.gz rootfs/
+  #cd rootfs
+  #gzip -cd core-image-minimal-pscnx86.cpio.gz | cpio -idmv
 
 rm -rf  l* usr/lib/libp* usr/lib/libthread* usr/lib/libstd* usr/lib/libm.* usr/lib/x86* usr/lib/c* usr/lib/g* usr/lib/libc.* usr/lib/libc_* usr/lib/libcry* usr/lib/libbdus* usr/lib/libexpat*
 cd ../../../../../
+
+
+
+
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 
