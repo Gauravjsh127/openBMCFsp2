@@ -347,11 +347,11 @@ cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
 
-cp /usr/lib64/libfld* /usr/lib/
-cp /usr/lib64/libclib* /usr/lib/
-cp /usr/lib64/libdbgx* /usr/lib/
-cp /usr/lib64/libffs* /usr/lib/
-cp /usr/lib64/libtrace* /usr/lib/
+cp usr/lib64/libfld* usr/lib/
+cp usr/lib64/libclib* usr/lib/
+cp usr/lib64/libdbgx* usr/lib/
+cp usr/lib64/libffs* usr/lib/
+cp usr/lib64/libtrace* usr/lib/
 rm -rf  l* usr/lib64* 
 rm -rf  usr/lib/opkg
 cd ../../../../../
