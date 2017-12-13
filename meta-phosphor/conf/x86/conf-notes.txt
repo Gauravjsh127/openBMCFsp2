@@ -1,5 +1,10 @@
 targets is:
      pscnx86
      
-Build the core minimum rootfile system and the linux image :   bitbake core-image-minimal
+Build the core minimum rootfile system and the linux image -
+	bitbake fcp-x86 
+	bitbake fpart-x86 
+	bitbake bootenvfld-x86
+	bitbake ffsfs-x86
+	bitbake additional-rootfs-x86
 
