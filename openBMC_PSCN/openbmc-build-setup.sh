@@ -233,7 +233,10 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV LANG en_US.UTF-8
   ENV LANGUAGE en_US:en
   ENV LC_ALL en_US.UTF-8
-  RUN yum install -y --nogpgcheck  texinfo chrpath texi2html
+  RUN yum install -y --nogpgcheck yum-plugin-ovl
+  RUN yum install -y --nogpgcheck texinfo
+  RUN yum install -y --nogpgcheck chrpath
+  RUN yum install -y --nogpgcheck texi2html
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   USER ${USER}
@@ -347,6 +350,9 @@ cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
 
+mkdir usr/lib/crash/
+mkdir usr/lib/crash/extensions
+
 cp usr/lib64/libfld* usr/lib/
 cp usr/lib64/libclib* usr/lib/
 cp usr/lib64/libdbgx* usr/lib/
@@ -355,6 +361,10 @@ cp usr/lib64/libtrace* usr/lib/
 rm -rf  l* usr/lib64* 
 rm -rf  usr/lib/opkg
 cd ../../../../../
+
+cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
+cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/extensions/* tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
+
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 EOF_SCRIPT
