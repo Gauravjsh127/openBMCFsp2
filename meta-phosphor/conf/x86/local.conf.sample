@@ -58,6 +58,8 @@ IMAGE_INSTALL_append += "tiny-syslogd-x86 "
 
 IMAGE_INSTALL_append += "zeromq zeromq-dev "
 
+IMAGE_INSTALL_append += "trace-cmd "
+
 ## ADAL Header files ######
 
 IMAGE_INSTALL_append += "adal-headerfiles-x86 adal-headerfiles-x86-dev "

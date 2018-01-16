@@ -363,6 +363,7 @@ rm -rf  usr/lib/opkg
 cd ../../../../../
 
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
+cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/extensions/* tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
 
 # Copy images out of internal obmcdir into workspace directory
