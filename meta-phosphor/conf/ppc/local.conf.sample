@@ -209,6 +209,8 @@ IMAGE_INSTALL_append += "tiny-syslogd "
 
 IMAGE_INSTALL_append += "zeromq zeromq-dev "
 
+IMAGE_INSTALL_append += "grpc grpc-dev "
+
 ################ openBMC packages ############################################
 
 IMAGE_INSTALL_append += "libstdc++ "
