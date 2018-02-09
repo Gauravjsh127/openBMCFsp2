@@ -243,7 +243,6 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV HOME ${HOME}
   RUN /bin/bash
 EOF
- 
 )
 fi
 
@@ -286,7 +285,19 @@ EOF_GIT
 EOF_SVN
 fi
 
-
+## Fetch the crash tool and build it inside the docker
+git clone https://github.com/xxpetri/crash-ppc32-cross.git
+cd crash-ppc32-cross/
+cd rpms_32bit
+sudo rpm --install --force *
+export LD_LIBRARY_PATH=/usr/lib/
+sudo ln -fs /usr/lib/libz.so.1 /usr/lib/libz.so
+sudo ln -fs /usr/lib/libtermcap.so.2.0.8 /usr/lib/libtermcap.so
+cd ..
+make target=PPC
+make target=PPC extensions
+cd ..
+ 
 #### Delete Any previous machine conf settings ####### 
 rm -rf build/conf
 
@@ -362,9 +373,11 @@ rm -rf  l* usr/lib64*
 rm -rf  usr/lib/opkg
 cd ../../../../../
 
-cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
+## copying crash tools build inside docker image to pscnx86 rootfs folder
+cp ../crash-ppc32-cross/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
+cp ../crash-ppc32-cross/extensions/*.so tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
+
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
-cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/extensions/* tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
 
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
