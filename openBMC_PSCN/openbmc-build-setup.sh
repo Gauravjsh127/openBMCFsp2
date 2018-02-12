@@ -317,6 +317,7 @@ EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
 echo "Generate the core-image-minimal"
+bitbake -c clean core-image-minimal 
 bitbake core-image-minimal 
 # To generate the SDK for the core-image-minimal if BITBAKE_OPTS passed as -c populate_sdk
 echo "Generate the SDK for the core-image-minimal"
@@ -342,8 +343,8 @@ EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
 echo "Generate the x86 application"
-bitbake core-image-minimal-x86
-
+bitbake -c clean core-image-minimal-x86
+bitbake core-image-minimal-x86 
 ## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
 cd tmp/deploy/images/fsp2
 mkdir rootfs

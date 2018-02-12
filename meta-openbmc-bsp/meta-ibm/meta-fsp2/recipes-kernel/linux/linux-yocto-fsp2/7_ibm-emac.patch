@@ -1,17 +1,16 @@
-From 7598447d7a8d0f5b7c82ca7dfaa83d689ce69856 Mon Sep 17 00:00:00 2001
-From: Ivan Mikhaylov <ivan@de.ibm.com>
-Date: Wed, 13 Dec 2017 05:11:58 -0600
-Subject: [PATCH] ethernet fix
-
----
- drivers/net/ethernet/ibm/emac/core.c |    6 ++++++
- drivers/net/ethernet/ibm/emac/emac.h |    4 +++-
- 2 files changed, 9 insertions(+), 1 deletions(-)
-
 diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 5909615..fe065b6 100644
+index 5909615..0fa69d3 100644
 --- a/drivers/net/ethernet/ibm/emac/core.c
 +++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -190,7 +190,7 @@ static const char emac_stats_keys[EMAC_ETHTOOL_STATS_COUNT][ETH_GSTRING_LEN] = {
+ 	"tx_bd_excessive_collisions", "tx_bd_late_collision",
+ 	"tx_bd_multple_collisions", "tx_bd_single_collision",
+ 	"tx_bd_underrun", "tx_bd_sqe", "tx_parity", "tx_underrun", "tx_sqe",
+-	"tx_errors"
++	"tx_errors", "rx_bd_mal_skipped", "rx_bd_mal_reordered"
+ };
+ 
+ static irqreturn_t emac_irq(int irq, void *dev_instance);
 @@ -498,6 +498,9 @@ static u32 __emac4_calc_base_mr1(struct emac_instance *dev, int tx_size, int rx_
  	case 16384:
  		ret |= EMAC4_MR1_TFS_16K;
@@ -32,6 +31,65 @@ index 5909615..fe065b6 100644
  	case 4096:
  		ret |= EMAC4_MR1_RFS_4K;
  		break;
+@@ -1709,17 +1715,41 @@ static int emac_poll_rx(void *param, int budget)
+ {
+ 	struct emac_instance *dev = param;
+ 	int slot = dev->rx_slot, received = 0;
+-
++	int nextslot;
++	
+ 	DBG2(dev, "poll_rx(%d)" NL, budget);
+ 
+  again:
+ 	while (budget > 0) {
+ 		int len;
+ 		struct sk_buff *skb;
++		u16 nextctrl;
+ 		u16 ctrl = dev->rx_desc[slot].ctrl;
+ 
+-		if (ctrl & MAL_RX_CTRL_EMPTY)
+-			break;
++		if (ctrl & MAL_RX_CTRL_EMPTY) {
++			nextslot = (slot + 1) % NUM_RX_BUFF;
++			nextctrl = dev->rx_desc[nextslot].ctrl;
++			if (nextctrl & MAL_RX_CTRL_EMPTY)
++				break;
++
++			/*
++			 * we see MAL update of the next BD.
++			 * do sync and check current BD again
++			 */
++			mb();
++			ctrl = dev->rx_desc[slot].ctrl;
++			if (ctrl & MAL_RX_CTRL_EMPTY) {
++				/*
++				 * current BD ctrl is empty even after sync
++				 * jump to the next one
++				 */
++				++dev->estats.rx_bd_mal_skipped;
++				slot = nextslot;
++				ctrl = nextctrl;
++			} else {
++				++dev->estats.rx_bd_mal_reordered;
++			}
++		}
+ 
+ 		skb = dev->rx_skb[slot];
+ 		mb();
+diff --git a/drivers/net/ethernet/ibm/emac/core.h b/drivers/net/ethernet/ibm/emac/core.h
+index 93ae114..35d2c49 100644
+--- a/drivers/net/ethernet/ibm/emac/core.h
++++ b/drivers/net/ethernet/ibm/emac/core.h
+@@ -159,6 +159,9 @@ struct emac_error_stats {
+ 	u64 tx_underrun;
+ 	u64 tx_sqe;
+ 	u64 tx_errors;
++	/* MAL BD write errors */
++	u64 rx_bd_mal_skipped;
++	u64 rx_bd_mal_reordered;	
+ };
+ 
+ #define EMAC_ETHTOOL_STATS_COUNT	((sizeof(struct emac_stats) + \
 diff --git a/drivers/net/ethernet/ibm/emac/emac.h b/drivers/net/ethernet/ibm/emac/emac.h
 index 5afcc27..c26d263 100644
 --- a/drivers/net/ethernet/ibm/emac/emac.h
@@ -57,5 +115,3 @@ index 5afcc27..c26d263 100644
  #define EMAC_STACR_OPBC_MASK		0x00000C00
  #define EMAC_STACR_OPBC_50		0x00000000
  #define EMAC_STACR_OPBC_66		0x00000400
--- 
-1.7.1

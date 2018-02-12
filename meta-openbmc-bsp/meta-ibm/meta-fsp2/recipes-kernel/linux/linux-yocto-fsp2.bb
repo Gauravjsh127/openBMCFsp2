@@ -30,7 +30,6 @@ SRC_URI += "file://6_pabend.patch"
 
 #### FSP Ethernet device driver patch
 SRC_URI += "file://7_ibm-emac.patch"
-SRC_URI += "file://7_ibm-emac_2.patch"
 
 #### Segmentation fault Kernel panic patch
 SRC_URI += "file://8_SEGFAULT_panic.patch"
