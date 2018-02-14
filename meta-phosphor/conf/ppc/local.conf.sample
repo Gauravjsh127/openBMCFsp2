@@ -16,18 +16,13 @@ BB_DISKMON_DIRS = "\
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
 INHERIT += "extrausers"
-
-
 BB_NUMBER_THREADS = '4'
 PARALLEL_MAKE = '-j 4'
 
 ################ kernel ############################################
 IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
 
-
 ################ Drivers ############################################
-IMAGE_INSTALL_append = "sample-driver "
-
 ##1 fsptrace ######
 IMAGE_INSTALL_append = "fsptrace "
 
@@ -161,6 +156,7 @@ IMAGE_INSTALL_append += "apps-headerfiles  apps-headerfiles-dev "
 IMAGE_INSTALL_append += "sqlite3 "
 
 IMAGE_INSTALL_append += "fuse fuse-dev "
+
 IMAGE_INSTALL_append += "libtirpc libtirpc-dev "
 
 IMAGE_INSTALL_append += "rpcbind rpcbind-dev "
@@ -221,10 +217,6 @@ IMAGE_INSTALL_append += " makedumpfile makedumpfile-dev "
 
 IMAGE_INSTALL_append += " openldap openldap-dev lua acl   "
 
-#IMAGE_INSTALL_append += " gnutils "
-
-#IMAGE_INSTALL_append += " glibc "
-
 IMAGE_INSTALL_append += " libidn gmp nettle libcap "
 
 IMAGE_INSTALL_append += " libgpg-error libgcrypt  "
@@ -270,5 +262,3 @@ IMAGE_INSTALL_append += "ifenslave ethtool kexec-tools "
 IMAGE_INSTALL_append += "udev "
 
 IMAGE_INSTALL_append += "trace-cmd "
-
-
