@@ -1,0 +1,12 @@
+targets is:
+     fsp2test
+
+Build the kernel :     bitbake linux-yocto-fsp2
+
+Build the example recipies :    bitbake hello or bitbake rootfsexample
+
+Build the core minimum rootfile system and the linux image :   bitbake core-image-minimal
+
+Build the application sdk :   bitbake core-image-minimal -c populate_sdk
+
+
