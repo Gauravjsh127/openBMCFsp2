@@ -233,6 +233,7 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV LANG en_US.UTF-8
   ENV LANGUAGE en_US:en
   ENV LC_ALL en_US.UTF-8
+  RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
   RUN yum install -y --nogpgcheck yum-plugin-ovl
   RUN yum install -y --nogpgcheck texinfo
   RUN yum install -y --nogpgcheck chrpath
@@ -285,6 +286,13 @@ EOF_GIT
 EOF_SVN
 fi
 
+## Fetch the cppcheck tool and build it inside the docker and install it
+git clone https://github.com/danmar/cppcheck
+cd cppcheck
+sudo make install CFGDIR=/usr/share/cppcheck/cfg
+cd .. 
+rm -rf cppcheck
+
 ## Fetch the crash tool and build it inside the docker
 git clone https://github.com/xxpetri/crash-ppc32-cross.git
 cd crash-ppc32-cross/
@@ -309,10 +317,11 @@ BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
 INHERIT += "rm_work"
 BB_GENERATE_MIRROR_TARBALLS = "1"
+TMPDIR="${sscdir}/bitbake_output"
 DL_DIR="${sscdir}/bitbake_downloads"
 SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
 USER_CLASSES += "buildstats"
-#INHERIT_remove = "uninative"
+INHERIT_remove = "uninative"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
@@ -335,10 +344,11 @@ BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
 INHERIT += "rm_work"
 BB_GENERATE_MIRROR_TARBALLS = "1"
+TMPDIR="${sscdir}/bitbake_output"
 DL_DIR="${sscdir}/bitbake_downloads"
 SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
 USER_CLASSES += "buildstats"
-#INHERIT_remove = "uninative"
+INHERIT_remove = "uninative"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
