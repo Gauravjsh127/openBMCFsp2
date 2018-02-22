@@ -315,13 +315,13 @@ ${BITBAKE_CMD_PPC}
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
-INHERIT += "rm_work"
-BB_GENERATE_MIRROR_TARBALLS = "1"
-TMPDIR="${sscdir}/bitbake_output"
+#INHERIT += "rm_work"
+#BB_GENERATE_MIRROR_TARBALLS = "1"
+#TMPDIR="${sscdir}/bitbake_output"
 DL_DIR="${sscdir}/bitbake_downloads"
-SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
-USER_CLASSES += "buildstats"
-INHERIT_remove = "uninative"
+#SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
+#USER_CLASSES += "buildstats"
+#INHERIT_remove = "uninative"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
@@ -342,13 +342,13 @@ ${BITBAKE_CMD_X86}
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
-INHERIT += "rm_work"
-BB_GENERATE_MIRROR_TARBALLS = "1"
-TMPDIR="${sscdir}/bitbake_output"
+#INHERIT += "rm_work"
+#BB_GENERATE_MIRROR_TARBALLS = "1"
+#TMPDIR="${sscdir}/bitbake_output"
 DL_DIR="${sscdir}/bitbake_downloads"
-SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
-USER_CLASSES += "buildstats"
-INHERIT_remove = "uninative"
+#SSTATE_DIR="${sscdir}/bitbake_sharedstatecache"
+#USER_CLASSES += "buildstats"
+#INHERIT_remove = "uninative"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal

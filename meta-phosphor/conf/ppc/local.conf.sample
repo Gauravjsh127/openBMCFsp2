@@ -16,8 +16,8 @@ BB_DISKMON_DIRS = "\
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
 INHERIT += "extrausers"
-BB_NUMBER_THREADS = '4'
-PARALLEL_MAKE = '-j 4'
+BB_NUMBER_THREADS = '16'
+PARALLEL_MAKE = '-j 16'
 
 ################ kernel ############################################
 IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
