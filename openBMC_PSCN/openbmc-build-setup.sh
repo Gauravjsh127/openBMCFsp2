@@ -390,6 +390,22 @@ cp ../crash-ppc32-cross/extensions/*.so tmp/deploy/images/pscnx86/rootfs/usr/lib
 
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
 
+rm -rf ../meta*
+rm -rf ../o*
+rm -rf ../import-*
+rm -rf ../crash-*
+rm -rf cache  conf  sstate-cache
+rm -rf tmp/work-shared
+rm -rf tmp/buildstats
+rm -rf tmp/cache
+rm -rf tmp/log
+rm -rf tmp/sstate-control
+rm -rf tmp/stamps
+rm -rf tmp/deploy/rpm
+rm -rf tmp/deploy/sdk
+rm -rf tmp/deploy/licenses
+
+
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 EOF_SCRIPT
