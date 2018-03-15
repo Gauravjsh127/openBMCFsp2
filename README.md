@@ -18,7 +18,7 @@ On Ubuntu 164.04 the following packages are required to build the default target
 
   - ./cd openBMCFsp2
     
-  - ./source openbmc-env  (Setup script)
+  - ./source openbmc-ppc-env  (Setup script)
     
   - Build the kernel :     ./bitbake linux-yocto-fsp2 
 
