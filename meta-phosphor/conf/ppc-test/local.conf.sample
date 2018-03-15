@@ -1,5 +1,5 @@
 MACHINE ??= "fsp2test"
-DISTRO ?= "openbmc-phosphor"
+DISTRO ?= "poky"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
@@ -16,8 +16,8 @@ BB_DISKMON_DIRS = "\
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
 INHERIT += "extrausers"
-BB_NUMBER_THREADS = '4'
-PARALLEL_MAKE = '-j 4'
+BB_NUMBER_THREADS = '32'
+PARALLEL_MAKE = '-j 32'
 
 ################ kernel ############################################
 IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
@@ -25,7 +25,6 @@ IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-dev
 ################ Drivers ############################################
 ##1 fsptrace ######
 IMAGE_INSTALL_append = "fsptrace "
-IMAGE_INSTALL_append = "fsptrace-testdriver "
 
 ##2 PSI ######
 IMAGE_INSTALL_append +="psi"
@@ -78,6 +77,7 @@ IMAGE_INSTALL_append +="gpio"
 IMAGE_INSTALL_append +="sbefifo"
 
 ################ ADALS ############################################
+
 ## ADAL Header files ######
 IMAGE_INSTALL_append += "adal-headerfiles adal-headerfiles-dev "
 
@@ -149,67 +149,66 @@ IMAGE_INSTALL_append += "pci-adal pci-adal-dev "
 ##22 SBEFIFO ######
 IMAGE_INSTALL_append += "sbefifo-adal sbefifo-adal-dev "
 
-################ FLD Additional packages ############################################
 
-IMAGE_INSTALL_append += "apps-headerfiles  apps-headerfiles-dev "
+## PSCN/FLD Libraries AND BINARIES ######
 
-IMAGE_INSTALL_append += "sqlite3 "
+IMAGE_INSTALL_append += " additional-rootfs "
 
-IMAGE_INSTALL_append += "fuse fuse-dev "
+IMAGE_INSTALL_append += " ppcdbg ppcdbg-dev "
 
-IMAGE_INSTALL_append += "libtirpc libtirpc-dev "
+IMAGE_INSTALL_append += " fpart "
+
+IMAGE_INSTALL_append += " fcp "
+
+IMAGE_INSTALL_append += " aeea aeea-dev "
+
+IMAGE_INSTALL_append += " fld-libs fld-libs-dev "
+
+IMAGE_INSTALL_append += " dbgx dbgx-dev "
+
+IMAGE_INSTALL_append += " clib clib-dev "
+
+IMAGE_INSTALL_append += " ffs ffs-dev "
+
+IMAGE_INSTALL_append += " spinor spinor-dev "
+
+IMAGE_INSTALL_append += " ffsfs "
+
+IMAGE_INSTALL_append += " bootenvfld "
+
+IMAGE_INSTALL_append += " dra-tool "
+
+IMAGE_INSTALL_append += " fsp-trace "
+
+IMAGE_INSTALL_append += " tiny-kmsglogd "
+
+IMAGE_INSTALL_append += " tiny-syslogd "
+
+IMAGE_INSTALL_append += " registry "
+
+################ openBMC packages ############################################
+
+IMAGE_INSTALL_append += " zeromq zeromq-dev "
+
+IMAGE_INSTALL_append += " grpc grpc-dev "
+
+IMAGE_INSTALL_append += " sqlite3 "
+
+IMAGE_INSTALL_append += " fuse fuse-dev "
+
+IMAGE_INSTALL_append += " libtirpc libtirpc-dev "
 
 IMAGE_INSTALL_append += "rpcbind rpcbind-dev "
 
 IMAGE_INSTALL_append = " kernel-modules "
 
-EXTRA_IMAGE_FEATURES += "tools-debug"
+EXTRA_IMAGE_FEATURES += " tools-debug"
 
-IMAGE_INSTALL_append +=" gdb gdbserver libatomic procps "
+IMAGE_INSTALL_append +=" libatomic procps "
 
-IMAGE_INSTALL_append += "trace-collect "
+IMAGE_INSTALL_append += " trace-collect "
 
-## Pscn and FLD Libraries AND BINARIES ######
-
-IMAGE_INSTALL_append += "additional-rootfs "
-
-IMAGE_INSTALL_append += "ppcdbg ppcdbg-dev "
-
-IMAGE_INSTALL_append += "fpart "
-
-IMAGE_INSTALL_append += "fcp "
-
-IMAGE_INSTALL_append += "aeea aeea-dev "
-
-IMAGE_INSTALL_append += "fld-libs fld-libs-dev "
-
-IMAGE_INSTALL_append += "dbgx dbgx-dev "
-
-IMAGE_INSTALL_append += "clib clib-dev "
-
-IMAGE_INSTALL_append += "ffs ffs-dev "
-
-IMAGE_INSTALL_append += "spinor spinor-dev "
-
-IMAGE_INSTALL_append += "ffsfs "
-
-IMAGE_INSTALL_append += "bootenvfld "
-
-IMAGE_INSTALL_append += "dra-tool "
-
-IMAGE_INSTALL_append += "fsp-trace "
-
-IMAGE_INSTALL_append += "tiny-kmsglogd "
-
-IMAGE_INSTALL_append += "tiny-syslogd "
-
-IMAGE_INSTALL_append += "zeromq zeromq-dev "
-
-IMAGE_INSTALL_append += "grpc grpc-dev "
-
-################ openBMC packages ############################################
-
-IMAGE_INSTALL_append += "libstdc++ "
+IMAGE_INSTALL_append += " libstdc++ "
 
 IMAGE_INSTALL_append += " kmod rpm "
 
@@ -223,21 +222,15 @@ IMAGE_INSTALL_append += " libgpg-error libgcrypt  "
 
 IMAGE_INSTALL_append += " libpam pam-plugin-succeed-if pam-plugin-access "
 
-##libpam check this package image
-
-IMAGE_INSTALL_append += "net-snmp net-snmp-dev "
-
-IMAGE_INSTALL_append += "registry "
+IMAGE_INSTALL_append += " net-snmp net-snmp-dev "
 
 IMAGE_INSTALL_append += "openssh openssh-dev "
 
-IMAGE_INSTALL_append += "glibc glibc-dev "
-
 IMAGE_INSTALL_append += "util-linux util-linux-dev "
 
-IMAGE_INSTALL_append += "tcpdump tcpdump-dev "
+IMAGE_INSTALL_append += " tcpdump tcpdump-dev "
 
-IMAGE_INSTALL_append += "pciutils pciutils-dev "
+IMAGE_INSTALL_append += " pciutils pciutils-dev "
 
 IMAGE_INSTALL_append += "net-tools net-tools-dev "
 

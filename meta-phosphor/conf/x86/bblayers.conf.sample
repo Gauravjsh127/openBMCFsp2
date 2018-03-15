@@ -18,6 +18,7 @@ BBLAYERS ?= " \
   ##OEROOT##/import-layers/meta-openembedded/meta-python \
   ##OEROOT##/import-layers/meta-virtualization \
   ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-iot-cloud \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \

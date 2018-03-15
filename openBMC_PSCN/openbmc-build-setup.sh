@@ -324,7 +324,6 @@ EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
 echo "Generate the core-image-minimal"
-bitbake -c clean core-image-minimal 
 bitbake core-image-minimal 
 # To generate the SDK for the core-image-minimal if BITBAKE_OPTS passed as -c populate_sdk
 echo "Generate the SDK for the core-image-minimal"
