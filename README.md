@@ -20,10 +20,6 @@ On Ubuntu 164.04 the following packages are required to build the default target
     
   - ./source openbmc-ppc-env  (Setup script)
     
-  - Build the kernel :     ./bitbake linux-yocto-fsp2 
-
-  - Build the example recipies :    ./bitbake hello or bitbake rootfsexample
-
   - Clean command :    bitbake -c clean core-image-minimal
   	
   - Build the bare minimum rootfile system and the linux image :    bitbake core-image-minimal
