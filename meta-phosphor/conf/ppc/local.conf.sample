@@ -152,6 +152,8 @@ IMAGE_INSTALL_append += "sbefifo-adal sbefifo-adal-dev "
 
 ## PSCN/FLD Libraries AND BINARIES ######
 
+IMAGE_INSTALL_append += "apps-headerfiles  apps-headerfiles-dev "
+
 IMAGE_INSTALL_append += " additional-rootfs "
 
 IMAGE_INSTALL_append += " ppcdbg ppcdbg-dev "
