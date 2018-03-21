@@ -298,7 +298,8 @@ cd rpms_32bit
 sudo rpm --install --force *
 export LD_LIBRARY_PATH=/usr/lib/
 sudo ln -fs /usr/lib/libz.so.1 /usr/lib/libz.so
-sudo ln -fs /usr/lib/libtermcap.so.2.0.8 /usr/lib/libtermcap.so
+sudo ln -fs /usr/lib/libtinfo.so.5 /usr/lib/libtinfo.so
+sudo ln -fs /usr/lib/libncurses.so.5 /usr/lib/libncurses.so
 cd ..
 make target=PPC
 make target=PPC extensions
