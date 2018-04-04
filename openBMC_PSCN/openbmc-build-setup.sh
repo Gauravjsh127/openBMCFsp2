@@ -57,9 +57,6 @@ ppbimg=${ppbimg:-1}
 PROXY=""
 CurrentDate=$(date +%F_%H.%M.%S)
 
-DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
-DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
-openBMCVersion="1"
 # Determine the architecture
 ARCH=$(uname -m)
 
@@ -79,6 +76,8 @@ case ${ARCH} in
     exit 1
 esac
 
+openBMCVersion="1"
+    
 # Timestamp for job
 echo "Build started, $(date)"
 
@@ -133,6 +132,8 @@ if [[ "${distro}" == fedora ]];then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"proxy=${http_proxy}\" >> /etc/dnf/dnf.conf"
   fi
+  DOCKER_BASE_BOE="fedora"
+  DOCKER_BASE_PSCN="fedora"
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE}${distro}:${imgtag}
   ${PROXY}
@@ -182,7 +183,8 @@ elif [[ "${distro}" == ubuntu ]]; then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
-	
+  DOCKER_BASE_BOE="ubuntu"
+  DOCKER_BASE_PSCN="ubuntu"
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE}${distro}:${imgtag}
   ${PROXY}
@@ -227,6 +229,8 @@ elif [[ "${distro}" == boesedev ]]; then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
+  DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+  DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
   ${PROXY}
