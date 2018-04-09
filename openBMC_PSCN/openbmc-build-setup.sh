@@ -85,6 +85,7 @@ echo "Build started, $(date)"
 if [ ! -d ${obmcext} ]; then
   echo "Clone in openbmc master to ${obmcext}"
   git clone https://github.com/Gauravjsh127/openBMCFsp2 ${obmcext}
+  git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
 fi
 
 # Work out what build target we should be running and set BitBake command
@@ -115,7 +116,7 @@ case ${target} in
     ;;
   fsp2)
     BITBAKE_CMD=""
-    BITBAKE_CMD_PPC="source openbmc-ppc-env"
+    BITBAKE_CMD_PPC="source openbmc-ppc-docker-env"
     BITBAKE_CMD_X86="source openbmc-x86-env"
     ;;
   qemu)
@@ -173,7 +174,6 @@ if [[ "${distro}" == fedora ]];then
       rpm
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
-  USER ${USER}
   ENV HOME ${HOME}
   RUN /bin/bash
 EOF
@@ -220,7 +220,6 @@ elif [[ "${distro}" == ubuntu ]]; then
   ENV LC_ALL en_US.UTF-8
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
-  USER ${USER}
   ENV HOME ${HOME}
   RUN /bin/bash
 EOF
@@ -242,7 +241,6 @@ elif [[ "${distro}" == boesedev ]]; then
   RUN yum install -y --nogpgcheck texinfo chrpath texi2html
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
-  USER ${USER}
   ENV HOME ${HOME}
   RUN /bin/bash
 EOF
@@ -449,7 +447,6 @@ fi
   if [[ ! -z ${ppbimg} ]]; then
     # Run the Docker container, execute the build.sh script
     docker run \
-    --entrypoint=/bin/bash \
     --cap-add=sys_admin \
     --net=host \
     -e WORKSPACE=${WORKSPACE} \
@@ -465,7 +462,6 @@ fi
   else
     # Run the Docker container, execute the build.sh script
     docker run \
-    --entrypoint=/bin/bash \
     --cap-add=sys_admin \
     --net=host \
     --rm=true \
