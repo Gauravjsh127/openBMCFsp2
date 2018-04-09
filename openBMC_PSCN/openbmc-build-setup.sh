@@ -447,6 +447,8 @@ fi
   if [[ ! -z ${ppbimg} ]]; then
     # Run the Docker container, execute the build.sh script
     docker run \
+    --user=$USER \
+    --entrypoint=/bin/bash  \
     --cap-add=sys_admin \
     --net=host \
     -e WORKSPACE=${WORKSPACE} \
@@ -463,6 +465,8 @@ fi
     # Run the Docker container, execute the build.sh script
     docker run \
     --cap-add=sys_admin \
+    --user=$USER \
+    --entrypoint=/bin/bash  \
     --net=host \
     --rm=true \
     -e WORKSPACE=${WORKSPACE} \
