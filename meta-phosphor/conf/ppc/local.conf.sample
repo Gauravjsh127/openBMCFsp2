@@ -82,72 +82,72 @@ IMAGE_INSTALL_append +="sbefifo"
 IMAGE_INSTALL_append += "adal-headerfiles adal-headerfiles-dev "
 
 ## 1 fsptrace ######
-IMAGE_INSTALL_append +="fsptrace-adal fsptrace-adal-staticdev fsptrace-adal-dev "
+IMAGE_INSTALL_append +="fsptrace-adal fsptrace-adal-staticdev fsptrace-adal-dev fsptrace-adal-dbg "
 IMAGE_INSTALL_append +="libtrex libtrex-dev "
 
 ##2 SCAN ######
-IMAGE_INSTALL_append += "scan-adal scan-adal-dev "
+IMAGE_INSTALL_append += "scan-adal scan-adal-dev scan-adal-dbg "
 
 ##3 SCOM ######
-IMAGE_INSTALL_append += "scom-adal scom-adal-dev "
+IMAGE_INSTALL_append += "scom-adal scom-adal-dev scom-adal-dbg "
 
 ##4 BASE ######
-IMAGE_INSTALL_append += "base-adal base-adal-dev "
+IMAGE_INSTALL_append += "base-adal base-adal-dev base-adal-dbg "
 
 ##5 FSI ######
-IMAGE_INSTALL_append += "fsi-adal fsi-adal-dev "
+IMAGE_INSTALL_append += "fsi-adal fsi-adal-dev fsi-adal-dbg  "
 
 ##6 IOMUX ######
-IMAGE_INSTALL_append += "iomux-adal iomux-adal-dev "
+IMAGE_INSTALL_append += "iomux-adal iomux-adal-dev iomux-adal-dev "
 
 ##7 dd-ddfc ######
-IMAGE_INSTALL_append += "dd-ffdc-adal dd-ffdc-adal-dev "
+IMAGE_INSTALL_append += "dd-ffdc-adal dd-ffdc-adal-dev dd-ffdc-adal-dbg "
 
 ##8 PSI ######
-IMAGE_INSTALL_append += "psi-adal psi-adal-dev "
+IMAGE_INSTALL_append += "psi-adal psi-adal-dev psi-adal-dbg "
 
 ##9 IIC ######
-IMAGE_INSTALL_append += "iic-master-adal iic-master-adal-dev "
-IMAGE_INSTALL_append += "iic-slave-adal iic-slave-adal-dev "
+IMAGE_INSTALL_append += "iic-master-adal iic-master-adal-dev iic-master-adal-dbg "
+IMAGE_INSTALL_append += "iic-slave-adal iic-slave-adal-dev iic-slave-adal-dbg "
 
 ##10 mbx ######
-IMAGE_INSTALL_append += "mbx-adal mbx-adal-dev "
+IMAGE_INSTALL_append += "mbx-adal mbx-adal-dev mbx-adal-dbg "
 
 ##11 PCI ######
-IMAGE_INSTALL_append += "pci-adal pci-adal-dev "
+IMAGE_INSTALL_append += "pci-adal pci-adal-dev pci-adal-dbg "
 
 ##12 RTC ######
-IMAGE_INSTALL_append += "rtc-adal rtc-adal-dev "
+IMAGE_INSTALL_append += "rtc-adal rtc-adal-dev rtc-adal-dbg "
 
 ##13 Scratchpad ######
-IMAGE_INSTALL_append += "scratchpad-adal scratchpad-adal-dev "
+IMAGE_INSTALL_append += "scratchpad-adal scratchpad-adal-dev scratchpad-adal-dbg "
 
 ##14 Tone ######
-IMAGE_INSTALL_append += "tone-adal tone-adal-dev "
+IMAGE_INSTALL_append += "tone-adal tone-adal-dev tone-adal-dbg "
 
 ##15 SFC ######
-IMAGE_INSTALL_append += "sfc-adal sfc-adal-dev "
+IMAGE_INSTALL_append += "sfc-adal sfc-adal-dev sfc-adal-dbg "
 
 ##16 Hostdma ######
-IMAGE_INSTALL_append += "hostdma-adal hostdma-adal-dev "
+IMAGE_INSTALL_append += "hostdma-adal hostdma-adal-dev hostdma-adal-dbg "
 
 ##17 UART ######
-IMAGE_INSTALL_append += "uart-adal uart-adal-dev "
+IMAGE_INSTALL_append += "uart-adal uart-adal-dev uart-adal-dbg "
 
 ##18 JTAG ######
-IMAGE_INSTALL_append += "jtag-adal jtag-adal-dev "
+IMAGE_INSTALL_append += "jtag-adal jtag-adal-dev jtag-adal-dbg "
 
 ##19 GPIO ######
-IMAGE_INSTALL_append += "gpio-adal gpio-adal-dev "
+IMAGE_INSTALL_append += "gpio-adal gpio-adal-dev gpio-adal-dbg  "
 
 ##20 GPIO ######
-IMAGE_INSTALL_append += "lua-bbutils-adal lua-bbutils-adal-dev "
+IMAGE_INSTALL_append += "lua-bbutils-adal lua-bbutils-adal-dev lua-bbutils-adal-dbg "
 
 ##21 PCI ######
-IMAGE_INSTALL_append += "pci-adal pci-adal-dev "
+IMAGE_INSTALL_append += "pci-adal pci-adal-dev pci-adal-dbg "
 
 ##22 SBEFIFO ######
-IMAGE_INSTALL_append += "sbefifo-adal sbefifo-adal-dev "
+IMAGE_INSTALL_append += "sbefifo-adal sbefifo-adal-dev sbefifo-adal-dbg "
 
 
 ## PSCN/FLD Libraries AND BINARIES ######
