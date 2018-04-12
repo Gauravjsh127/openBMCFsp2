@@ -156,23 +156,23 @@ IMAGE_INSTALL_append += "apps-headerfiles  apps-headerfiles-dev "
 
 IMAGE_INSTALL_append += " additional-rootfs "
 
-IMAGE_INSTALL_append += " ppcdbg ppcdbg-dev "
+IMAGE_INSTALL_append += " ppcdbg ppcdbg-dev ppcdbg-dbg"
 
 IMAGE_INSTALL_append += " fpart "
 
 IMAGE_INSTALL_append += " fcp "
 
-IMAGE_INSTALL_append += " aeea aeea-dev "
+IMAGE_INSTALL_append += " aeea aeea-dev aeea-dbg "
 
-IMAGE_INSTALL_append += " fld-libs fld-libs-dev "
+IMAGE_INSTALL_append += " fld-libs fld-libs-dev fld-libs-dbg "
 
-IMAGE_INSTALL_append += " dbgx dbgx-dev "
+IMAGE_INSTALL_append += " dbgx dbgx-dev dbgx-dbg "
 
-IMAGE_INSTALL_append += " clib clib-dev "
+IMAGE_INSTALL_append += " clib clib-dev clib-dbg "
 
-IMAGE_INSTALL_append += " ffs ffs-dev "
+IMAGE_INSTALL_append += " ffs ffs-dev ffs-dbg "
 
-IMAGE_INSTALL_append += " spinor spinor-dev "
+IMAGE_INSTALL_append += " spinor spinor-dev spinor-dbg "
 
 IMAGE_INSTALL_append += " ffsfs "
 
