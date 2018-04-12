@@ -56,6 +56,8 @@ http_proxy=${http_proxy:-}
 ppbimg=${ppbimg:-1}
 PROXY=""
 CurrentDate=$(date +%F_%H.%M.%S)
+openbmcCommitID=${openbmcCommitID:-HEAD}
+ibminternalCommitID=${ibminternalCommitID:-HEAD}
 
 # Determine the architecture
 ARCH=$(uname -m)
@@ -83,9 +85,19 @@ echo "Build started, $(date)"
 
 # If the obmcext directory doesn't exist clone it in
 if [ ! -d ${obmcext} ]; then
-  echo "Clone in openbmc master to ${obmcext}"
-  git clone https://github.com/Gauravjsh127/openBMCFsp2 ${obmcext}
-  git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+      echo "Clone in openbmc master to ${obmcext}"
+      git clone https://github.com/Gauravjsh127/openBMCFsp2 ${obmcext}
+    if [[ "${openbmcCommitID}" != HEAD ]];then
+          cd ${obmcext}   
+          git checkout ${openbmcCommitID}  
+          cd -  
+    fi
+      git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+    if [[ "${ibminternalCommitID}" != HEAD ]];then
+          cd ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+          git checkout ${ibminternalCommitID}
+          cd -    
+    fi
 fi
 
 # Work out what build target we should be running and set BitBake command
