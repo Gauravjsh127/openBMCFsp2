@@ -83,7 +83,7 @@ IMAGE_INSTALL_append += "adal-headerfiles adal-headerfiles-dev "
 
 ## 1 fsptrace ######
 IMAGE_INSTALL_append +="fsptrace-adal fsptrace-adal-staticdev fsptrace-adal-dev fsptrace-adal-dbg "
-IMAGE_INSTALL_append +="libtrex libtrex-dev "
+IMAGE_INSTALL_append +="libtrex libtrex-dev libtrex-dbg "
 
 ##2 SCAN ######
 IMAGE_INSTALL_append += "scan-adal scan-adal-dev scan-adal-dbg "
@@ -174,19 +174,23 @@ IMAGE_INSTALL_append += " ffs ffs-dev ffs-dbg "
 
 IMAGE_INSTALL_append += " spinor spinor-dev spinor-dbg "
 
-IMAGE_INSTALL_append += " ffsfs "
+IMAGE_INSTALL_append += " ffsfs ffsfs-dbg "
 
-IMAGE_INSTALL_append += " bootenvfld "
+IMAGE_INSTALL_append += " bootenvfld bootenvfld-dbg "
 
-IMAGE_INSTALL_append += " dra-tool "
+IMAGE_INSTALL_append += " dra-tool dra-tool-dbg "
 
-IMAGE_INSTALL_append += " fsp-trace "
+IMAGE_INSTALL_append += " fsp-trace fsp-trace-dbg "
 
 IMAGE_INSTALL_append += " tiny-kmsglogd "
 
-IMAGE_INSTALL_append += " tiny-syslogd "
+IMAGE_INSTALL_append += " tiny-syslogd tiny-syslogd-dbg "
 
 IMAGE_INSTALL_append += " registry "
+
+#IMAGE_INSTALL_append += " kwd kwd-dbg "
+
+IMAGE_INSTALL_append += " iomuxtool iomuxtool-dbg "
 
 ################ openBMC packages ############################################
 
