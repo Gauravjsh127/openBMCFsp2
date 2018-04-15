@@ -174,23 +174,23 @@ IMAGE_INSTALL_append += " ffs ffs-dev ffs-dbg "
 
 IMAGE_INSTALL_append += " spinor spinor-dev spinor-dbg "
 
-IMAGE_INSTALL_append += " ffsfs ffsfs-dbg "
+IMAGE_INSTALL_append += " ffsfs ffsfs-dev ffsfs-dbg "
 
-IMAGE_INSTALL_append += " bootenvfld bootenvfld-dbg "
+IMAGE_INSTALL_append += " bootenvfld bootenvfld-dev bootenvfld-dbg "
 
-IMAGE_INSTALL_append += " dra-tool dra-tool-dbg "
+IMAGE_INSTALL_append += " dra-tool dra-tool-dev dra-tool-dbg "
 
-IMAGE_INSTALL_append += " fsp-trace fsp-trace-dbg "
+IMAGE_INSTALL_append += " fsp-trace fsp-trace-dev fsp-trace-dbg "
 
 IMAGE_INSTALL_append += " tiny-kmsglogd "
 
 IMAGE_INSTALL_append += " tiny-syslogd tiny-syslogd-dbg "
 
-IMAGE_INSTALL_append += " registry "
+IMAGE_INSTALL_append += " registry registry-dev registry-dbg "
 
-#IMAGE_INSTALL_append += " kwd kwd-dbg "
+#IMAGE_INSTALL_append += " kwd kwd-dev kwd-dbg "
 
-IMAGE_INSTALL_append += " iomuxtool iomuxtool-dbg "
+IMAGE_INSTALL_append += " iomuxtool iomuxtool-dev iomuxtool-dbg "
 
 ################ openBMC packages ############################################
 
