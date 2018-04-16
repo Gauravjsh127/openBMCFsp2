@@ -374,12 +374,12 @@ cp core-image-minimal-fsp2.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
 
-cp ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/bin/* /usr/bin
+cp ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/bin/* usr/bin/
 chmod +x /usr/bin/grpc*
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/include/* /usr/include/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/lib/* /usr/lib/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/share/* /usr/share/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/src/* /usr/src/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/include/* usr/include/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/lib/* usr/lib/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/share/* usr/share/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/src/* usr/src/
 
 cd ../../../../../
 
