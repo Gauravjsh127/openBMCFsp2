@@ -196,8 +196,6 @@ IMAGE_INSTALL_append += " iomuxtool iomuxtool-dev iomuxtool-dbg "
 
 IMAGE_INSTALL_append += " zeromq zeromq-dev "
 
-IMAGE_INSTALL_append += " grpc grpc-dev "
-
 IMAGE_INSTALL_append += " sqlite3 "
 
 IMAGE_INSTALL_append += " fuse fuse-dev "
