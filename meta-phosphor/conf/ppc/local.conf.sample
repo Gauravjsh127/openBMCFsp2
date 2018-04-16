@@ -19,6 +19,13 @@ INHERIT += "extrausers"
 BB_NUMBER_THREADS = '32'
 PARALLEL_MAKE = '-j 32'
 
+DISTRO_FEATURES_LIBC = "ipv6 libc-backtrace libc-big-macros libc-bsd libc-cxx-tests libc-catgets libc-charsets libc-crypt \
+               libc-crypt-ufc libc-db-aliases libc-envz libc-fcvt libc-fmtmsg libc-fstab libc-ftraverse \
+               libc-getlogin libc-idn libc-inet libc-inet-anl libc-libm libc-locales libc-locale-code \
+               libc-memusage libc-nis libc-nsswitch libc-rcmd libc-rtld-debug libc-spawn libc-streams libc-sunrpc \
+               libc-utmp libc-utmpx libc-wordexp libc-posix-clang-wchar libc-posix-regexp libc-posix-regexp-glibc \
+               libc-posix-wchar-io"
+
 ################ kernel ############################################
 IMAGE_INSTALL_append = "kernel-image-zimage kernel-dev kernel-vmlinux kernel-devicetree  fsp-headerfiles fsp-headerfiles-dev images "
 
@@ -194,68 +201,78 @@ IMAGE_INSTALL_append += " iomuxtool iomuxtool-dev iomuxtool-dbg "
 
 ################ openBMC packages ############################################
 
-IMAGE_INSTALL_append += " zeromq zeromq-dev "
+IMAGE_INSTALL_append += " zeromq zeromq-dev zeromq-dbg "
 
-IMAGE_INSTALL_append += " sqlite3 "
+IMAGE_INSTALL_append += " sqlite3 sqlite3-dbg "
 
-IMAGE_INSTALL_append += " fuse fuse-dev "
+IMAGE_INSTALL_append += " fuse fuse-dev fuse-dbg  "
 
-IMAGE_INSTALL_append += " libtirpc libtirpc-dev "
+IMAGE_INSTALL_append += " libtirpc libtirpc-dev libtirpc-dbg "
 
-IMAGE_INSTALL_append += "rpcbind rpcbind-dev "
+IMAGE_INSTALL_append += "rpcbind rpcbind-dev rpcbind-dbg "
 
 IMAGE_INSTALL_append = " kernel-modules "
 
 EXTRA_IMAGE_FEATURES += " tools-debug"
 
-IMAGE_INSTALL_append +=" libatomic procps "
+IMAGE_INSTALL_append +=" libatomic libatomic procps "
 
 IMAGE_INSTALL_append += " trace-collect "
 
 IMAGE_INSTALL_append += " libstdc++ "
 
-IMAGE_INSTALL_append += " kmod rpm "
+IMAGE_INSTALL_append += " kmod kmod-dbg rpm rpm-dbg "
 
-IMAGE_INSTALL_append += " makedumpfile makedumpfile-dev "
+IMAGE_INSTALL_append += " makedumpfile makedumpfile-dev makedumpfile-dbg "
 
 IMAGE_INSTALL_append += " openldap openldap-dev lua acl   "
 
-IMAGE_INSTALL_append += " libidn gmp nettle libcap "
+IMAGE_INSTALL_append += " libidn gmp nettle libcap libcap-dbg "
 
-IMAGE_INSTALL_append += " libgpg-error libgcrypt  "
+IMAGE_INSTALL_append += " libgpg-error libgpg-error-dbg libgcrypt  libgcrypt-dbg "
 
-IMAGE_INSTALL_append += " libpam pam-plugin-succeed-if pam-plugin-access "
+IMAGE_INSTALL_append += " libpam pam-plugin-succeed-if pam-plugin-access libpam-dbg "
 
-IMAGE_INSTALL_append += " net-snmp net-snmp-dev "
+IMAGE_INSTALL_append += " net-snmp net-snmp-dev net-snmp-dbg "
 
-IMAGE_INSTALL_append += "openssh openssh-dev "
+IMAGE_INSTALL_append += "openssh openssh-dev openssh-dbg "
 
-IMAGE_INSTALL_append += "util-linux util-linux-dev "
+IMAGE_INSTALL_append += "util-linux util-linux-dev util-linux-dbg "
 
-IMAGE_INSTALL_append += " tcpdump tcpdump-dev "
+IMAGE_INSTALL_append += " tcpdump tcpdump-dev tcpdump-dbg "
 
-IMAGE_INSTALL_append += " pciutils pciutils-dev "
+IMAGE_INSTALL_append += " pciutils pciutils-dev pciutils-dbg "
 
-IMAGE_INSTALL_append += "net-tools net-tools-dev "
+IMAGE_INSTALL_append += "net-tools net-tools-dev net-tools-dbg "
 
-IMAGE_INSTALL_append += "krb5 krb5-dev "
+IMAGE_INSTALL_append += "krb5 krb5-dev krb5-dbg "
 
-IMAGE_INSTALL_append += "xz xz-dev "
+IMAGE_INSTALL_append += "xz xz-dev xz-dbg "
 
-IMAGE_INSTALL_append += "lua lua-dev "
+IMAGE_INSTALL_append += "lua lua-dev lua-dbg "
 
 IMAGE_INSTALL_append += "libbz2 "
 
-IMAGE_INSTALL_append += "elfutils elfutils-dev "
+IMAGE_INSTALL_append += "elfutils elfutils-dev elfutils-dbg "
 
-IMAGE_INSTALL_append += "libcap-ng libcap-ng-dev "
+IMAGE_INSTALL_append += "libcap-ng libcap-ng-dev libcap-ng-dbg "
 
-IMAGE_INSTALL_append += "libxml2 liburcu "
+IMAGE_INSTALL_append += "libxml2 libxml2-dbg liburcu liburcu-dbg "
 
-IMAGE_INSTALL_append += "audit "
+IMAGE_INSTALL_append += "audit audit-dev audit-dbg "
 
-IMAGE_INSTALL_append += "ifenslave ethtool kexec-tools "
+IMAGE_INSTALL_append += "ifenslave ethtool kexec-tools kexec-tools-dbg "
 
 IMAGE_INSTALL_append += "udev "
 
-IMAGE_INSTALL_append += "trace-cmd "
+IMAGE_INSTALL_append += "trace-cmd trace-cmd-dbg "
+
+
+
+################ Debug packages ############################################
+
+
+IMAGE_INSTALL_append += "glibc-dbg " 
+
+
+
