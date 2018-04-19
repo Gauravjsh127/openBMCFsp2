@@ -195,6 +195,8 @@ IMAGE_INSTALL_append += " tiny-syslogd tiny-syslogd-dbg "
 
 IMAGE_INSTALL_append += " registry registry-dev registry-dbg "
 
+IMAGE_INSTALL_append += " watchdogfld watchdogfld-dev watchdogfld-dbg "
+
 ################ openBMC packages ############################################
 
 IMAGE_INSTALL_append += " zeromq zeromq-dev zeromq-dbg "
