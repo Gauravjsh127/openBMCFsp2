@@ -105,7 +105,7 @@ IMAGE_INSTALL_append += "base-adal base-adal-dev base-adal-dbg "
 IMAGE_INSTALL_append += "fsi-adal fsi-adal-dev fsi-adal-dbg  "
 
 ##6 IOMUX ######
-IMAGE_INSTALL_append += "iomux-adal iomux-adal-dev iomux-adal-dev "
+IMAGE_INSTALL_append += "iomux-adal iomux-adal-dev iomux-adal-dbg "
 
 ##7 dd-ddfc ######
 IMAGE_INSTALL_append += "dd-ffdc-adal dd-ffdc-adal-dev dd-ffdc-adal-dbg "
@@ -194,10 +194,6 @@ IMAGE_INSTALL_append += " tiny-kmsglogd "
 IMAGE_INSTALL_append += " tiny-syslogd tiny-syslogd-dbg "
 
 IMAGE_INSTALL_append += " registry registry-dev registry-dbg "
-
-#IMAGE_INSTALL_append += " kwd kwd-dev kwd-dbg "
-
-IMAGE_INSTALL_append += " iomuxtool iomuxtool-dev iomuxtool-dbg "
 
 ################ openBMC packages ############################################
 
