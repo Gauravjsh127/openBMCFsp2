@@ -249,8 +249,30 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV LANGUAGE en_US:en
   ENV LC_ALL en_US.UTF-8
   RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
-  RUN yum install -y --nogpgcheck yum-plugin-ovl 
+  RUN yum install -y --nogpgcheck yum-plugin-ovl
   RUN yum install -y --nogpgcheck texinfo chrpath texi2html
+  RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
+  RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
+  ENV HOME ${HOME}
+  RUN /bin/bash
+EOF
+)
+elif [[ "${distro}" == boesebase ]]; then
+  if [[ -n "${http_proxy}" ]]; then
+    PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
+  fi
+  DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+  DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
+  Dockerfile=$(cat << EOF
+  FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
+  ${PROXY}
+  ENV LANG en_US.UTF-8
+  ENV LANGUAGE en_US:en
+  ENV LC_ALL en_US.UTF-8
+  RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
+  RUN yum install -y --nogpgcheck yum-plugin-ovl
+  RUN yum install -y --nogpgcheck texinfo chrpath texi2html
+  RUN wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tar.xz; tar xf Python-3.*; cd Python-3.*; ./configure; make; make install
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   ENV HOME ${HOME}
@@ -445,6 +467,9 @@ chmod a+x ${WORKSPACE}/build.sh
 if [[ "${launch}" == "" ]]; then
 
 if [[ "${distro}" == boesedev ]]; then
+  # Give the Docker image a name based on the distro,tag,arch,and target
+  imgname=${imgname:-${DOCKER_BASE_PSCN}/${distro}-${imgtag}:"openBMC_${openBMCVersion}_dev"}
+elif [[ "${distro}" == boesebase ]]; then
   # Give the Docker image a name based on the distro,tag,arch,and target
   imgname=${imgname:-${DOCKER_BASE_PSCN}/${distro}-${imgtag}:"openBMC_${openBMCVersion}_dev"}
 else
