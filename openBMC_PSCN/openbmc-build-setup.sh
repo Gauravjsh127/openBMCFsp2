@@ -249,6 +249,9 @@ elif [[ "${distro}" == boesedev ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
   DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+  if [[ "${JENKINS}" == yes ]];then
+      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5004"
+  fi
   DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
@@ -270,6 +273,9 @@ elif [[ "${distro}" == boesebase ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
   DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+  if [[ "${JENKINS}" == yes ]];then
+      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5004"
+  fi
   DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
   Dockerfile=$(cat << EOF
   FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
