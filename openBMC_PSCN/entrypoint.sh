@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # environment setup:
 # RUN_AS - format: <numeric>:<numeric>
 
