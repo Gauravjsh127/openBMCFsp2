@@ -1,3 +1,5 @@
+#!/bin/bash 
+
 ###############################################################################
 #
 # This build script is for running the OpenBMC builds as containers with the
@@ -57,9 +59,16 @@ ppbimg=${ppbimg:-1}
 PROXY=""
 openbmcCommitID=${openbmcCommitID:-HEAD}
 ibminternalCommitID=${ibminternalCommitID:-HEAD}
-
+dockercmd=docker
 # Determine the architecture
 ARCH=$(uname -m)
+
+if [[ "${JENKINS}" == yes ]];then
+	echo "running inside jenkins"
+	dockercmd=$DOCKERBUILD_DOCKER_CMD
+fi
+
+echo "dockercommand is "$dockercmd
 
 
 #echo ${target}
@@ -476,7 +485,7 @@ else
   imgname=${imgname:-openbmc/${distro}:${imgtag}-${target}-${ARCH}}
 fi
   # Build the Docker image
-  docker build -t ${imgname} - <<< "${Dockerfile}"
+  $dockercmd build -t ${imgname} - <<< "${Dockerfile}"
 
   # If obmcext or sscdir are ${HOME} or a subdirectory they will not be mounted
   mountobmcext="-v ""${obmcext}"":""${obmcext}"" "
@@ -490,7 +499,7 @@ fi
 
   if [[ ! -z ${ppbimg} ]]; then
     # Run the Docker container, execute the build.sh script
-    docker run \
+    $dockercmd run \
     --cap-add=sys_admin \
     --net=host \
     -e WORKSPACE=${WORKSPACE} \
@@ -500,12 +509,12 @@ fi
     ${mountsscdir} \
     -t ${imgname} \
     ${WORKSPACE}/build.sh
-    cnt_id=$(docker ps -lq)
-    docker commit ${cnt_id} ${imgname}-"openBMCBuild"
+    cnt_id=$($dockercmd ps -lq)
+    $dockercmd commit ${cnt_id} ${imgname}-"openBMCBuild"
     echo "Docker image has created ${imgname}-openBMCBuild"
   else
     # Run the Docker container, execute the build.sh script
-    docker run \
+    $dockercmd run \
     --cap-add=sys_admin \
     --net=host \
     --rm=true \
@@ -545,6 +554,11 @@ EOF
 )
 
 # Build the Docker image
-docker build -t ${imgname}-${CurrentDate} - <<< "${FinalDockerfile}"
+$dockercmd build -t ${imgname}-${CurrentDate} - <<< "${FinalDockerfile}"
+
+if [[ "${JENKINS}" == yes ]];then
+        echo "running inside jenkins"
+        echo ${imgname}-${CurrentDate} > DOCKERIMAGENAME.txt
+fi
   
   
