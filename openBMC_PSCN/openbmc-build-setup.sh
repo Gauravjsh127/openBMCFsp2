@@ -510,7 +510,7 @@ fi
     --net=host \
     -e WORKSPACE=${WORKSPACE} \
     -w "${HOME}" \
-    -v "${HOME}":"${HOME}" \
+    --volume="${HOME}":"${HOME}" \
     ${mountobmcext} \
     ${mountsscdir} \
     -t ${imgname} \
