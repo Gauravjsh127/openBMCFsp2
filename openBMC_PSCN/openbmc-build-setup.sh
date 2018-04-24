@@ -55,7 +55,6 @@ launch=${launch:-}
 http_proxy=${http_proxy:-}
 ppbimg=${ppbimg:-1}
 PROXY=""
-CurrentDate=$(date +%F_%H.%M.%S)
 openbmcCommitID=${openbmcCommitID:-HEAD}
 ibminternalCommitID=${ibminternalCommitID:-HEAD}
 
@@ -433,7 +432,7 @@ cp ../crash-ppc32-cross/extensions/*.so tmp/deploy/images/pscnx86/rootfs/usr/lib
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
 
 rm -rf ../meta*
-rm -rf ../o*
+rm -rf ../openbmc-*
 rm -rf ../import-*
 rm -rf ../crash-*
 rm -rf ../d*
@@ -502,8 +501,8 @@ fi
     -t ${imgname} \
     ${WORKSPACE}/build.sh
     cnt_id=$(docker ps -lq)
-    docker commit ${cnt_id} ${imgname}-${CurrentDate}
-    echo "Docker image has created ${imgname}-${CurrentDate}"
+    docker commit ${cnt_id} ${imgname}-"openBMCBuild"
+    echo "Docker image has created ${imgname}-openBMCBuild"
   else
     # Run the Docker container, execute the build.sh script
     docker run \
@@ -529,4 +528,23 @@ else
 fi
 
 # Timestamp for build
-echo "Build completed, $(date)"
+echo "openBMCBuild completed, $(date)"
+
+
+CurrentDate=$(date +%F_%H.%M.%S)
+
+
+FinalDockerfile=$(cat << EOF
+    FROM ${imgname}-"openBMCBuild"
+    RUN cp /tmp/openbmcFSP2/openBMC_PSCN/exec-as.c /tmp/exec-as.c
+    RUN gcc -o /usr/sbin/exec-as /tmp/exec-as.c && rm -f /tmp/exec-as.c 
+    RUN cp /tmp/openbmcFSP2/openBMC_PSCN/entrypoint.sh /entrypoint.sh
+    ENTRYPOINT ["/entrypoint.sh"]
+    CMD ["/bin/bash"]
+EOF
+)
+
+# Build the Docker image
+docker build -t ${imgname}-${CurrentDate} - <<< "${FinalDockerfile}"
+  
+  
