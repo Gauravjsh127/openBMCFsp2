@@ -505,8 +505,8 @@ fi
     -t ${imgname} \
     ${WORKSPACE}/build.sh
     cnt_id=$($dockercmd ps -lq)
-    $dockercmd commit ${cnt_id} ${imgname}-"openBMCBuild"
-    echo "Docker image has created ${imgname}-openBMCBuild"
+    $dockercmd commit ${cnt_id} ${imgname}-"openBMCBuild"-${rnd}
+    echo "Docker image has created ${imgname}-openBMCBuild"-${rnd}
   else
     # Run the Docker container, execute the build.sh script
     $dockercmd run \
