@@ -364,6 +364,8 @@ ${BITBAKE_CMD_PPC}
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
+DL_DIR="${sscdir}/bitbake_downloads"
+
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
@@ -383,6 +385,7 @@ ${BITBAKE_CMD_X86}
 cat >> conf/local.conf << EOF_CONF
 BB_NUMBER_THREADS = "$(nproc)"
 PARALLEL_MAKE = "-j$(nproc)"
+DL_DIR="${sscdir}/bitbake_downloads"
 EOF_CONF
 # Kick off a build
 # To generate the core-image-minimal
@@ -554,5 +557,5 @@ if [[ "${JENKINS}" == yes ]];then
 fi
   
 
-
+rm -rf ${HOME}/workspace/bitbake*
 rm -rf ${HOME}/workspace/open*
