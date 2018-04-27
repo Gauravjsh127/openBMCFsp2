@@ -539,7 +539,7 @@ CurrentDate=$(date +%F_%H.%M.%S)
 
 
 FinalDockerfile=$(cat << EOF
-    FROM ${imgname}-"openBMCBuild"
+    FROM ${imgname}-"openBMCBuild"-${rnd}
     RUN cp /tmp/openbmcFSP2/openBMC_PSCN/exec-as.c /tmp/exec-as.c
     RUN gcc -o /usr/sbin/exec-as /tmp/exec-as.c && rm -f /tmp/exec-as.c 
     RUN cp /tmp/openbmcFSP2/openBMC_PSCN/entrypoint.sh /entrypoint.sh
