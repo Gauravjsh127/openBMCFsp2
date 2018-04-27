@@ -556,6 +556,3 @@ if [[ "${JENKINS}" == yes ]];then
         echo ${imgname}-${CurrentDate} > DOCKERIMAGENAME.txt
 fi
   
-
-rm -rf ${HOME}/workspace/bitbake*
-rm -rf ${HOME}/workspace/open*
