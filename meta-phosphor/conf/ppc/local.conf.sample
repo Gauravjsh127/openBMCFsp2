@@ -83,6 +83,9 @@ IMAGE_INSTALL_append +="gpio"
 ##17 sbefifo ######
 IMAGE_INSTALL_append +="sbefifo"
 
+##18 simcom ######
+IMAGE_INSTALL_append +="simcom"
+
 ################ ADALS ############################################
 
 ## ADAL Header files ######
