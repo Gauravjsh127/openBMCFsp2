@@ -391,7 +391,10 @@ EOF_CONF
 # To generate the core-image-minimal
 echo "Generate the x86 application"
 bitbake -c clean core-image-minimal-x86
+
 bitbake core-image-minimal-x86 
+bitbake grpc
+
 ## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
 cd tmp/deploy/images/fsp2
 mkdir rootfs
@@ -416,6 +419,9 @@ mkdir rootfs
 cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
+
+mkdir grpc
+cp -r ../../../../work/x86_64-openbmc-linux/grpc/1.8.5-r0/package/* grpc/
 
 mkdir usr/lib/crash/
 mkdir usr/lib/crash/extensions
