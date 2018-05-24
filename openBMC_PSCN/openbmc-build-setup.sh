@@ -431,8 +431,8 @@ cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
 
-mkdir tmp/grpc
-cp -r ../../../../work/x86_64-openbmc-linux/grpc/1.8.5-r0/package/* tmp/grpc/
+mkdir grpc
+cp -r ../../../../work/x86_64-openbmc-linux/grpc/1.8.5-r0/package/* grpc/
 
 mkdir usr/lib/crash/
 mkdir usr/lib/crash/extensions
