@@ -202,6 +202,8 @@ IMAGE_INSTALL_append += " watchdogfld watchdogfld-dev watchdogfld-dbg "
 
 ################ openBMC packages ############################################
 
+IMAGE_INSTALL_append += " grpc grpc-dev grpc-dbg "
+
 IMAGE_INSTALL_append += " zeromq zeromq-dev zeromq-dbg "
 
 IMAGE_INSTALL_append += " sqlite3 sqlite3-dbg "
