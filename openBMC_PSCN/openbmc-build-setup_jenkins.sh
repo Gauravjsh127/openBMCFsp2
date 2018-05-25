@@ -466,6 +466,8 @@ rm -rf tmp/work/pscnx86-openbmc-linux
 rm -rf tmp/work/x86_64-linux
 rm -rf tmp/work/x86_64-openbmc-linux
 
+chown -R user /tmp/openbmcFSP2/
+
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 EOF_SCRIPT
