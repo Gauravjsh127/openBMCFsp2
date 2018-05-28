@@ -60,7 +60,7 @@ IMAGE_INSTALL_append += "zeromq zeromq-dev "
 
 ################ openBMC packages ############################################
 
-IMAGE_INSTALL_append += "trace-cmd gflags c-ares protobuf protobuf-c openssl protobuf-compiler "
+IMAGE_INSTALL_append += "trace-cmd "
 
 ## ADAL Header files ######
 

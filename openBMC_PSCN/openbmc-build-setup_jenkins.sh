@@ -334,6 +334,32 @@ EOF_GIT
 EOF_SVN
 fi
 
+#### Protoc ####### 
+mkdir protoc_grpc
+cd protoc_grpc
+git clone https://github.com/google/protobuf.git
+cd protobuf/
+git reset --hard  fe773bfe97854c4be95b1b6e66281c0868194269
+git submodule update --init --recursive
+./autogen.sh
+./configure
+make
+make check
+make install
+cd ..
+
+#### grpc ####### 
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+wget https://github.com/grpc/grpc/archive/v1.8.5.tar.gz
+tar -xvzf v1.8.5.tar.gz
+cd grpc-1.8.5
+make
+cp bins/opt/* /usr/local/bin/
+cd ..
+cd ..
+
+rm -rf protoc_grpc
+
 ## Fetch the cppcheck tool and build it inside the docker and install it
 git clone https://github.com/danmar/cppcheck
 cd cppcheck
@@ -393,7 +419,6 @@ echo "Generate the x86 application"
 bitbake -c clean core-image-minimal-x86
 
 bitbake core-image-minimal-x86 
-bitbake grpc
 
 ## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
 cd tmp/deploy/images/fsp2
@@ -419,9 +444,6 @@ mkdir rootfs
 cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
-
-mkdir grpc
-cp -r ../../../../work/x86_64-openbmc-linux/grpc/1.8.5-r0/package/* grpc/
 
 mkdir usr/lib/crash/
 mkdir usr/lib/crash/extensions
