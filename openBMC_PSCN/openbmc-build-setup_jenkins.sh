@@ -261,7 +261,7 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV LC_ALL en_US.UTF-8
   RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
   RUN yum install -y --nogpgcheck yum-plugin-ovl
-  RUN yum install -y --nogpgcheck texinfo chrpath texi2html
+  RUN yum install -y --nogpgcheck chrpath 
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   ENV HOME ${HOME}
@@ -366,41 +366,6 @@ cd cppcheck
 sudo make install CFGDIR=/usr/share/cppcheck/cfg
 cd .. 
 rm -rf cppcheck
-
-
-cp usr/lib64/libfld* usr/lib/
-cp usr/lib64/libclib* usr/lib/
-cp usr/lib64/libdbgx* usr/lib/
-cp usr/lib64/libffs* usr/lib/
-cp usr/lib64/libtrace* usr/lib/
-rm -rf  l* usr/lib64* 
-rm -rf  usr/lib/opkg
-cd ../../../../../
-
-rm -rf ../meta*
-rm -rf ../openbmc-*
-rm -rf ../import-*
-rm -rf ../crash-*
-rm -rf ../d*
-rm -rf ../s*
-rm -rf ../README.md
-rm -rf ../LICENSE
-rm -rf cache  conf  sstate-cache
-rm -rf tmp/work-shared
-rm -rf tmp/buildstats
-rm -rf tmp/cache
-rm -rf tmp/log
-rm -rf tmp/sstate-control
-rm -rf tmp/stamps
-rm -rf tmp/deploy/rpm
-rm -rf tmp/deploy/sdk
-rm -rf tmp/deploy/licenses
-rm -rf tmp/work/all-openbmc-linux
-rm -rf tmp/work/fsp2-openbmc-linux
-rm -rf tmp/work/powerpc-openbmc-linux
-rm -rf tmp/work/pscnx86-openbmc-linux
-rm -rf tmp/work/x86_64-linux
-rm -rf tmp/work/x86_64-openbmc-linux
 
 chown -R 1000 /tmp/
 
