@@ -261,7 +261,7 @@ elif [[ "${distro}" == boesedev ]]; then
   ENV LC_ALL en_US.UTF-8
   RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
   RUN yum install -y --nogpgcheck yum-plugin-ovl
-  RUN yum install -y --nogpgcheck chrpath 
+  RUN yum install -y --nogpgcheck texinfo chrpath texi2html
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   ENV HOME ${HOME}
@@ -366,6 +366,127 @@ cd cppcheck
 sudo make install CFGDIR=/usr/share/cppcheck/cfg
 cd .. 
 rm -rf cppcheck
+
+## Fetch the crash tool and build it inside the docker
+git clone https://github.com/xxpetri/crash-ppc32-cross.git
+cd crash-ppc32-cross/
+cd rpms_32bit
+sudo rpm --install --force *
+export LD_LIBRARY_PATH=/usr/lib/
+sudo ln -fs /usr/lib/libz.so.1 /usr/lib/libz.so
+sudo ln -fs /usr/lib/libtinfo.so.5 /usr/lib/libtinfo.so
+sudo ln -fs /usr/lib/libncurses.so.5 /usr/lib/libncurses.so
+cd ..
+make target=PPC
+make target=PPC extensions
+cd ..
+ 
+#### Delete Any previous machine conf settings ####### 
+rm -rf build/conf
+
+#### Build the fsp2 PPC target  ####### 
+${BITBAKE_CMD_PPC}
+# Custom BitBake config settings
+cat >> conf/local.conf << EOF_CONF
+BB_NUMBER_THREADS = "$(nproc)"
+PARALLEL_MAKE = "-j$(nproc)"
+DL_DIR="${sscdir}/bitbake_downloads"
+
+EOF_CONF
+# Kick off a build
+# To generate the core-image-minimal
+echo "Generate the core-image-minimal"
+bitbake core-image-minimal 
+# To generate the SDK for the core-image-minimal if BITBAKE_OPTS passed as -c populate_sdk
+echo "Generate the SDK for the core-image-minimal"
+bitbake core-image-minimal -c populate_sdk
+
+cd ../
+#### Delete Any previous machine conf settings ####### 
+rm -rf build/conf
+
+#### Build the PSCN x86 target  ####### 
+${BITBAKE_CMD_X86}
+# Custom BitBake config settings
+cat >> conf/local.conf << EOF_CONF
+BB_NUMBER_THREADS = "$(nproc)"
+PARALLEL_MAKE = "-j$(nproc)"
+DL_DIR="${sscdir}/bitbake_downloads"
+EOF_CONF
+# Kick off a build
+# To generate the core-image-minimal
+echo "Generate the x86 application"
+bitbake -c clean core-image-minimal-x86
+
+bitbake core-image-minimal-x86 
+
+## Extract core-image-minimal-fsp2.cpio.gz files inside tmp/deploy/images/fsp2 folder inside build directory
+cd tmp/deploy/images/fsp2
+mkdir rootfs
+cp core-image-minimal-fsp2.cpio.gz rootfs/
+cd rootfs
+gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
+
+cp ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/bin/* usr/bin/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/include/* usr/include/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/lib/* usr/lib/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/share/* usr/share/
+cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/src/* usr/src/
+
+cd ../../../../../
+
+# Copy images out of internal obmcdir into workspace directory
+cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
+
+### Extract core-image-minimal-pscnx86.cpio.gz files inside tmp/deploy/images/pscnX86 folder inside build directory
+cd tmp/deploy/images/pscnx86
+mkdir rootfs
+cp core-image-minimal-x86-pscnx86.cpio.gz rootfs/
+cd rootfs
+gzip -cd core-image-minimal-x86-pscnx86.cpio.gz | cpio -idmv
+
+mkdir usr/lib/crash/
+mkdir usr/lib/crash/extensions
+
+cp usr/lib64/libfld* usr/lib/
+cp usr/lib64/libclib* usr/lib/
+cp usr/lib64/libdbgx* usr/lib/
+cp usr/lib64/libffs* usr/lib/
+cp usr/lib64/libtrace* usr/lib/
+rm -rf  l* usr/lib64* 
+rm -rf  usr/lib/opkg
+cd ../../../../../
+
+## copying crash tools build inside docker image to pscnx86 rootfs folder
+cp ../crash-ppc32-cross/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
+cp ../crash-ppc32-cross/extensions/*.so tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
+
+cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
+
+rm -rf ../meta*
+rm -rf ../openbmc-*
+rm -rf ../import-*
+rm -rf ../crash-*
+rm -rf ../d*
+rm -rf ../s*
+rm -rf ../README.md
+rm -rf ../LICENSE
+rm -rf cache  conf  sstate-cache
+rm -rf tmp/work-shared
+rm -rf tmp/buildstats
+rm -rf tmp/cache
+rm -rf tmp/log
+rm -rf tmp/sstate-control
+rm -rf tmp/stamps
+rm -rf tmp/deploy/rpm
+rm -rf tmp/deploy/sdk
+rm -rf tmp/deploy/licenses
+rm -rf tmp/work/all-openbmc-linux
+rm -rf tmp/work/fsp2-openbmc-linux
+rm -rf tmp/work/powerpc-openbmc-linux
+rm -rf tmp/work/pscnx86-openbmc-linux
+rm -rf tmp/work/x86_64-linux
+rm -rf tmp/work/x86_64-openbmc-linux
 
 chown -R 1000 /tmp/
 
