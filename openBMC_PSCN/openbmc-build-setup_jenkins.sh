@@ -489,6 +489,7 @@ rm -rf tmp/work/x86_64-linux
 rm -rf tmp/work/x86_64-openbmc-linux
 
 chown -R 1000 /tmp/
+chmod -R a+rx /tmp/
 
 # Copy images out of internal obmcdir into workspace directory
 cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
