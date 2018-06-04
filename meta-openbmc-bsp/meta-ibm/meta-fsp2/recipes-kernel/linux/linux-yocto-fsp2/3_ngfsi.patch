@@ -1384,7 +1384,7 @@ index 0000000..ddbb347
 +
 +	mtspr(SPRN_TSR, TSR_ENW | TSR_WIS); /* clear watchdog */
 +
-+	//pra_write(PRA_SFT_RST_FLAVOR, LINUX_REBOOT_CMD_HOSTINIT);
++	pra_write(PRA_SFT_RST_FLAVOR, LINUX_REBOOT_CMD_HOSTINIT);
 +	//flush_dcache_all();
 +
 +	/* Do not clear the DRCR register.  This signals to the host that it is
@@ -1588,7 +1588,7 @@ index 0000000..e591381
 +static void reset(u32 crcs, u32 flavor)
 +{
 +
-+	//pra_write(PRA_SFT_RST_FLAVOR, flavor);
++	pra_write(PRA_SFT_RST_FLAVOR, flavor);
 +
 +	local_irq_disable();
 +
@@ -1619,10 +1619,10 @@ index 0000000..e591381
 +		unsigned int type, data_a, data_b, data_c;
 +		sscanf(cmd, LINUX_REBOOT_CMD_COREDUMP_STR " %x %x %x %x",
 +		       &type, &data_a, &data_b, &data_c);
-+	//	pra_write(PRA_PABEND, type);
-+	//	pra_write(PRA_PABEND_A, data_a);
-+	//	pra_write(PRA_PABEND_B, data_b);
-+	//	pra_write(PRA_PABEND_C, data_c);
++		pra_write(PRA_PABEND, type);
++		pra_write(PRA_PABEND_A, data_a);
++		pra_write(PRA_PABEND_B, data_b);
++		pra_write(PRA_PABEND_C, data_c);
 +		panic("User-initiated panic");
 +	}
 +	else
@@ -2259,7 +2259,7 @@ index 0000000..e591381
 +
 +	pra_bootstatus = (pra_bootstatus & 0xffff00ff) | ((val & 0xff) << 8);
 +
-+	//ret = pra_write(PRA_BOOT_STATUS, pra_bootstatus);
++	ret = pra_write(PRA_BOOT_STATUS, pra_bootstatus);
 +	if (ret < 0) {
 +		printk(KERN_ERR "FSP RESET: cannot update PRA\n");
 +		return ret;
@@ -2582,18 +2582,18 @@ index 0000000..e591381
 +	 	 * Clear out the reset flavor so that any future spurious resets will
 +	 	 * be correctly interpreted as type "unknown".
 +	 	 */
-+	//	pra_write(PRA_SFT_RST_FLAVOR,  0);
++		pra_write(PRA_SFT_RST_FLAVOR,  0);
 +
 +		/* Clear out the callout information.  Otherwise the next panic could
 +	 	 * have unrelated callout information associated with it.
 +	 	 */
-+	//	pra_write(PRA_CALLOUT, 0);
++		pra_write(PRA_CALLOUT, 0);
 +
 +		/* reset values to be able to detect panic correctly */
-+	//	pra_write(PRA_PABEND,   0x00000000);
-+	//	pra_write(PRA_PABEND_A, 0x00000000);
-+	//	pra_write(PRA_PABEND_B, 0x00000000);
-+	//	pra_write(PRA_PABEND_C, 0x00000000);
++		pra_write(PRA_PABEND,   0x00000000);
++		pra_write(PRA_PABEND_A, 0x00000000);
++		pra_write(PRA_PABEND_B, 0x00000000);
++		pra_write(PRA_PABEND_C, 0x00000000);
 +	}
 +
 +//#ifdef CONFIG_FSP2
