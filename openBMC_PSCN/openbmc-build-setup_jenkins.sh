@@ -576,9 +576,6 @@ fi
 echo "openBMCBuild completed, $(date)"
 
 
-CurrentDate=$(date +%F_%H.%M.%S)
-
-
 FinalDockerfile=$(cat << EOF
     FROM ${imgname}-openBMCBuild-${rnd}
     RUN cp /tmp/openbmcFSP2/openBMC_PSCN/exec-as.c /tmp/exec-as.c
