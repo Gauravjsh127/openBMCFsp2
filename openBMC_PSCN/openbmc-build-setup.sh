@@ -49,9 +49,9 @@ target=${target:-fsp2}
 distro=${distro:-boesedev}
 imgtag=${imgtag:-8.3.5.1}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
-sscdir=${sscdir:-${HOME}}
-rnd=${RANDOM}${RANDOM}
-WORKSPACE=${WORKSPACE:-${HOME}/${rnd}}
+sscdir=${sscdir:-${HOME}/workspace/}
+rnd="openBMC"-${RANDOM}
+WORKSPACE=${WORKSPACE:-${HOME}/workspace/${rnd}}
 obmcext=${obmcext:-${WORKSPACE}/openbmc}
 launch=${launch:-}
 http_proxy=${http_proxy:-}
@@ -91,6 +91,8 @@ openBMCVersion="1"
 # Timestamp for job
 echo "Build started, $(date)"
 
+CurrentDate=$(date +%F_%H.%M.%S)
+
 # If the obmcext directory doesn't exist clone it in
 if [ ! -d ${obmcext} ]; then
       echo "Clone in openbmc master to ${obmcext}"
@@ -100,12 +102,20 @@ if [ ! -d ${obmcext} ]; then
           git checkout ${openbmcCommitID}  
           cd -  
     fi
+      cd ${obmcext}
+      git tag releases/"openBMC"-${CurrentDate}
+      git push --tags 
+      cd - 
       git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
     if [[ "${ibminternalCommitID}" != HEAD ]];then
           cd ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
           git checkout ${ibminternalCommitID}
           cd -    
     fi
+      cd ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+      git tag releases/"openBMC-IBM"-${CurrentDate}
+      git push --tags 
+      cd -   
 fi
 
 # Work out what build target we should be running and set BitBake command
@@ -533,8 +543,8 @@ fi
     -t ${imgname} \
     ${WORKSPACE}/build.sh
     cnt_id=$($dockercmd ps -lq)
-    $dockercmd commit ${cnt_id} ${imgname}-"openBMCBuild"
-    echo "Docker image has created ${imgname}-openBMCBuild"
+    $dockercmd commit ${cnt_id} ${imgname}-"openBMCBuild"-${rnd}
+    echo "Docker image has created ${imgname}-openBMCBuild"-${rnd}
   else
     # Run the Docker container, execute the build.sh script
     $dockercmd run \
@@ -563,11 +573,8 @@ fi
 echo "openBMCBuild completed, $(date)"
 
 
-CurrentDate=$(date +%F_%H.%M.%S)
-
-
 FinalDockerfile=$(cat << EOF
-    FROM ${imgname}-"openBMCBuild"
+    FROM ${imgname}-openBMCBuild-${rnd}
     RUN cp /tmp/openbmcFSP2/openBMC_PSCN/exec-as.c /tmp/exec-as.c
     RUN gcc -o /usr/sbin/exec-as /tmp/exec-as.c && rm -f /tmp/exec-as.c 
     RUN cp /tmp/openbmcFSP2/openBMC_PSCN/entrypoint.sh /entrypoint.sh
@@ -583,5 +590,4 @@ if [[ "${JENKINS}" == yes ]];then
         echo "running inside jenkins"
         echo ${imgname}-${CurrentDate} > DOCKERIMAGENAME.txt
 fi
-  
   

@@ -91,6 +91,8 @@ openBMCVersion="1"
 # Timestamp for job
 echo "Build started, $(date)"
 
+CurrentDate=$(date +%F_%H.%M.%S)
+
 # If the obmcext directory doesn't exist clone it in
 if [ ! -d ${obmcext} ]; then
       echo "Clone in openbmc master to ${obmcext}"
@@ -100,12 +102,20 @@ if [ ! -d ${obmcext} ]; then
           git checkout ${openbmcCommitID}  
           cd -  
     fi
+      cd ${obmcext}
+      git tag releases/"openBMC"-${CurrentDate}
+      git push --tags 
+      cd - 
       git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
     if [[ "${ibminternalCommitID}" != HEAD ]];then
           cd ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
           git checkout ${ibminternalCommitID}
           cd -    
     fi
+      cd ${obmcext}/meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal
+      git tag releases/"openBMC-IBM"-${CurrentDate}
+      git push --tags 
+      cd -   
 fi
 
 # Work out what build target we should be running and set BitBake command
