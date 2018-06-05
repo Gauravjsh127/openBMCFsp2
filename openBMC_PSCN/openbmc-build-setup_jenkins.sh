@@ -96,7 +96,7 @@ CurrentDate=$(date +%F_%H.%M.%S)
 # If the obmcext directory doesn't exist clone it in
 if [ ! -d ${obmcext} ]; then
       echo "Clone in openbmc master to ${obmcext}"
-      git clone https://github.com/Gauravjsh127/openBMCFsp2 ${obmcext}
+      git clone git@github.com:Gauravjsh127/openBMCFsp2.git ${obmcext}
     if [[ "${openbmcCommitID}" != HEAD ]];then
           cd ${obmcext}   
           git checkout ${openbmcCommitID}  
