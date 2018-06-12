@@ -10,7 +10,7 @@ somewhere to hold the build.  This directory will get big.
 
 On Ubuntu 164.04 the following packages are required to build the default target
 
-    sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat mkimage
+    sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat u-boot-tools
 
 ## Build steps ##
 
