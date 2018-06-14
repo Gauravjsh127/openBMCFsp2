@@ -46,8 +46,8 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-fsp2}
-distro=${distro:-boemcp}
-imgtag=${imgtag:-8.3.5}
+distro=${distro:-boesedev}
+imgtag=${imgtag:-8.3.5.1}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}/workspace/}
 rnd="openBMC"-${RANDOM}
