@@ -260,7 +260,7 @@ elif [[ "${distro}" == boemcp ]]; then
   fi
   DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
   if [[ "${JENKINS}" == yes ]];then
-      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5004"
+      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
   fi
   DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
   Dockerfile=$(cat << EOF
