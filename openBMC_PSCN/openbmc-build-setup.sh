@@ -472,34 +472,17 @@ cp ../crash-ppc32-cross/crash tmp/deploy/images/pscnx86/rootfs/usr/bin/
 cp ../crash-ppc32-cross/extensions/*.so tmp/deploy/images/pscnx86/rootfs/usr/lib/crash/extensions/
 
 cp ../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/crashtool/crashtool-x86/ppc-linux-gdb tmp/deploy/images/pscnx86/rootfs/usr/bin/
+cd ../../
+./openbmcFSP2/build/tmp/deploy/sdk/openbmc-phosphor-glibc-x86_64-core-image-minimal-powerpc-toolchain-2.2.sh -y
+mkdir openbmc_output
+cd openbmc_output
+mkdir fsp2-x86
+mkdir fsp2-ppc
+cd ..
+cp -r openbmcFSP2/tmp/deploy/images/fsp2/rootfs  openbmc_output/fsp2-ppc
+cp -r openbmcFSP2/tmp/deploy/images/pscnx86/rootfs  openbmc_output/fsp2-x86
+rm -rf openbmcFSP2
 
-rm -rf ../meta*
-rm -rf ../openbmc-*
-rm -rf ../import-*
-rm -rf ../crash-*
-rm -rf ../d*
-rm -rf ../s*
-rm -rf ../README.md
-rm -rf ../LICENSE
-rm -rf cache  conf  sstate-cache
-rm -rf tmp/work-shared
-rm -rf tmp/buildstats
-rm -rf tmp/cache
-rm -rf tmp/log
-rm -rf tmp/sstate-control
-rm -rf tmp/stamps
-rm -rf tmp/deploy/rpm
-rm -rf tmp/deploy/sdk
-rm -rf tmp/deploy/licenses
-rm -rf tmp/work/all-openbmc-linux
-rm -rf tmp/work/fsp2-openbmc-linux
-rm -rf tmp/work/powerpc-openbmc-linux
-rm -rf tmp/work/pscnx86-openbmc-linux
-rm -rf tmp/work/x86_64-linux
-rm -rf tmp/work/x86_64-openbmc-linux
-
-# Copy images out of internal obmcdir into workspace directory
-cp -R ${obmcdir}/build/tmp/deploy ${WORKSPACE}/deploy/
 EOF_SCRIPT
 
 chmod a+x ${WORKSPACE}/build.sh
