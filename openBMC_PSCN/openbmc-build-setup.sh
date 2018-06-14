@@ -479,8 +479,8 @@ cd openbmc_output
 mkdir fsp2-x86
 mkdir fsp2-ppc
 cd ..
-cp -r openbmcFSP2/tmp/deploy/images/fsp2/rootfs  openbmc_output/fsp2-ppc
-cp -r openbmcFSP2/tmp/deploy/images/pscnx86/rootfs  openbmc_output/fsp2-x86
+cp -r openbmcFSP2/build/tmp/deploy/images/fsp2/rootfs  openbmc_output/fsp2-ppc
+cp -r openbmcFSP2/build/tmp/deploy/images/pscnx86/rootfs  openbmc_output/fsp2-x86
 rm -rf openbmcFSP2
 
 EOF_SCRIPT
