@@ -10,7 +10,7 @@
 # Variables used for Jenkins build job matrix:
 #  target       = barreleye|palmetto|witherspoon|firestone|garrison|evb-ast2500
 #                 zaius|romulus|qemu|fsp2
-#  distro       = fedora|ubuntu|boesedev
+#  distro       = fedora|ubuntu|boesedev|boemcp
 #  imgtag       = Varies by distro. latest|16.04|14.04|trusty|xenial; 23|24|25;8.1.6
 #  obmcext      = Path of the OpenBMC repo directory used in creating a copy
 #                 inside the container that is not mounted to external storage
@@ -46,8 +46,8 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-fsp2}
-distro=${distro:-boesedev}
-imgtag=${imgtag:-8.3.5.1}
+distro=${distro:-boemcp}
+imgtag=${imgtag:-8.3.5}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}/workspace/}
 rnd="openBMC"-${RANDOM}
@@ -248,6 +248,30 @@ elif [[ "${distro}" == ubuntu ]]; then
   ENV LANG en_US.UTF-8
   ENV LANGUAGE en_US:en
   ENV LC_ALL en_US.UTF-8
+  RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
+  RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
+  ENV HOME ${HOME}
+  RUN /bin/bash
+EOF
+)
+elif [[ "${distro}" == boemcp ]]; then
+  if [[ -n "${http_proxy}" ]]; then
+    PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
+  fi
+  DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+  if [[ "${JENKINS}" == yes ]];then
+      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5004"
+  fi
+  DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
+  Dockerfile=$(cat << EOF
+  FROM ${DOCKER_BASE_BOE}/${distro}:${imgtag}
+  ${PROXY}
+  ENV LANG en_US.UTF-8
+  ENV LANGUAGE en_US:en
+  ENV LC_ALL en_US.UTF-8
+  RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
+  RUN yum install -y --nogpgcheck yum-plugin-ovl
+  RUN yum install -y --nogpgcheck texinfo chrpath texi2html
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
   RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
   ENV HOME ${HOME}
@@ -487,8 +511,8 @@ rm -rf openbmcFSP2
 chown -R 1000 /opt/openbmc*
 chmod -R a+rx /opt/openbmc*
 
-chown -R 1000 /tmp/fsp2*
-chmod -R a+rx /tmp/fsp2*
+chown -R 1000 /tmp/openbmc_output/*
+chmod -R a+rx /tmp/openbmc_output/*
 
 EOF_SCRIPT
 
