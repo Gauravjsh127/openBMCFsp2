@@ -534,6 +534,9 @@ if [[ "${distro}" == boesedev ]]; then
 elif [[ "${distro}" == boesebase ]]; then
   # Give the Docker image a name based on the distro,tag,arch,and target
   imgname=${imgname:-${DOCKER_BASE_PSCN}/${distro}-${imgtag}:"openBMC_${openBMCVersion}_dev"}
+elif [[ "${distro}" == boesemcp ]]; then
+  # Give the Docker image a name based on the distro,tag,arch,and target
+  imgname=${imgname:-${DOCKER_BASE_PSCN}/${distro}-${imgtag}:"openBMC_${openBMCVersion}_dev"}
 else
   # Give the Docker image a name based on the distro,tag,arch,and target
   imgname=${imgname:-openbmc/${distro}:${imgtag}-${target}-${ARCH}}
