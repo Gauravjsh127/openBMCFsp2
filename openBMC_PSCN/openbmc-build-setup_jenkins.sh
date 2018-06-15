@@ -10,7 +10,7 @@
 # Variables used for Jenkins build job matrix:
 #  target       = barreleye|palmetto|witherspoon|firestone|garrison|evb-ast2500
 #                 zaius|romulus|qemu|fsp2
-#  distro       = fedora|ubuntu|boesedev|boemcp
+#  distro       = fedora|ubuntu|boesedev|boesemcp
 #  imgtag       = Varies by distro. latest|16.04|14.04|trusty|xenial; 23|24|25;8.1.6
 #  obmcext      = Path of the OpenBMC repo directory used in creating a copy
 #                 inside the container that is not mounted to external storage
@@ -46,7 +46,7 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-fsp2}
-distro=${distro:-boesebase}
+distro=${distro:-boesedev}
 imgtag=${imgtag:-8.3.5.1}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}/workspace/}
