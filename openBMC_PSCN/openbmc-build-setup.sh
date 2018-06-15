@@ -505,6 +505,9 @@ mkdir fsp2-ppc
 cd ..
 cp -r openbmcFSP2/build/tmp/deploy/images/fsp2/rootfs  openbmc_output/fsp2-ppc
 cp -r openbmcFSP2/build/tmp/deploy/images/pscnx86/rootfs  openbmc_output/fsp2-x86
+
+cp -r openbmcFSP2/openBMC_PSCN . 
+
 rm -rf openbmcFSP2
 
 EOF_SCRIPT
@@ -582,9 +585,9 @@ echo "openBMCBuild completed, $(date)"
 
 FinalDockerfile=$(cat << EOF
     FROM ${imgname}-openBMCBuild-${rnd}
-    RUN cp /tmp/openbmcFSP2/openBMC_PSCN/exec-as.c /tmp/exec-as.c
+    RUN cp /tmp/openBMC_PSCN/exec-as.c /tmp/exec-as.c
     RUN gcc -o /usr/sbin/exec-as /tmp/exec-as.c && rm -f /tmp/exec-as.c 
-    RUN cp /tmp/openbmcFSP2/openBMC_PSCN/entrypoint.sh /entrypoint.sh
+    RUN cp /tmp/openBMC_PSCN/entrypoint.sh /entrypoint.sh
     ENTRYPOINT ["/entrypoint.sh"]
     CMD ["/bin/bash"]
 EOF
