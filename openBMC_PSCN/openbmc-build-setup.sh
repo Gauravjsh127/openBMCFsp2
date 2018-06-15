@@ -46,8 +46,8 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-fsp2}
-distro=${distro:-boesedev}
-imgtag=${imgtag:-8.3.5.1}
+distro=${distro:-boesemcp}
+imgtag=${imgtag:-8.3.5}
 obmcdir=${obmcdir:-/tmp/openbmcFSP2}
 sscdir=${sscdir:-${HOME}/workspace/}
 rnd="openBMC"-${RANDOM}
@@ -254,13 +254,13 @@ elif [[ "${distro}" == ubuntu ]]; then
   RUN /bin/bash
 EOF
 )
-elif [[ "${distro}" == boemcp ]]; then
+elif [[ "${distro}" == boesemcp ]]; then
   if [[ -n "${http_proxy}" ]]; then
     PROXY="RUN echo \"Acquire::http::Proxy \\"\"${http_proxy}/\\"\";\" > /etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
   fi
   DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
   if [[ "${JENKINS}" == yes ]];then
-      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5000"
+      DOCKER_BASE_BOE="fwdocker.boeblingen.de.ibm.com:5004"
   fi
   DOCKER_BASE_PSCN="fwdocker.boeblingen.de.ibm.com:5004"
   Dockerfile=$(cat << EOF
@@ -270,6 +270,7 @@ elif [[ "${distro}" == boemcp ]]; then
   ENV LANGUAGE en_US:en
   ENV LC_ALL en_US.UTF-8
   RUN yum-config-manager --add-repo http://mirror.centos.org/centos/7/os/x86_64/
+  RUN yum install -y --nogpgcheck git
   RUN yum install -y --nogpgcheck yum-plugin-ovl
   RUN yum install -y --nogpgcheck texinfo chrpath texi2html
   RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
