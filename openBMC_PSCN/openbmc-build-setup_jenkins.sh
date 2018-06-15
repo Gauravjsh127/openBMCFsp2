@@ -504,8 +504,11 @@ cd openbmc_output
 mkdir fsp2-x86
 mkdir fsp2-ppc
 cd ..
-cp -r openbmcFSP2/build/tmp/deploy/images/fsp2/rootfs  openbmc_output/fsp2-ppc
-cp -r openbmcFSP2/build/tmp/deploy/images/pscnx86/rootfs  openbmc_output/fsp2-x86
+cp -r openbmcFSP2/build/tmp/deploy/images/fsp2/rootfs/*  openbmc_output/fsp2-ppc
+cp -r openbmcFSP2/build/tmp/deploy/images/pscnx86/rootfs/*  openbmc_output/fsp2-x86
+
+rm openbmc_output/fsp2-ppc/core-image-minimal-*.gz
+rm openbmc_output/fsp2-x86/core-image-minimal-*.gz
 
 cp -r openbmcFSP2/openBMC_PSCN . 
 
@@ -596,6 +599,7 @@ FinalDockerfile=$(cat << EOF
     RUN cp /tmp/openBMC_PSCN/exec-as.c /tmp/exec-as.c
     RUN gcc -o /usr/sbin/exec-as /tmp/exec-as.c && rm -f /tmp/exec-as.c 
     RUN cp /tmp/openBMC_PSCN/entrypoint.sh /entrypoint.sh
+    RUN rm -rf /tmp/openBMC_PSCN
     ENTRYPOINT ["/entrypoint.sh"]
     CMD ["/bin/bash"]
 EOF
