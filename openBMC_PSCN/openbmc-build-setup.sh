@@ -395,13 +395,6 @@ cd ..
 
 rm -rf protoc_grpc
 
-## Fetch the cppcheck tool and build it inside the docker and install it
-git clone https://github.com/danmar/cppcheck
-cd cppcheck
-sudo make install CFGDIR=/usr/share/cppcheck/cfg
-cd .. 
-rm -rf cppcheck
-
 ## Fetch the crash tool and build it inside the docker
 git clone https://github.com/xxpetri/crash-ppc32-cross.git
 cd crash-ppc32-cross/
@@ -461,12 +454,6 @@ mkdir rootfs
 cp core-image-minimal-fsp2.cpio.gz rootfs/
 cd rootfs
 gzip -cd core-image-minimal-fsp2.cpio.gz | cpio -idmv
-
-cp ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/bin/* usr/bin/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/include/* usr/include/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/lib/* usr/lib/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/share/* usr/share/
-cp -r ../../../../../../meta-openbmc-bsp/meta-ibm/meta-fsp2-ibm-internal/meta-fsp2-apps/recipes-apps/additional-rootfs/grpc/usr/src/* usr/src/
 
 cd ../../../../../
 
