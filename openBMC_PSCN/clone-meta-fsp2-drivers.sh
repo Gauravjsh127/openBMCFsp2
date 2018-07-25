@@ -9,7 +9,11 @@ cd meta-openbmc-bsp/meta-ibm/
 
 git clone git@github.ibm.com:XXPETRI/meta-fsp2-ibm-internal.git
 
+cd meta-fsp2-ibm-internal
+
+git checkout 1a5d14b58875ce17f8a910acea9eee0ab83fc457
+
 echo " Change directory to OE root directory " 
 
-cd ../../
+cd ../../../
 
